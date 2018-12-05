@@ -1,0 +1,53 @@
+Package: viser
+Type: Package
+Title: NIRASOFT R package for visualization 
+Version: 5.7.4
+Date: 06 November 2018
+Author: Nicolas Ramezani
+Maintainer: <nicolas.berta@gmail.com>
+  Description: A toolbox for generating of more elegant visualizations and easier built of shiny dashboards
+License: MIT
+Collate: 
+  'visgen.R'
+  'dt.R'
+  'tfd3.R'
+  'amcharts.R'
+  'billboarder.R'
+  'bpexploder.R'
+  'bubblecloud.R'
+  'bubbles.R'
+  'c3.R'
+  'calheatmap.R'
+  'candela.R'
+  'coffeewheel.R'
+  'csscripts.R'
+  'd3plus.R'
+  'dashboard.R'
+  'dashtools.R'
+  'dc.R'
+  'dialogs.R'
+  'dimple.R'
+  'jscripts.R'
+  'dygraphs.R'
+  'echarts.R'
+  'ggvis.R'
+  'googlevis.R'
+  'grviz.R'
+  'highcharter.R'
+  'highcharts.R'
+  'leaflet.R'
+  'morrisjs.R'
+  'networkd3.R'
+  'viserplot.R'
+  'xcharts.R'
+  'visnetwork.R'
+  'rcharts.R'
+  'rbokeh.R'
+  'plotly.R'
+  'nvd3.R'
+  'rscripts.R'
+  'viser.R'
+  'pivot.R'
+  'sankeytree.R'
+  'streamgraph.R'
+RoxygenNote: 6.0.1

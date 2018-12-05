@@ -1,0 +1,174 @@
+plotters,Property,Class,Default,Domain
+billboarder,yAxis.label.position,character,,top middle bottom inner-top inner-middle inner-bottom outer-top outer-middle outer-bottom inner outer
+billboarder,xAxis.label.position,character,,left right inner-left inner-right outer-left outer-right inner outer
+billboarder,yAxis.grid.enabled,logical,F,T F
+billboarder,xAxis.grid.enabled,logical,F,T F
+billboarder,yAxis.tick.label.suffix,character,,
+billboarder,xAxis.tick.label.suffix,character,,
+billboarder,xAxis.tick.label.format,character,%Y-%m-%d,
+billboarder,yAxis.label,character,,
+billboarder,xAxis.label,character,,
+billboarder,title,character,,
+billboarder,subtitle,character,,
+billboarder,legend.enabled,logical,T,T F
+billboarder,legend.position,character,,right bottom top-right top-left bottom-right bottom-left
+billboarder,label.enabled,logical,,T F
+billboarder,size,numeric integer,,0 Inf
+billboarder,stack.enabled,logical,F,T F
+billboarder,additionalColumns,character,,
+billboarder,subchart.enabled,logical,F,T F
+billboarder,subchart.height,numeric integer,30,10 100
+c3,additionalColumns,character,,
+bpexploder,size,numeric integer,0.75,0 1
+bubbles,label.threshold,numeric integer,0,0 Inf
+c3,xAxis.label,character,,
+c3,yAxis.label,character,,
+c3,stack,logical,F,T F
+candela,aggregator.function.string,character,value,value mean sum
+coffeewheel,title,character,,
+coffeewheel,aggregator.function.string,character,sum,mean sum
+coffeewheel,tree.function,function,,
+coffeewheel,width,numeric integer,1200,0 Inf
+coffeewheel,height,numeric integer,800,0 Inf
+visNetwork,node.border.color,character,,
+diagramer,node.border.color,character,,
+diagramer,node.border.width,numeric integer,2,0 10
+echarts,cloud.shape,character,circle,circle
+echarts,size.min,character,1,0 20
+echarts,size.max,character,30,20 100
+echarts,colorize,logical,T,T F
+echarts,additionalColumns,character,,
+plotly,xAxis.enabled,logical,T,T F
+plotly,yAxis.enabled,logical,T,T F
+plotly,xAxis.label,character,,
+plotly,yAxis.label,character,,
+plotly,barMode,character,group,group stack relative
+plotly,xAxis.grid.enabled,logical,T,T F
+plotly,yAxis.grid.enabled,logical,T,T F
+plotly,xAxis.tick.label.enabled,logical,T,T F
+plotly,yAxis.tick.label.enabled,logical,T,T F
+plotly,legend.border.color,character,,
+plotly,legend.border.width,numeric integer,,0 Inf
+plotly,legend.orientation,character,,
+plotly,legend.size,numeric integer,,0 Inf
+plotly,legend.color,character,,
+plotly,legend.font,character,,
+plotly,xAxis.margin.bottom,numeric integer,,0 Inf
+plotly,xAxis.margin.top,numeric integer,,0 Inf
+plotly,yAxis.margin.right,numeric integer,,0 Inf
+plotly,yAxis.margin.left,numeric integer,,0 Inf
+plotly,yAxis.tick.angle,numeric integer,,
+plotly,xAxis.tick.angle,numeric integer,,
+visNetwork,node.color,character,,
+diagramer,node.color,character,,
+diagramer,direction,character,up.down,up.down down.up right.left left.right
+visNetwork,direction,character,up.down,up.down left.right right.left down.up
+visNetwork,node.highlight.color,character,,
+visNetwork,node.label,character,,
+visNetwork,node.label.font,character,,
+diagramer,node.label.size,numeric integer,30,
+visNetwork,layout,character,random,random hierarchical
+diagramer,layout,character,random, random hierarchical neato twopi circo
+visNetwork,link.hidden,logical,F,T F
+visNetwork,link.hover.width,numeric integer,12,
+visNetwork,link.label,character,,
+visNetwork,link.label.color,character,,
+visNetwork,link.label.highlight.bold,logical,T,T F
+visNetwork,link.label.size,numeric integer,,
+visNetwork,link.length,numeric integer,,
+visNetwork,link.length.max,numeric integer,50,
+visNetwork,link.length.min,numeric integer,1,
+visNetwork,link.physics,logical,F,T F
+visNetwork,link.physics.enabled,logical,F,T F
+visNetwork,link.size,numeric integer,,
+visNetwork,link.smooth.type,character,curvedCCW,dynamic continuous discrete diagonalCross straightCross horizontal vertical curvedCW curvedCCW cubicBezier
+visNetwork,link.tooltip,character,,
+visNetwork,link.width,numeric integer,5,
+visNetwork,link.width.max,numeric integer,10,
+diagramer,link.width.max,numeric integer,12,
+visNetwork,link.width.min,numeric integer,1,
+diagramer,link.width.min,numeric integer,2,
+visNetwork,node.physics.enabled,logical,F,T F
+visNetwork,node.shadow.enabled,logical,T,T F
+visNetwork,node.shape,character,rectangle,square delta curl icon triangleDown point triangle box rectangle dot bubble circle bubble star ellipse cylinder diamond rhombus image circularImage database text
+diagramer,node.shape,character,rectangle,square delta icon triangle rectangle box dot point egg oval text bubble circle star ellipse cylinder diamond rhombus
+diagramer,shinyInput.click,character,,
+diagramer,shinyInput.click,character,,
+visNetwork,node.size.max,numeric integer,40,
+diagramer,node.size.ratio,numeric integer,0.6,0 1
+diagramer,node.size,numeric integer,3,
+diagramer,node.size.max,numeric integer,4,
+visNetwork,node.size.min,numeric integer,15,
+diagramer,node.size.min,numeric integer,2,
+diagramer,title,character,,
+visNetwork,tooltip,character,,
+diagramer,tooltip,character,,
+networkD3,link.tooltip.suffix,character,,
+networkD3,width,numeric integer,30,
+networkD3,label.size,numeric integer,30,
+plotly,size.min,numeric integer,10,
+plotly,size.max,numeric integer,500,
+amCharts,direction,character,up.down,up.down down.up
+amCharts,thetaAxis.tick.step,numeric integer,20,1 Inf
+amCharts,theta.min,numeric integer,0,
+amCharts,theta.max,numeric integer,100,
+amCharts,x.min,numeric integer,0,
+amCharts,x.max,numeric integer,100,
+amCharts,y.min,numeric integer,0,
+amCharts,y.max,numeric integer,100,
+amCharts,xAxis.tick.step,numeric integer,20,
+amCharts,yAxis.tick.step,numeric integer,20,
+amCharts,xAxis.step.enabled,logical,T,T F
+amCharts,yAxis.step.enabled,logical,T,T F
+d3plus,legend.enabled,logical,T,T F
+d3plus,legend.size,numeric integer,30,1 Inf
+d3plus,legend.tooltip.enabled,logical,T,T F
+d3plus,tooltip,character,,
+d3plus,additionalColumns,character,,
+d3plus,height,numeric integer character,,
+d3plus,width,numeric integer character,,
+d3plus,xAxis.grid.enabled,logical,T,T F
+d3plus,yAxis.grid.enabled,logical,T,T F
+d3plus,xAxis.min,numeric integer Date,,
+d3plus,xAxis.max,numeric integer Date,,
+d3plus,label.format,character,,
+d3plus,currency.symbol,character,US$,
+d3plus,shape,character,line,line bar
+morrisjs,yAxis.tick.suffix,character,,
+morrisjs,yAxis.tick.prefix,character,,
+dygraphs,subchart.enabled,logical,T,T F
+dygraphs,subchart.height,numeric,40,
+dygraphs,subchart.background,character,A7B1C4,
+dygraphs,subchart.color,character,808FAB,
+dygraphs,subchart.zoom.enabled,logical,T,T F
+highcharter,color.min,character,white,
+highcharter,color.max,character,blue,
+billboarder,title.position,character,left-top,left-top right-top
+billboarder,title.padding.top,integer,0,
+billboarder,title.padding.right,integer,0,
+billboarder,title.padding.left,integer,0,
+billboarder,title.padding.bottom,integer,20,
+amCharts,xAxis.label.rotation,numeric,0,-90 90
+amCharts,barMode,character,group,group stack
+amCharts,legend.enabled,logical,T,T F
+amCharts,theme,character,,light dark patterns chalk
+amCharts,legend.position,character,bottom,right left
+amCharts,title,character,,
+amCharts,title.color,character,black,
+amCharts,title.size,integer,15,1 100
+amCharts,xAxis.scrollbar.enabled,logical,F,T F
+amCharts,yAxis.scrollbar.enabled,logical,T,T F
+amCharts,xAxis.scrollbar.width,numeric,10,5 100
+amCharts,yAxis.scrollbar.width,numeric,10,5 100
+dimple,legend.enabled,logical,T,T F
+dc,yAxis.label,character,,
+dc,xAxis.label,character,,
+dc,xAxis.min,numeric,,
+dc,xAxis.max,numeric,,
+dc,legend.enabled,logical,T,T F
+dc,legend.position.x,numeric,20,
+dc,legend.position.y,numeric,20,
+dc,legend.width,numeric,140,
+dc,legend.height,numeric,140,
+diagramer,link.label.size,numeric integer,30,
+diagramer,link.arrow.size,numeric integer,1.5,
