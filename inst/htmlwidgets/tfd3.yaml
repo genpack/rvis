@@ -1,0 +1,93 @@
+# /htmlwidgets/tfd3.yaml -----------------------------------------------------------------------------
+
+dependencies:
+  - name: d3tf
+    version: 4.7.4
+    src: "lib/d3"
+    script: d3_d3tf.min.js
+  - name: colorbrewer
+    version: 1
+    src: "lib/colorbrewer"
+    script: colorbrewer.js
+  - name: tablefilter
+    version: 0.4.15
+    src: "lib/tablefilter"
+    script:
+      - tablefilter.js
+      - tf-0-9f35c43ee2b90b920298.js
+    stylesheet:
+      - style/colsVisibility.css
+      - style/filtersVisibility.css
+      - style/tablefilter.css
+    attachment:
+      - ''
+      - style/themes/blank.png
+      - style/themes/btn_clear_filters.png
+      - style/themes/btn_filter.png
+      - style/themes/btn_first_page.gif
+      - style/themes/btn_last_page.gif
+      - style/themes/btn_next_page.gif
+      - style/themes/btn_previous_page.gif
+      - style/themes/downsimple.png
+      - style/themes/upsimple.png
+      - style/themes/icn_clp.png
+      - style/themes/icn_exp.png
+      - style/themes/icn_filterActive.gif
+      - style/themes/icn_filter.gif
+      - style/themes/default/default.css
+      - style/themes/default/images/bg_infDiv.jpg
+      - style/themes/default/images/bg_th.jpg
+      - style/themes/default/images/btn_eraser.gif
+      - style/themes/default/images/btn_first_page.gif
+      - style/themes/default/images/btn_last_page.gif
+      - style/themes/default/images/btn_next_page.gif
+      - style/themes/default/images/btn_over_eraser.gif
+      - style/themes/default/images/btn_over_first_page.gif
+      - style/themes/default/images/btn_over_last_page.gif
+      - style/themes/default/images/btn_over_next_page.gif
+      - style/themes/default/images/btn_over_previous_page.gif
+      - style/themes/default/images/btn_previous_page.gif
+      - style/themes/default/images/img_loading.gif
+      - style/themes/mytheme/images/bg_headers.jpg
+      - style/themes/mytheme/images/bg_infDiv.jpg
+      - style/themes/mytheme/images/btn_filter.png
+      - style/themes/mytheme/images/btn_first_page.gif
+      - style/themes/mytheme/images/btn_last_page.gif
+      - style/themes/mytheme/images/btn_next_page.gif
+      - style/themes/mytheme/images/btn_previous_page.gif
+      - style/themes/mytheme/images/img_loading.gif
+      - style/themes/mytheme/mytheme.css
+      - style/themes/skyblue/images/bg_skyblue.gif
+      - style/themes/skyblue/images/btn_first_page.gif
+      - style/themes/skyblue/images/btn_last_page.gif
+      - style/themes/skyblue/images/btn_next_page.gif
+      - style/themes/skyblue/images/btn_prev_page.gif
+      - style/themes/skyblue/images/icn_clear_filters.png
+      - style/themes/skyblue/images/img_loading.gif
+      - style/themes/skyblue/skyblue.css
+  - name: jquery
+    version: 1.12.4
+    src: "lib/jquery"
+    script: jquery.min.js
+  - name: bootstrap
+    version: 3.3.7
+    src: "lib/bootstrap/"
+    script:
+    - js/bootstrap.min.js
+    stylesheet:
+    - css/bootstrap.min.css
+    - css/bootstrap-theme.min.css
+  - name: sparklines
+    version: 2.1.2
+    src: "lib/sparklines"
+    script: "jquery.sparkline.min.js"
+    stylesheet: "tooltip.css"
+  - name: colsresizable
+    version: 1.6
+    src: "lib/colsresizable/"
+    script: colResizable-1.6.min.js
+    stylesheet:
+      colsResizable.css
+    attachment:
+      grip.png
+      slider.png
