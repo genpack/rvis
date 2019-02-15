@@ -196,7 +196,7 @@ visNetwork.graph = function(obj,
 
   if (is.null(L$labelColor) & !is.null(L$color)){
     obj$nodes$font.color <- obj$nodes$color.background %>%
-      niragen::contrastColors()
+      gener::contrastColors()
   }
 
   visNetwork(obj$nodes, obj$links, ...)  %>% visNetwork.applyConfig(config)
