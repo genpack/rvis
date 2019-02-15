@@ -395,7 +395,7 @@ highcharter.bubble = function(obj, x = NULL, y = NULL, size = NULL, color = NULL
   config = highcharter.bubble.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
     list.edit(dimclass = highcharter.bubble.defset$dimclass %>% list.edit(z = 'numeric', size = NULL))
 
-  obj %>% highcharter.combo(shape = 'bubble', x = x, y = y, z = size, color = color, config = config)
+  obj %>% highcharter.combo(shape = 'bubble', x = x, y = y, size = size, color = color, config = config)
 }
 
 highcharter.area.range = function(obj, x = NULL, low = NULL, high = NULL, color = NULL, config = NULL){

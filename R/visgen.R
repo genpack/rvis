@@ -37,8 +37,8 @@
 # 1.3.4     18 October 2018    Dimension 'linkTooltip' added
 
 
-if (!require(niragen)){
-  cat(paste("\n", "Package 'niragen' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
+if (!require(gener)){
+  cat(paste("\n", "Package 'gener' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
   stop()
 }
 

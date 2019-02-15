@@ -171,7 +171,7 @@ grviz.addAttributes = function(graph, attr, value, attr_type){
   graph
 }
 
-# Function that gets the calling function as a formatted character string todo: transfer to niragen
+# Function that gets the calling function as a formatted character string todo: transfer to gener
 #' @importFrom stringr str_replace_all
 getCallingFcn <- function() {
   calling_fcn <- deparse(sys.call(-1))
@@ -201,8 +201,8 @@ graphFunctionDuration <- function(start_time) {
 
 grviz.createNodeDF <- function(n, type = NULL, label = NULL, ...){
   fcn_name <- getCallingFcn()
-  niragen::assert(inherits(n, "numeric") | inherits(n, "integer"), "The value supplied to `n` must be numeric", fcn_name)
-  niragen::assert(length(n) <= 1, "The value supplied to `n` must be a single numeric value", fcn_name)
+  gener::assert(inherits(n, "numeric") | inherits(n, "integer"), "The value supplied to `n` must be numeric", fcn_name)
+  gener::assert(length(n) <= 1, "The value supplied to `n` must be a single numeric value", fcn_name)
 
   if (is.null(type)) {type <- rep(as.character(NA), n)}
   if (!is.null(type)) {
@@ -562,7 +562,7 @@ grviz.createGraph <- function(nodes_df = NULL, edges_df = NULL, directed = TRUE,
                       "white", "Helvetica", "8", "1.5", "gray80", "0.5"),
         attr_type = c(rep("graph", 2), rep("node", 9), "graph", rep("edge", 5)),
         stringsAsFactors = FALSE)
-    } else {niragen::assert(F, "The value for `attr_theme` doesn't refer to any available theme", fcn_name)}
+    } else {gener::assert(F, "The value for `attr_theme` doesn't refer to any available theme", fcn_name)}
   } else if (is.null(attr_theme)) {
     global_attrs <- data.frame(
       attr  = as.character(NA),
@@ -660,7 +660,7 @@ grviz.createGraph <- function(nodes_df = NULL, edges_df = NULL, directed = TRUE,
 
 grviz.generateDot <- function(graph) {
   fcn_name <- getCallingFcn()
-  is.graph.valid(graph) %>% niragen::assert("The graph object is not valid", fcn_name)
+  is.graph.valid(graph) %>% gener::assert("The graph object is not valid", fcn_name)
   attr_type <- attr <- value <- string <- NULL
   # Extract objects from the graph objecct
   nodes_df <- graph$nodes_df
@@ -1230,7 +1230,7 @@ grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, 
 {
   if(nrow(graph$nodes_df) == 0){dotstr = ""} else {
     fcn_name <- getCallingFunctionName()
-    is.grviz.graph(graph) %>% niragen::assert("The graph object is not valid", fcn_name)
+    is.grviz.graph(graph) %>% gener::assert("The graph object is not valid", fcn_name)
     V1 <- V2 <- x <- y <- attr_type <- value_x <- NULL
     value <- hex <- fillcolor <- new_fillcolor <- NULL
     if (!is.null(title)) {

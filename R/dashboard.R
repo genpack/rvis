@@ -547,10 +547,10 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         mn = items[[i]]$min   %>% verify(c('numeric', 'integer', 'logical', valid.time.classes), varname = "items[['" %++% i %++% "']]$min"  , default = 0)
                                         mx = items[[i]]$max   %>% verify(c('numeric', 'integer', 'logical', valid.time.classes), varname = "items[['" %++% i %++% "']]$max"  , default = 1, domain = c(mn, Inf))
                                         vl = items[[i]]$value %>% verify(c('numeric', 'integer', 'logical', valid.time.classes), varname = "items[['" %++% i %++% "']]$value", default = 0, domain = c(mn, mx))
-                                        an = items[[i]]$anicolaste %>% verify(c("list", "logical"), default = F)
+                                        an = items[[i]]$animate %>% verify(c("list", "logical"), default = F)
 
                                         obj = sliderInput(i, label = lbl, min = mn, max = mx, value = vl, step = items[[i]]$step,
-                                                          sep  = items[[i]]$sep, pre = items[[i]]$pre, post = items[[i]]$post, timeFormat = items[[i]]$timeFormat, anicolaste = an)},
+                                                          sep  = items[[i]]$sep, pre = items[[i]]$pre, post = items[[i]]$post, timeFormat = items[[i]]$timeFormat, animate = an)},
                                       "actionButton"   = {
                                         obj = actionButton(i, label = lbl, icon = icn, width = items[[i]]$width) %>% buildStyle(inline = items[[i]]$inline, vertical_align = items[[i]]$vertical_align, float = items[[i]]$float, width = items[[i]]$width)},
                                       "actionBttn"     = {

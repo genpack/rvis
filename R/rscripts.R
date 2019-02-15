@@ -22,7 +22,7 @@
 # 0.1.3     12 October 2017     Observer function TFD3.observer.column.footer.R() changed. Code protected by isolate to be called only when sync$<itemID>_column.footer changes
 # 0.1.5     23 October 2017     Observer function TFD3.observer.table.S2C.R() modified: Table redraw is trigerred if any cell is replaced to/from NA
 # 0.1.6     26 October 2017     Observer function TFD3.observer.table.S2C.R() modified: Bug fixed! Column number was shifted for tables with rownames
-# 0.1.7     27 October 2017     Observer function TFD3.observer.table.S2C.R() modified: Calls function compareTable() from niragen to extract changes to be sent
+# 0.1.7     27 October 2017     Observer function TFD3.observer.table.S2C.R() modified: Calls function compareTable() from gener to extract changes to be sent
 # 0.1.8     27 November 2017    loginService and loginUIExtraService for loginInput added
 # 0.1.9     06 December 2017    'login.srv' and 'logout.srv' modified: Saves/loads session data after logout/login"
 # 0.2.0     08 December 2017    'login.srv' and 'logout.srv' modified: saves/loads local objects in userData

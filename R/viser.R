@@ -10,7 +10,7 @@
 #' @docType package
 #' @name viser
 #'
-#' @import niragen
+#' @import gener
 #' @import magrittr
 #'
 #' @include visgen.R
