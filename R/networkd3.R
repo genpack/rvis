@@ -40,7 +40,8 @@ networkD3.sankey.defset = defset %>% list.edit(
   ),
   multiples  = c(),
   essentials = c('key', 'source', 'target'),
-  link.tooltip.suffix = ''
+  link.tooltip.suffix = '',
+  node.width = 50
 )
 
 networkD3.sankey = function(obj, key = NULL, label = NULL, source = NULL, target = NULL, linkWidth = NULL, config = NULL){
