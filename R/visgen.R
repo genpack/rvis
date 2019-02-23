@@ -7,8 +7,8 @@
 # Author:        Nicolas Berta
 # Email :        nicolas.berta@gmail.com
 # Start Date:    28 October 2016
-# Last Revision: 18 October 2018
-# Version:       1.3.4
+# Last Revision: 24 February 2019
+# Version:       1.3.6
 
 # Version History:
 
@@ -22,7 +22,7 @@
 # 1.1.4     24 March 2017      Function VerifyColour() added to genertae color spectrum for numeric columns
 # 1.1.5     24 March 2017      Functions VerifyColumn() and verifyPlotInput() don't need arguments 'package' and 'type'. Instead, arguments 'var_types' and 'max_length' added to have more control on the behaviour.
 #                              Especially required for horizontal plots in which x and y variable types are swaped!
-# 1.2.0     26 March 2017      Functions addcol() and prepare4Plotble4Plot() added
+# 1.2.0     26 March 2017      Functions addcol() and prepare4Plot() added
 # 1.2.1     27 March 2017      Argument var_types replaced by config. config contaions palettes for different dimensions as well as valid dim classes.
 # 1.2.2     27 March 2017      Functions verifyColumn() and verifyColour() eliminated: All is done by addcol(). Function addcol() is not exported.
 # 1.2.3     27 March 2017      Functions nameList() added. Renamed from previous function as.named.list()
@@ -35,17 +35,19 @@
 # 1.3.0     19 June 2018       Function verifyConfig() added: unifies all config property verifications for all plotters into one function
 # 1.3.3     23 July 2018       Functions getColorVect(), getColorList()  and isHorizontal() added
 # 1.3.4     18 October 2018    Dimension 'linkTooltip' added
+# 1.3.5     24 February 2019   data('properties') changed to data('properties', package = 'viser')
+# 1.3.6     24 February 2019   All argument err_src is no more used when calling assert()
 
 
-if (!require(niragen)){
-  cat(paste("\n", "Package 'niragen' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
+if (!require(gener)){
+  cat(paste("\n", "Package 'gener' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
   stop()
 }
 
 # dataPath = 'data/'
 #dataPath = ''
-# properties = read.csv('C:/Nicolas/RCode/packages/master/viser-master/data/properties.csv' , as.is = T)
-# save.image("C:/Nicolas/RCode/packages/master/viser-master/data/properties.RData")
+# properties = read.csv('data/properties.csv' , as.is = T)
+# save.image("data/properties.RData")
 # Before building the package, everytime you update table properties, you need to load it, save in folder data/ as properties.RData
 
 support('magrittr', 'shiny', 'shinydashboard', 'htmlwidgets')
@@ -177,9 +179,9 @@ prepare4Plot = function(obj, aesthetics, config){
     # Verifications:
     if(!is.null(columns[[i]])){
       if(!is.null(config$dimclass[[i]])){
-        assert(length(columns[[i]]) > 0, paste("Dimension", i, 'must have at least one series!'), 'prepare4Plot')
+        assert(length(columns[[i]]) > 0, paste("Dimension", i, 'must have at least one series!'))
         if (!(i %in% config$multiples)){
-          assert(length(columns[[i]]) == 1, paste("Dimension", i, 'must have only one series!'), 'prepare4Plot')
+          assert(length(columns[[i]]) == 1, paste("Dimension", i, 'must have only one series!'))
         }
       }
     }
@@ -333,7 +335,7 @@ renameSeries = function(from, to){
 
 # plotter: single character
 verifyConfig = function(config, plotter){
-  data("properties")
+  data("properties", package = 'viser')
   tbl = properties %>% dplyr::filter(plotters == plotter)
   for(i in tbl %>% nrow %>% sequence){
     property     = tbl$Property[i]

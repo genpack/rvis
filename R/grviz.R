@@ -353,8 +353,8 @@ grviz.graph = function(obj,
 
   # if (is.empty(obj$nodes)){obj$nodes <- data.frame(id = nodeIDs)} else {obj$nodes$id = nodeIDs}
 
-  assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
-  assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
+  gener::assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
+  gener::assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
 
   if(!inherits(obj$nodes[, L$key], 'integer')){
     nodemap = sequence(nrow(obj$nodes))

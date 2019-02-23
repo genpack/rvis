@@ -1,9 +1,9 @@
 Package: viser
 Type: Package
 Title: NIRASOFT R package for visualization 
-Version: 5.7.4
-Date: 06 November 2018
-Author: Nicolas Ramezani
+Version: 5.7.6
+Date: 24 February 2019
+Author: Nicolas Berta
 Maintainer: <nicolas.berta@gmail.com>
 Description: A toolbox for generating of more elegant visualizations and easier built of shiny dashboards
 License: MIT
