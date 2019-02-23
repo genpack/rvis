@@ -4,7 +4,7 @@ dependencies:
     version: 1.8.2
     src: lib/viz
     script: viz.js
-- name: vizstyles
-  version: 0.2
-  src: styles/gviz
-  stylesheet: styles.css
+  - name: vizstyles
+    version: 0.2
+    src: styles/gviz
+    stylesheet: styles.css
