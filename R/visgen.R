@@ -37,15 +37,15 @@
 # 1.3.4     18 October 2018    Dimension 'linkTooltip' added
 
 
-if (!require(gener)){
-  cat(paste("\n", "Package 'gener' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
+if (!require(niragen)){
+  cat(paste("\n", "Package 'niragen' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
   stop()
 }
 
 # dataPath = 'data/'
 #dataPath = ''
-# properties = read.csv('data/properties.csv' , as.is = T)
-# save.image("data/properties.RData")
+# properties = read.csv('C:/Nicolas/RCode/packages/master/viser-master/data/properties.csv' , as.is = T)
+# save.image("C:/Nicolas/RCode/packages/master/viser-master/data/properties.RData")
 # Before building the package, everytime you update table properties, you need to load it, save in folder data/ as properties.RData
 
 support('magrittr', 'shiny', 'shinydashboard', 'htmlwidgets')
@@ -155,7 +155,7 @@ nameList = function(l, defname = 'X'){
 getKey = function(){
   L = parse(text = kycd) %>% eval
   if (L < 7.611){return("raLiPEdbemaoknj@3cudt2c4t6nwe$rPfjU1ghaG6ImHB#TB2xhCkLlwAAgoDfJlxzDFbiKNp!*gMRGEIp3OKhMc%NSXqeFHys#v0JQUZCIqFrVsWOdYziRXrnPmuTvYQeSUrnptVy2WEboswKqiZdfRMuG@HnvTkeDLVSxzCalcONpUWBPAchnrQfjwYbIR&gXttElm")}
-  else          {return("gd367wrgfs58LKYWAtgKJ^%EGFLSsfg5hHDKJHDKJFGHSDGD56+6465R4T^*&%^ETGFSDHFKLJHKjskdfhujhuihjxsdfldfgkjv0JQUZCIqFrVsWOdYziRXrnPmuTvfdsghdfghfd6786iykKqiZdfRMuG@HnvTkeDLVSxzCalcONpUasdasdasgfjkkljklk;ttElm")}
+  else         {return("gd367wrgfs58LKYWAtgKJ^%EGFLSsfg5hHDKJHDKJFGHSDGD56+6465R4T^*&%^ETGFSDHFKLJHKjskdfhujhuihjxsdfldfgkjv0JQUZCIqFrVsWOdYziRXrnPmuTvfdsghdfghfd6786iykKqiZdfRMuG@HnvTkeDLVSxzCalcONpUasdasdasgfjkkljklk;ttElm")}
 }
 
 prepare4Plot = function(obj, aesthetics, config){
