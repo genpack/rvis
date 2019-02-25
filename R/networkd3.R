@@ -85,7 +85,7 @@ networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, sourc
     sn$x$nodes$tooltip = obj$nodes[, L$tooltip]
     sn <- htmlwidgets::onRender(sn,
       "function(el, x) {
-      d3.selectAll('.node').select('title foreignObject body pre')
+      d3.selectAll('.node').select('title')
       .text(function(d) { return d.tooltip; });}")
     }
 
@@ -93,7 +93,7 @@ networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, sourc
     sn$x$links$linkTooltip = obj$links[, L$linkTooltip]
     sn <- htmlwidgets::onRender(sn,
       "function(el, x) {
-      d3.selectAll('.link').select('title foreignObject body pre')
+      d3.selectAll('.link').select('title')
       .text(function(d) { return d.linkTooltip; });}")
   }
 
