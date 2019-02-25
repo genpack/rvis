@@ -193,6 +193,7 @@
 # 5.7.4 (06 November 2018)  - grviz.R changed to ver 0.1.7
 # 5.7.4 (06 November 2018)  - dashboard.R changed to ver 2.5.6
 # 5.7.6 (24 February 2019)  - visgen.R changed to ver 1.3.6
+# 5.7.7 (25 February 2019)  - networkd3.R changed to ver 1.1.3
 NULL
 #> NULL
 
