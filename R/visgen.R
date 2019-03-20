@@ -7,8 +7,8 @@
 # Author:        Nicolas Berta
 # Email :        nicolas.berta@gmail.com
 # Start Date:    28 October 2016
-# Last Revision: 24 February 2019
-# Version:       1.3.6
+# Last Revision: 21 March 2019 (Nowrouz 1398)
+# Version:       1.3.7
 
 # Version History:
 
@@ -37,6 +37,7 @@
 # 1.3.4     18 October 2018    Dimension 'linkTooltip' added
 # 1.3.5     24 February 2019   data('properties') changed to data('properties', package = 'viser')
 # 1.3.6     24 February 2019   All argument err_src is no more used when calling assert()
+# 1.3.7     21 March 2019      Function df2Network() added
 
 
 if (!require(gener)){
@@ -387,6 +388,7 @@ isHorizontal = function(obj, Lx, Ly){
 
 # tbc to viser:
 
+# Converts a dataframe into a network containing a nodes and links table
 #' @export
 df2Network = function(df, id_cols = names(df), value_col){
   links = NULL
