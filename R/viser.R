@@ -194,6 +194,7 @@
 # 5.7.4 (06 November 2018)  - dashboard.R changed to ver 2.5.6
 # 5.7.6 (24 February 2019)  - visgen.R changed to ver 1.3.6
 # 5.7.7 (25 February 2019)  - networkd3.R changed to ver 1.1.3
+# 5.7.8 (21 March 2019)     - visgen.R changed to ver 1.3.7
 NULL
 #> NULL
 
