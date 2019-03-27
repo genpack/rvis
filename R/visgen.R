@@ -390,27 +390,33 @@ isHorizontal = function(obj, Lx, Ly){
 
 # Converts a dataframe into a network containing a nodes and links table
 #' @export
-df2Network = function(df, id_cols = names(df), value_col){
+df2Network = function(df, id_cols = names(df), value_col, percentage = F){
   links = NULL
   for(i in sequence(length(id_cols) - 1)){
     scr = paste0("df ", "%>% group_by(", id_cols[i], ", ", id_cols[i + 1], ") %>% summarise(value = ", "sum", "(", value_col, ")) %>% select(source = ", id_cols[i], ", target = ", id_cols[i + 1], ", value)")
     parse(text = scr) %>% eval %>% mutate(svname = id_cols[i], tvname = id_cols[i + 1]) %>% rbind(links) -> links
   }
-
+  
   links %<>% mutate(hovertext = paste0(source, ' --> ', target, ': ', value))
-
+  
   links$source = paste(links$svname, links$source, sep = "=")
   links$target = paste(links$tvname, links$target, sep = "=")
-
-  links %<>% left_join(links %>% group_by(source) %>% summarise(sumval = sum(value)), by = 'source') %>%
-    mutate(ratio = round(100*value/sumval, digits = 2)) %>%
-    mutate(hovertext = hovertext %>% paste0(' (', ratio, '%)'))
+  
+  links %<>% left_join(links %>% group_by(source) %>% summarise(sumval = sum(value)), by = 'source') %>% 
+    mutate(ratio = round(100*value/sumval, digits = 2)) %>% 
+    mutate(hovertext = hovertext %>% paste0(' (', ratio, '%)')) 
   #links$tooltip = paste()
-
-  nodes = data.frame(id = c(links$source, links$target)) %>%
+  if(percentage){
+    links %<>% left_join(links %>% group_by(target) %>% summarise(sumratio = sum(ratio)) %>% select(source = target, sumratio), by = 'source') %>% 
+      mutate(sumratio = ifelse(is.na(sumratio), 100, sumratio)) %>% 
+      mutate(pathratio = round(ratio*sumratio/100, digits = 2))
+  }
+  
+  nodes = data.frame(id = c(links$source, links$target)) %>% 
     distinct(id, .keep_all = T) %>% mutate(label = id)
-
+  
   list(nodes = nodes, links = links)
 }
+
 
 
