@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     29 December 2016
-# Last Revision:  18 October 2018
-# Version:        1.3.6
+# Last Revision:  27 June 2019
+# Version:        1.3.7
 #
 
 # Version History:
@@ -38,6 +38,7 @@
 # 1.3.4     02 July 2018       plotly.box.molten() renamed to plotly.box().
 # 1.3.5     16 October 2018    plotly.box() modified: factors converted to character for computing nchar in order to adjust margin
 # 1.3.6     18 October 2018    plotly.combo() modified: tooltip added
+# 1.3.7     27 June 2019       plotly.pie() and plotly.box() modified: additional arguments passed to original function.
 
 
 
@@ -276,7 +277,7 @@ plotly.bar = function(..., config = NULL){
   plotly.combo(..., shape = 'bar', config = config)
 }
 
-plotly.pie = function(obj, label = NULL, theta = NULL, config = NULL){
+plotly.pie = function(obj, label = NULL, theta = NULL, config = NULL, ...){
   assert(require(plotly, quietly = T, warn.conflicts = F), "Package plotly is not installed!", err_src = match.call()[[1]])
   config = plotly.pie.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>% verifyConfig(plotter = 'plotly')
 
@@ -287,7 +288,7 @@ plotly.pie = function(obj, label = NULL, theta = NULL, config = NULL){
 
   obj %<>% prepare4Plot(A, config)
 
-  plot_ly(labels = obj[, L$label], values = obj[, L$theta], type = 'pie') %>% plotly.applyConfig(config)
+  plot_ly(labels = obj[, L$label], values = obj[, L$theta], type = 'pie', ...) %>% plotly.applyConfig(config)
 
 }
 
@@ -314,7 +315,7 @@ plotly.box = function(obj, x = NULL, y = NULL, group = NULL, config = NULL, ...)
   if(is.null(L$y)){yfrml = NULL} else {yfrml = as.formula('~`' %++% L$y %++% '`')}
   if(is.null(L$group)){clrfrml = NULL} else {clrfrml = as.formula('~`' %++% L$group %++% '`')}
 
-  p  = plot_ly(obj, x = xfrml, y = yfrml, color = clrfrml, type = "box") %>% plotly.applyConfig(config)
+  p  = plot_ly(obj, x = xfrml, y = yfrml, color = clrfrml, type = "box", ...) %>% plotly.applyConfig(config)
   if(!is.null(L$group)){p %<>% layout(boxmode = "group")}
   p
 }
