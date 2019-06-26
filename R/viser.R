@@ -195,6 +195,8 @@
 # 5.7.6 (24 February 2019)  - visgen.R changed to ver 1.3.6
 # 5.7.7 (25 February 2019)  - networkd3.R changed to ver 1.1.3
 # 5.7.8 (21 March 2019)     - visgen.R changed to ver 1.3.7
+# 5.8.0 (21 June 2019)      - grviz.R changed to ver 0.1.8, dashboard.R changed to ver 2.5.7
+# 5.8.1 (27 June 2019)      - plotly.R changed to ver 1.3.7
 NULL
 #> NULL
 
