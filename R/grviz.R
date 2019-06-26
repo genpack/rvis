@@ -20,6 +20,7 @@
 # 0.1.4     05 November 2018   functions grviz.createNodeDF() & .createEdgeDF() added.
 # 0.1.6     05 November 2018   functions grviz.createGraph() & .generateDot() added.
 # 0.1.7     05 November 2018   functions replaceInSpec() added.
+# 0.1.8     20 June 2019       grviz.graph() modified: ... Arguments passed to grviz.renderGraph()
 
 
 grviz.graph.defset = defset %>% list.edit(
@@ -466,10 +467,12 @@ grviz.graph = function(obj,
     # https://www.graphviz.org/doc/info/attrs.html#h:undir_note
   }
 
-  grviz.createGraph(nodes_df, edges_df, ...) %>% grviz.applyConfig(config) %>%
+  ## todo: pass additional arguments to grviz.createGraph() from config
+  grviz.createGraph(nodes_df, edges_df) %>% grviz.applyConfig(config) %>%
     grviz.renderGraph(layout = config$layout %>% verify('character', default = 'dot'),
                       title  = config$title %>% verify('character', lengths == 1),
-                      shinyInput.click = config$shinyInput.click %>% verify('character', lengths = 1, varname = 'config$shinyInput.click'))
+                      shinyInput.click = config$shinyInput.click %>% verify('character', lengths = 1, varname = 'config$shinyInput.click'),
+                      ...)
 }
 
 
