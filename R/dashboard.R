@@ -7,8 +7,8 @@
 # Author:        Nicolas Berta
 # Email :        nicolas.berta@gmail.com
 # Start Date:    22 January 2016
-# Last Revision: 06 November 2018
-# Version:       2.5.6
+# Last Revision: 21 June 2019
+# Version:       2.5.7
 
 # Version History:
 
@@ -92,6 +92,7 @@
 # 2.5.4     29 October 2018     Input item type actionButton modified: argument weight re-added
 # 2.5.5     05 November 2018    grviz is now independent
 # 2.5.6     06 November 2018    Argument 'width' added for selectInput
+# 2.5.7     21 June 2019        Argument 'style' added for box cloth
 
 support('shiny', 'shinydashboard', 'htmlwidgets')
 
@@ -302,6 +303,11 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                     if (!is.null(cloth$height)){
                                       verify(cloth$height, 'character')
                                       scr = paste0(scr, "height = ", cloth.str, "$height,")
+                                    }
+
+                                    if (!is.null(cloth$style)){
+                                      verify(cloth$style, 'character')
+                                      scr = paste0(scr, "style = ", cloth.str, "$style,")
                                     }
 
                                     if (!is.null(cloth$collapsible)){
