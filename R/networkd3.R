@@ -14,7 +14,7 @@
 # Version History:
 
 # Version   Date               Action
-# ----------------------------------
+# -----------------------------------
 # 1.0.0     28 November 2016   Initial issue
 # 1.1.0     13 May 2017        Fundamental changes, using standard aesthetics
 # 1.1.1     27 June 2018       Dimension 'key' added
