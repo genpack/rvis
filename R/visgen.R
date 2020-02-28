@@ -109,7 +109,7 @@ addcol = function(tbl, obj, col, dim, config, cln){
     warnif(length(col) > 1, "For dimension " %++% dim %++% ", Only the first element of argument col is considered!")
     col = col[1]
     assert(!is.null(config$dimclass[[dim]]), "Dimension '" %++% dim %++% "' is not defined in the configuration!")
-    if (!inherits(obj[,col], config$dimclass[[dim]])){obj[, col] <- try(obj[,col] %>% coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
+    if (!inherits(obj[,col], config$dimclass[[dim]])){obj[, col] <- try(obj[,col] %>% gener::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
     if ((dim %in% c('color', 'labelColor', 'borderColor', 'linkColor', 'linkLabelColor')) & config$colorize){obj[, col] %<>% colorise(palette = config$palette[[dim]])}
     return(tbl %>% appendCol(obj[,col], cln))
   }
@@ -127,7 +127,7 @@ addcol = function(tbl, obj, col, dim, config, cln){
   }
 
   assert(!is.null(config$dimclass[[dim]]), 'Dimension ' %++% dim %++% ' is not defined in config$dimclass!')
-  if(!inherits(col, config$dimclass[[dim]])){col <- try(col %>% coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
+  if(!inherits(col, config$dimclass[[dim]])){col <- try(col %>% gener::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
 
   tbl %<>% appendCol(col, cln)
   if (inherits(col,'character')){tbl[,cln] %<>% as.character}
@@ -342,8 +342,8 @@ verifyConfig = function(config, plotter){
     property     = tbl$Property[i]
     assert(!is.empty(tbl$Class[i]))
     validClasses = tbl$Class[i] %>% strsplit(' ') %>% unlist %>% na.omit
-    if(is.empty(tbl$Domain[i])){validValues = NULL} else {validValues  = tbl$Domain[i] %>% strsplit(' ') %>% unlist %>% coerce(validClasses[1])}
-    if(is.empty(tbl$Default[i])){default = NULL} else {default = tbl$Default[i] %>% coerce(validClasses[1])}
+    if(is.empty(tbl$Domain[i])){validValues = NULL} else {validValues  = tbl$Domain[i] %>% strsplit(' ') %>% unlist %>% gener::coerce(validClasses[1])}
+    if(is.empty(tbl$Default[i])){default = NULL} else {default = tbl$Default[i] %>% gener::coerce(validClasses[1])}
 
     config[[property]] %<>% verify(validClasses, domain = validValues, default = default, varname = 'config$' %++% property)
   }
@@ -396,25 +396,25 @@ df2Network = function(df, id_cols = names(df), value_col, percentage = F){
     scr = paste0("df ", "%>% group_by(", id_cols[i], ", ", id_cols[i + 1], ") %>% summarise(value = ", "sum", "(", value_col, ")) %>% select(source = ", id_cols[i], ", target = ", id_cols[i + 1], ", value)")
     parse(text = scr) %>% eval %>% mutate(svname = id_cols[i], tvname = id_cols[i + 1]) %>% rbind(links) -> links
   }
-  
+
   links %<>% mutate(hovertext = paste0(source, ' --> ', target, ': ', value))
-  
+
   links$source = paste(links$svname, links$source, sep = "=")
   links$target = paste(links$tvname, links$target, sep = "=")
-  
-  links %<>% left_join(links %>% group_by(source) %>% summarise(sumval = sum(value)), by = 'source') %>% 
-    mutate(ratio = round(100*value/sumval, digits = 2)) %>% 
-    mutate(hovertext = hovertext %>% paste0(' (', ratio, '%)')) 
+
+  links %<>% left_join(links %>% group_by(source) %>% summarise(sumval = sum(value)), by = 'source') %>%
+    mutate(ratio = round(100*value/sumval, digits = 2)) %>%
+    mutate(hovertext = hovertext %>% paste0(' (', ratio, '%)'))
   #links$tooltip = paste()
   if(percentage){
-    links %<>% left_join(links %>% group_by(target) %>% summarise(sumratio = sum(ratio)) %>% select(source = target, sumratio), by = 'source') %>% 
-      mutate(sumratio = ifelse(is.na(sumratio), 100, sumratio)) %>% 
+    links %<>% left_join(links %>% group_by(target) %>% summarise(sumratio = sum(ratio)) %>% select(source = target, sumratio), by = 'source') %>%
+      mutate(sumratio = ifelse(is.na(sumratio), 100, sumratio)) %>%
       mutate(pathratio = round(ratio*sumratio/100, digits = 2))
   }
-  
-  nodes = data.frame(id = c(links$source, links$target)) %>% 
+
+  nodes = data.frame(id = c(links$source, links$target)) %>%
     distinct(id, .keep_all = T) %>% mutate(label = id)
-  
+
   list(nodes = nodes, links = links)
 }
 
