@@ -25,7 +25,7 @@
 # 1.3.4     20 June 2018       Function googleVis.bar() and googleVis.line() modified: y2 is now a new diemnsion
 
 
-googleVis.line.defset = defset %>% list.edit(
+googleVis.line.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = 'character',
@@ -35,7 +35,7 @@ googleVis.line.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-googleVis.bar.defset = defset %>% list.edit(
+googleVis.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('character', 'numeric', 'factor', 'integer'),
@@ -44,7 +44,7 @@ googleVis.bar.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-googleVis.gauge.defset = defset %>% list.edit(
+googleVis.gauge.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     label = 'character',
@@ -53,7 +53,7 @@ googleVis.gauge.defset = defset %>% list.edit(
   essentials = c('label', 'theta')
 )
 
-googleVis.sankey.defset = defset %>% list.edit(
+googleVis.sankey.defset = defset %<==>% list(
   dimclass = list(
     key          = 'character',
     source       = 'character',

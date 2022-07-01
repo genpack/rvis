@@ -21,7 +21,7 @@
 # 1.1.2     27 June 2018       More config properties added
 # 1.1.3     25 February 2019   tooltip and linkTooltip dimensions added to sankey chart
 
-networkD3.sankey.defset = defset %>% list.edit(
+networkD3.sankey.defset = defset %<==>% list(
   dimclass = list(
     key          = c('character', 'factor', 'integer'),
     label        = c('character', 'factor'),

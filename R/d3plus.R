@@ -19,7 +19,7 @@
 # 1.1.5     01 July 2018       Functions d3plus.bar.molten(), d3plus.tsline.molten() and d3plus.tsbar.molten() added using new htmlwidget: D3plusR
 # 1.1.6     25 July 2018       Function d3plus.bar.molten() converted to d3plus.bar() plots both wide and molten
 
-d3plus.scatter.defset = defset %>% list.edit(
+d3plus.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(x = 'numeric',
                    y = 'numeric',
@@ -27,7 +27,7 @@ d3plus.scatter.defset = defset %>% list.edit(
                    label = 'character')
 )
 
-d3plus.bubble.defset = defset %>% list.edit(
+d3plus.bubble.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
     size = 'numeric',
@@ -36,7 +36,7 @@ d3plus.bubble.defset = defset %>% list.edit(
   essentials = c('size', 'label')
 )
 
-d3plus.bubble.molten.defset = defset %>% list.edit(
+d3plus.bubble.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
     size  = 'numeric',
@@ -46,7 +46,7 @@ d3plus.bubble.molten.defset = defset %>% list.edit(
   essentials = c('size', 'label')
 )
 
-d3plus.bar.defset = defset %>% list.edit(
+d3plus.bar.defset = defset %<==>% list(
   dimclass  = list(
     x     = c('character', 'factor', 'numeric', 'integer'),
     y     = c('numeric', 'integr', 'character', 'factor'),
@@ -55,7 +55,7 @@ d3plus.bar.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-d3plus.bar.molten.defset = defset %>% list.edit(
+d3plus.bar.molten.defset = defset %<==>% list(
   dimclass  = list(
     x     = 'character',
     y     = 'numeric',
@@ -64,10 +64,10 @@ d3plus.bar.molten.defset = defset %>% list.edit(
   essentials = c('x', 'y', 'group'),
   shape = 'bar'
 )
-d3plus.line.molten.defset = d3plus.bar.molten.defset %>% list.edit(shape = 'line')
-d3plus.area.molten.defset = d3plus.bar.molten.defset %>% list.edit(shape = 'area')
+d3plus.line.molten.defset = d3plus.bar.molten.defset %<==>% list(shape = 'line')
+d3plus.area.molten.defset = d3plus.bar.molten.defset %<==>% list(shape = 'area')
 
-d3plus.tree.defset = defset %>% list.edit(
+d3plus.tree.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
     label = 'character',
@@ -78,7 +78,7 @@ d3plus.tree.defset = defset %>% list.edit(
   colorize = F
 )
 
-d3plus.tsline.molten.defset = defset %>% list.edit(
+d3plus.tsline.molten.defset = defset %<==>% list(
   dimclass  = list(
     x     = 'Date',
     y     = 'numeric',
@@ -88,7 +88,7 @@ d3plus.tsline.molten.defset = defset %>% list.edit(
   shape = 'line'
 )
 
-d3plus.tsline.defset = defset %>% list.edit(
+d3plus.tsline.defset = defset %<==>% list(
   dimclass  = list(
     x     = 'Date',
     y     = 'numeric',
@@ -98,10 +98,10 @@ d3plus.tsline.defset = defset %>% list.edit(
   shape = 'line'
 )
 
-d3plus.tsbar.molten.defset  = d3plus.tsline.molten.defset %>% list.edit(shape = 'bar')
-d3plus.tsarea.molten.defset = d3plus.tsline.molten.defset %>% list.edit(shape = 'area')
+d3plus.tsbar.molten.defset  = d3plus.tsline.molten.defset %<==>% list(shape = 'bar')
+d3plus.tsarea.molten.defset = d3plus.tsline.molten.defset %<==>% list(shape = 'area')
 
-d3plus.treemap.defset = defset %>% list.edit(
+d3plus.treemap.defset = defset %<==>% list(
   dimclass  = list(
     label = 'character',
     size  = 'numeric',

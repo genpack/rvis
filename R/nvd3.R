@@ -20,7 +20,7 @@
 # 1.0.4     23 July 2018        nvd3.scatter.molten() embedded in new added function added nvd3.scatter()
 # 1.0.5     23 July 2018        nvd3.bar.molten() embedded in new added function added nvd3.bar()
 
-nvd3.bar.defset = defset %>% list.edit(
+nvd3.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('character', 'factor', 'numeric', 'integer'),
@@ -31,7 +31,7 @@ nvd3.bar.defset = defset %>% list.edit(
   palette = list(color = NULL)
 )
 
-nvd3.pie.molten.defset = defset %>% list.edit(
+nvd3.pie.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     group = c('factor', 'character', 'integer')),
@@ -40,7 +40,7 @@ nvd3.pie.molten.defset = defset %>% list.edit(
   palette = list(color = NULL)
 )
 
-nvd3.pie.defset = defset %>% list.edit(
+nvd3.pie.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     theta = c('numeric', 'integer'),
@@ -50,7 +50,7 @@ nvd3.pie.defset = defset %>% list.edit(
   palette = list(color = NULL)
 )
 
-nvd3.scatter.defset = defset %>% list.edit(
+nvd3.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('numeric', 'integer'),

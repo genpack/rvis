@@ -4,7 +4,7 @@
 
 # Header
 # Filename:      dialogs.R
-# Description:   Contains functions for building dialog boxes as viser containers which can be embedded in a UI or dashboard
+# Description:   Contains functions for building dialog boxes as rvis containers which can be embedded in a UI or dashboard
 # Author:        Nicolas Berta
 # Email :        nicolas.berta@gmail.com
 # Start Date:    01 June 2018
@@ -19,7 +19,7 @@
 # 0.1.1     01 June 2018        Argument containerType added, specifying container type
 
 
-# This functions builds a viser container for a dialog box in order to get a CSV table and issue out a table with desired column names and classes.
+# This functions builds a rvis container for a dialog box in order to get a CSV table and issue out a table with desired column names and classes.
 # The returned container includes all service functions for reading and modifying the input table as well as error handling.
 # todo: add Excel tables should be added
 # the function returns a list of items that needs to be appended to any UI(dashboard) on which the dialog box is going to appear.

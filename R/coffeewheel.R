@@ -23,7 +23,7 @@
 
 #' @include visgen.R
 
-coffeewheel.sunburst.defset = defset %>% list.edit(
+coffeewheel.sunburst.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     theta   = 'numeric',
@@ -73,13 +73,13 @@ coffeewheel <- function(treeData, width=400, height=400, main="", partitionAttri
     x,
     width = width,
     height = height,
-    package = 'viser'
+    package = 'rvis'
   );
 }
 
 ## Widget output function for use in Shiny
 coffeewheelOutput <- function(outputId, width= 400, height= 400) {
-  shinyWidgetOutput(outputId, 'coffeewheel', width, height, package = 'viser');
+  shinyWidgetOutput(outputId, 'coffeewheel', width, height, package = 'rvis');
 }
 
 

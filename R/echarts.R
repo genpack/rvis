@@ -18,7 +18,7 @@
 # ----------------------------------
 # 0.1.0     19 June 2018       Initial issue with bar, funnel, wordCloud and gauge
 
-echarts.bar.defset = defset %>% list.edit(
+echarts.bar.defset = defset %<==>% list(
   dimclass   = list(
     x       = 'character',
     y       = 'numeric'),
@@ -26,7 +26,7 @@ echarts.bar.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-echarts.funnel.defset = defset %>% list.edit(
+echarts.funnel.defset = defset %<==>% list(
   dimclass   = list(
     label    = 'character',
     size     = 'numeric'),
@@ -34,7 +34,7 @@ echarts.funnel.defset = defset %>% list.edit(
   essentials = c('label', 'size')
 )
 
-echarts.wordCloud.defset = defset %>% list.edit(
+echarts.wordCloud.defset = defset %<==>% list(
   dimclass   = list(
     label    = 'character',
     size     = 'numeric',

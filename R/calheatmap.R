@@ -14,7 +14,7 @@
 # ----------------------------------
 # 0.0.1     30 June 2018       Initial issue
 
-calheatmap.calendar.defset = defset %>% list.edit(
+calheatmap.calendar.defset = defset %<==>% list(
   dimclass   = list(
     t        = 'Date',
     color    = 'numeric'),

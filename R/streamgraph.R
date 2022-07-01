@@ -20,7 +20,7 @@
 
 
 # Does not work with POSIXct, don't try!
-streamgraph.tsarea.defset = defset %>% list.edit(
+streamgraph.tsarea.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('Date', 'integer', 'numeric'),
     y       = 'numeric',

@@ -28,7 +28,7 @@
 
 #' @include jscripts.R
 
-dygraphs.combo.defset = defset %>% list.edit(
+dygraphs.combo.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c("POSIXct", "Date", "character", "factor", "numeric", "integer"),
@@ -38,7 +38,7 @@ dygraphs.combo.defset = defset %>% list.edit(
   essentials = c('x', 'y or y2')
 )
 
-dygraphs.tsline.defset = defset %>% list.edit(
+dygraphs.tsline.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c("POSIXct", "Date"),

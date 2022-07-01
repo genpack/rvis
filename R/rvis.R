@@ -1,16 +1,16 @@
-# viser.R ----------------------------------------------------------------
+# rvis.R ----------------------------------------------------------------
 
-#' viser: This package is a tool-box for visualization in R and making word-class and elegant shiny dashboards.
+#' rvis: This package is a tool-box for visualization in R and making word-class and elegant shiny dashboards.
 #'
 #' @section Class DASHBOARD:
-#' viser provides a Reference class named as DASHBOARD.
+#' rvis provides a Reference class named as DASHBOARD.
 #' You can design your interactive dashboard layout and assign multiple R objects into your dashboard.
 #' It supports various visualization engines like graphics, ggplot2, ggvis, googlevis, amCharts, rCharts, dygraphs and many other plotter engines.
 #'
 #' @docType package
-#' @name viser
+#' @name rvis
 #'
-#' @import gener
+#' @import rutils
 #' @import magrittr
 #'
 #' @include visgen.R
@@ -47,7 +47,7 @@
 #' @include visnetwork.R
 #' @include xcharts.R
 
-#' @include viserplot.R
+#' @include rvisplot.R
 
 # Version History:
 # 1.1.0 (04 July 2016)      - dashboard.R changed to version 1.6
@@ -58,7 +58,7 @@
 # 1.3.0 (29 September 2016) - deviset.R transferred from package timser
 # 1.3.1 (29 September 2016) - visgen.R transferred from package niragen
 # 1.3.2 (29 September 2016) - nira_plotters.R changed to version 1.1.4
-# 1.4.0 (06 October 2016)   - nira_plotters.R changed to version 1.2.1 and renamed to: viserPlotter.R
+# 1.4.0 (06 October 2016)   - nira_plotters.R changed to version 1.2.1 and renamed to: rvisPlotter.R
 # 1.4.1 (12 October 2016)   - dashboard.R changed to version 1.6.3
 # 1.5.0 (14 October 2016)   - highcharterPlotters.R (version 1.0.0) added to the package
 # 1.6.0 (18 October 2016)   - bubblesPlotters.R (version 1.0.0) added to the package
@@ -98,7 +98,7 @@
 # 2.9.2 (13 June 2017)      - jscripts.R added (Version 0.0.1) (Small codes collected from various plotter engine files into one file plus more code added for D3TableFilter)
 # 3.0.0 (14 June 2017)      - D3TableFilter.R added and updated to version 0.0.3
 # 3.0.1 (13 July 2017)      - visgen.R updated to version 1.2.6
-# 3.1.0 (13 July 2017)      - viserplot.R added and replaced viserPlotter
+# 3.1.0 (13 July 2017)      - rvisplot.R added and replaced rvisPlotter
 # 3.1.2 (20 July 2017)      - coffeewheel embedded to the package! coffeewheel.R and dahboard.R modified
 # 3.2.5 (25 July 2017)      - D3TableFilter triggers to re-plot if the sync table changes structure from server side.
 #                             Files modified: dashboard.R to version 1.9.5, rscripts.R to version 0.1.1
@@ -197,6 +197,9 @@
 # 5.7.8 (21 March 2019)     - visgen.R changed to ver 1.3.7
 # 5.8.0 (21 June 2019)      - grviz.R changed to ver 0.1.8, dashboard.R changed to ver 2.5.7
 # 5.8.1 (27 June 2019)      - plotly.R changed to ver 1.3.7
+# 5.8.3 (30 July 2021)      - revisit to update
+# 5.8.4 (04 Spetember 2021) - sankeytree changed to version 0.0.2
+# 5.8.6 (13 October 2021)   - imageOutput added to dashboard
 NULL
 #> NULL
 

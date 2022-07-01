@@ -25,6 +25,17 @@
 # 1.1.8     30 June 2018       amCharts.bullet() added.
 # 1.1.9     24 July 2018       amCharts.tsline() added.
 
+# General settings for all the plots
+defset = list(
+  palette= list(
+    # color = c("#FB1108", "#FA7806","#FBE426","#FCFB8F", "#F3F5E7", "#C7E4EA","#ABD6E6","#9AD2E1"),
+    color = c("purple", "blue","cyan","green", "yellow", "orange","red","black" , 'white'),
+    shape = c('circle', 'x', 'o', 'plus', 'square.hollow', 'rhombus.hollow')
+  ),
+
+  withRowNames = F,
+  colorize     = T
+)
 
 symbols = c('point', 'circle', 'bubble', 'square', 'rhombus', 'diamond', 'delta', 'right', 'left')
 ltypes  = c('line', 'dashLine')
@@ -36,7 +47,7 @@ amCharts.bullet[valid.amCharts.shapes] = c(NA, rep('bubble', 3), 'square', rep('
 amCharts.linetype = numeric()
 amCharts.linetype[valid.amCharts.shapes] = c(rep(0, 10), rep(1, 10))
 
-amCharts.bar.defset = defset %>% list.edit(
+amCharts.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c("character", "factor", "numeric", "integer"),
@@ -46,7 +57,7 @@ amCharts.bar.defset = defset %>% list.edit(
   xLabelsRotation = 0
 )
 
-amCharts.pie.defset = defset %>% list.edit(
+amCharts.pie.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     theta = c("numeric", "integer"),
@@ -55,7 +66,7 @@ amCharts.pie.defset = defset %>% list.edit(
   essentials = c('theta', 'label')
 )
 
-amCharts.tsline.defset = defset %>% list.edit(
+amCharts.tsline.defset = defset %<==>% list(
   dimclass   = list(
     x = c('POSIXct', 'POSIXlt'),
     y = 'numeric',
@@ -67,7 +78,7 @@ amCharts.tsline.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-amCharts.gauge.defset = defset %>% list.edit(
+amCharts.gauge.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     theta = c('numeric', 'integer')),
@@ -80,7 +91,7 @@ amCharts.gauge.defset = defset %>% list.edit(
   # todo: set in settings table
 )
 
-amCharts.bullet.defset = defset %>% list.edit(
+amCharts.bullet.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c('numeric', 'integer'),
@@ -95,7 +106,7 @@ amCharts.bullet.defset = defset %>% list.edit(
   # todo: set in settings table
 )
 
-amCharts.funnel.defset = defset %>% list.edit(
+amCharts.funnel.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     label = c('character', 'factor'),
@@ -106,7 +117,7 @@ amCharts.funnel.defset = defset %>% list.edit(
   # todo: add to settings
 )
 
-amCharts.box.defset = defset %>% list.edit(
+amCharts.box.defset = defset %<==>% list(
   dimclass   = list(
     x = c("character", "factor", "numeric", "integer"),
     y = c("character", "factor", "numeric", "integer")),

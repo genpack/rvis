@@ -24,7 +24,7 @@
 # chartID_click
 
 # Default settings for package bubbles:
-bubbles.defset = defset %>% list.edit(
+bubbles.defset = defset %<==>% list(
   # Percentage threshold for showing the label in the bubble
   point.label.threshold = 0.0,
   # Valid classes for all dimensions
@@ -35,7 +35,7 @@ bubbles.defset = defset %>% list.edit(
                   labelColor = valid.classes)
 )
 
-bubbles.defset$palette %<>% list.edit(
+bubbles.defset$palette <- bubbles.defset$palette %<==>% list(
   labelColor = c("#FB1108", "#FA7806","#FBE426","#FCFB8F", "#F3F5E7", "#C7E4EA","#ABD6E6","#9AD2E1")
 )
 

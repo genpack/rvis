@@ -18,7 +18,7 @@
 # 0.0.1     13 February 2018    Initial issue
 # 0.0.2     19 July 2018        bar.molten renamed to bar
 
-candela.bar.defset = defset %>% list.edit(
+candela.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('character', 'factor'),
@@ -29,7 +29,7 @@ candela.bar.defset = defset %>% list.edit(
   colorize   = F
 )
 
-candela.scatter.defset = defset %>% list.edit(
+candela.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('numeric','integer'),

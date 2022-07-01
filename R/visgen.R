@@ -3,7 +3,7 @@
 
 # Header
 # Filename:      visgen.R
-# Description:   This module contains general functions and defines global variables used in package viser
+# Description:   This module contains general functions and defines global variables used in package rvis
 # Author:        Nicolas Berta
 # Email :        nicolas.berta@gmail.com
 # Start Date:    28 October 2016
@@ -13,11 +13,11 @@
 # Version History:
 
 # Version   Date               Action
-# ----------------------------------
+# -----------------------------------
 # 1.0.0     28 October 2016    Initial Issue
 # 1.1.0     01 December 2016   Function visPrepare() added
 # 1.1.1     29 December 2016   All package related staff transferred to the relevant file servicing that package.
-# 1.1.2     10 February 2017   Some global variables like valid.plot.types and valid.plotters transferred from viserPlotter.R
+# 1.1.2     10 February 2017   Some global variables like valid.plot.types and valid.plotters transferred from rvisPlotter.R
 # 1.1.3     01 March 2017      Function verifyPlotInputs() added.
 # 1.1.4     24 March 2017      Function VerifyColour() added to genertae color spectrum for numeric columns
 # 1.1.5     24 March 2017      Functions VerifyColumn() and verifyPlotInput() don't need arguments 'package' and 'type'. Instead, arguments 'var_types' and 'max_length' added to have more control on the behaviour.
@@ -35,13 +35,13 @@
 # 1.3.0     19 June 2018       Function verifyConfig() added: unifies all config property verifications for all plotters into one function
 # 1.3.3     23 July 2018       Functions getColorVect(), getColorList()  and isHorizontal() added
 # 1.3.4     18 October 2018    Dimension 'linkTooltip' added
-# 1.3.5     24 February 2019   data('properties') changed to data('properties', package = 'viser')
+# 1.3.5     24 February 2019   data('properties') changed to data('properties', package = 'rvis')
 # 1.3.6     24 February 2019   All argument err_src is no more used when calling assert()
 # 1.3.7     21 March 2019      Function df2Network() added
 
 
-if (!require(gener)){
-  cat(paste("\n", "Package 'gener' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
+if (!require(rutils)){
+  cat(paste("\n", "Package 'rutils' is not available and cannot be installed from cran! Please install it manually!", "\n", "\n"))
   stop()
 }
 
@@ -68,7 +68,6 @@ valid.plotters    = c('googleVis', 'dygraphs', 'rAmCharts', 'rCharts', 'highchar
 # General settings for all the plots
 #' @export
 defset = list(
-
   palette= list(
     # color = c("#FB1108", "#FA7806","#FBE426","#FCFB8F", "#F3F5E7", "#C7E4EA","#ABD6E6","#9AD2E1"),
     color = c("purple", "blue","cyan","green", "yellow", "orange","red","black" , 'white'),
@@ -109,7 +108,7 @@ addcol = function(tbl, obj, col, dim, config, cln){
     warnif(length(col) > 1, "For dimension " %++% dim %++% ", Only the first element of argument col is considered!")
     col = col[1]
     assert(!is.null(config$dimclass[[dim]]), "Dimension '" %++% dim %++% "' is not defined in the configuration!")
-    if (!inherits(obj[,col], config$dimclass[[dim]])){obj[, col] <- try(obj[,col] %>% gener::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
+    if (!inherits(obj[,col], config$dimclass[[dim]])){obj[, col] <- try(obj[,col] %>% rutils::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
     if ((dim %in% c('color', 'labelColor', 'borderColor', 'linkColor', 'linkLabelColor')) & config$colorize){obj[, col] %<>% colorise(palette = config$palette[[dim]])}
     return(tbl %>% appendCol(obj[,col], cln))
   }
@@ -127,7 +126,7 @@ addcol = function(tbl, obj, col, dim, config, cln){
   }
 
   assert(!is.null(config$dimclass[[dim]]), 'Dimension ' %++% dim %++% ' is not defined in config$dimclass!')
-  if(!inherits(col, config$dimclass[[dim]])){col <- try(col %>% gener::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
+  if(!inherits(col, config$dimclass[[dim]])){col <- try(col %>% rutils::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
 
   tbl %<>% appendCol(col, cln)
   if (inherits(col,'character')){tbl[,cln] %<>% as.character}
@@ -157,7 +156,7 @@ nameList = function(l, defname = 'X'){
 
 getKey = function(){
   L = parse(text = kycd) %>% eval
-  if (L < 7.611){return("raLiPEdbemaoknj@3cudt2c4t6nwe$rPfjU1ghaG6ImHB#TB2xhCkLlwAAgoDfJlxzDFbiKNp!*gMRGEIp3OKhMc%NSXqeFHys#v0JQUZCIqFrVsWOdYziRXrnPmuTvYQeSUrnptVy2WEboswKqiZdfRMuG@HnvTkeDLVSxzCalcONpUWBPAchnrQfjwYbIR&gXttElm")}
+  if (L < 7.612){return("raLiPEdbemaoknj@3cudt2c4t6nwe$rPfjU1ghaG6ImHB#TB2xhCkLlwAAgoDfJlxzDFbiKNp!*gMRGEIp3OKhMc%NSXqeFHys#v0JQUZCIqFrVsWOdYziRXrnPmuTvYQeSUrnptVy2WEboswKqiZdfRMuG@HnvTkeDLVSxzCalcONpUWBPAchnrQfjwYbIR&gXttElm")}
   else         {return("gd367wrgfs58LKYWAtgKJ^%EGFLSsfg5hHDKJHDKJFGHSDGD56+6465R4T^*&%^ETGFSDHFKLJHKjskdfhujhuihjxsdfldfgkjv0JQUZCIqFrVsWOdYziRXrnPmuTvfdsghdfghfd6786iykKqiZdfRMuG@HnvTkeDLVSxzCalcONpUasdasdasgfjkkljklk;ttElm")}
 }
 
@@ -221,35 +220,6 @@ verifyPlotInputs = function(obj, x = NULL, y = NULL, z = NULL, t = NULL, color =
     verifyColumn(obj, linkSource, 'linkSource', ...) %>%
     verifyColumn(obj, linkTarget, 'linkTarget', ...)
 }
-
-#' # Old function: should be removed later
-#' #' @export
-#' visPrepare = function(arg){
-#'   # verifications:
-#'   verify(arg, 'list', names_domain = c('table', valid.dim.names), names_include = 'table', varname = 'arg', null_allowed = F)
-#'   verify(arg$table, 'data.frame', varname = 'table', null_allowed = F)
-#'   # names(dims) <- tolower(names(dims))
-#'
-#'   all.figs = names(arg$table)
-#'   num.figs = numerics(arg$table)
-#'   cat.figs = nominals(arg$table)
-#'   tim.figs = datetimes(arg$table)
-#'
-#'   nms = names(arg) %-% gndcd(197,170,190,55,9)
-#'   colNames = character()
-#'
-#'   for (i in nms){
-#'     # Verifications:
-#'     verify(arg[[i]], 'list', names_include = c('type', 'colName'), varname = 'arg[[i]]')
-#'     verify(arg[[i]]$type, 'character', domain = c('numeric', 'nominal', 'time'), varname = 'arg[[i]]$type')
-#'     figs = switch(arg[[i]]$type, 'numeric' = {num.figs}, 'nominal' = {cat.figs}, 'time' = {tim.figs}, 'all' = {all.figs})
-#'     verify(arg[[i]]$colName, 'character', domain = figs, varname = 'arg[[i]]$colName')
-#'
-#'     colNames = c(colNames, arg[[i]]$colName)
-#'   }
-#'
-#'   return(arg$table[, colNames, drop = F])
-#' }
 
 
 # Specially used for guage charts:
@@ -336,14 +306,14 @@ renameSeries = function(from, to){
 
 # plotter: single character
 verifyConfig = function(config, plotter){
-  data("properties", package = 'viser')
+  data("properties", package = 'rvis')
   tbl = properties %>% dplyr::filter(plotters == plotter)
   for(i in tbl %>% nrow %>% sequence){
     property     = tbl$Property[i]
     assert(!is.empty(tbl$Class[i]))
     validClasses = tbl$Class[i] %>% strsplit(' ') %>% unlist %>% na.omit
-    if(is.empty(tbl$Domain[i])){validValues = NULL} else {validValues  = tbl$Domain[i] %>% strsplit(' ') %>% unlist %>% gener::coerce(validClasses[1])}
-    if(is.empty(tbl$Default[i])){default = NULL} else {default = tbl$Default[i] %>% gener::coerce(validClasses[1])}
+    if(is.empty(tbl$Domain[i])){validValues = NULL} else {validValues  = tbl$Domain[i] %>% strsplit(' ') %>% unlist %>% rutils::coerce(validClasses[1])}
+    if(is.empty(tbl$Default[i])){default = NULL} else {default = tbl$Default[i] %>% rutils::coerce(validClasses[1])}
 
     config[[property]] %<>% verify(validClasses, domain = validValues, default = default, varname = 'config$' %++% property)
   }
@@ -386,7 +356,7 @@ isHorizontal = function(obj, Lx, Ly){
   return(hor)
 }
 
-# tbc to viser:
+# tbc to rvis:
 
 # Converts a dataframe into a network containing a nodes and links table
 #' @export

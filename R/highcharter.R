@@ -35,7 +35,7 @@
 # todo: add sunburst asap! take the example in tutorial
 
 
-highcharter.line.defset = defset %>% list.edit(
+highcharter.line.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('character', 'factor', 'numeric', 'integer'),
     y       = c('numeric', 'integer', 'character', 'factor'),
@@ -44,7 +44,7 @@ highcharter.line.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-highcharter.combo.defset = defset %>% list.edit(
+highcharter.combo.defset = defset %<==>% list(
   dimclass   = list(
     x         = c('character', 'factor', 'numeric', 'integer', 'Date', 'POSIXct'),
     y         = c('numeric', 'integer', 'character', 'factor', 'Date', 'POSIXct'),
@@ -59,7 +59,7 @@ highcharter.combo.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-highcharter.bubble.defset = defset %>% list.edit(
+highcharter.bubble.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('character', 'factor', 'numeric', 'integer'),
     y       = c('numeric', 'integer', 'character', 'factor'),
@@ -69,7 +69,7 @@ highcharter.bubble.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-highcharter.area.range.defset = defset %>% list.edit(
+highcharter.area.range.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('character', 'factor'),
     low     = c('numeric', 'integer'),
@@ -80,7 +80,7 @@ highcharter.area.range.defset = defset %>% list.edit(
 )
 
 
-highcharter.funnel.defset = defset %>% list.edit(
+highcharter.funnel.defset = defset %<==>% list(
   dimclass   = list(
     label   = c('character', 'factor'),
     size    = c('numeric', 'integer'),
@@ -90,7 +90,7 @@ highcharter.funnel.defset = defset %>% list.edit(
 )
 
 
-highcharter.scatter.defset = defset %>% list.edit(
+highcharter.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x       = 'numeric',
@@ -105,7 +105,7 @@ highcharter.scatter.defset = defset %>% list.edit(
 
 )
 
-highcharter.scatter.molten.defset = defset %>% list.edit(
+highcharter.scatter.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x       = 'numeric',
@@ -392,16 +392,16 @@ highcharter.bar = function(obj, x = NULL, y = NULL, color = NULL, config = NULL)
 
 highcharter.bubble = function(obj, x = NULL, y = NULL, size = NULL, color = NULL, config = NULL){
 
-  config = highcharter.bubble.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
-    list.edit(dimclass = highcharter.bubble.defset$dimclass %>% list.edit(z = 'numeric', size = NULL))
+  config = highcharter.bubble.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %<==>%
+    list(dimclass = highcharter.bubble.defset$dimclass %<==>% list(z = 'numeric', size = NULL))
 
   obj %>% highcharter.combo(shape = 'bubble', x = x, y = y, size = size, color = color, config = config)
 }
 
 highcharter.area.range = function(obj, x = NULL, low = NULL, high = NULL, color = NULL, config = NULL){
 
-  config = highcharter.area.range.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
-    list.edit(dimclass = highcharter.area.range.defset$dimclass %>% list.edit(y = 'numeric'), multiples = c('y', 'low', 'high', 'color'))
+  config = highcharter.area.range.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %<==>%
+    list(dimclass = highcharter.area.range.defset$dimclass %<==>% list(y = 'numeric'), multiples = c('y', 'low', 'high', 'color'))
 
   obj %>% highcharter.combo(shape = chif(config$link.smooth.enabled, 'areasplinerange', 'arearange'), x = x, low = low, high = high, color = color, config = config)
 }

@@ -14,7 +14,7 @@
 # Version History:
 
 # Version   Date               Action
-# ----------------------------------
+# -----------------------------------
 # 1.0.0     29 December 2016   Initial issue
 # 1.0.1     28 February 2017   Function plotly.barChart() renamed to plotly.bar() and modified: Calls verifyPlotInputs() to verify inputs
 # 1.1.0     03 March 2017      Function plotly.pie() added
@@ -58,7 +58,7 @@ plotly.mode['line.' %++% names(plotly.symbol)] = 'lines+markers'
 plotly.symbol['line.' %++% names(plotly.symbol)] = plotly.symbol
 valid.plotly.shapes = names(plotly.mode)
 
-plotly.combo.defset = defset %>% list.edit(
+plotly.combo.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c("character", "factor", "numeric", "integer", 'Date', 'POSIXct'),
@@ -70,7 +70,7 @@ plotly.combo.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-plotly.box.defset = defset %>% list.edit(
+plotly.box.defset = defset %<==>% list(
   dimclass   = list(
     x      = c("character", "factor", "numeric", "integer"),
     y      = c("character", "factor", "numeric", "integer"),
@@ -79,7 +79,7 @@ plotly.box.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-plotly.tsline.defset = defset %>% list.edit(
+plotly.tsline.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c("Date", "POSIXct", "numeric", "integer"),
@@ -89,7 +89,7 @@ plotly.tsline.defset = defset %>% list.edit(
 )
 
 
-plotly.scatter.defset = defset %>% list.edit(
+plotly.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     # x = c('numeric', 'character'),
@@ -109,7 +109,7 @@ plotly.scatter.defset = defset %>% list.edit(
   palette.shape = c('circle', 'square.hollow', 'triangle.hollow', 'plus', 'x', 'rhombus.hollow') # todo: should include all shapes and extended to domain size of the categorical field
 )
 
-plotly.pie.defset = defset %>% list.edit(
+plotly.pie.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     # x = c('numeric', 'character'),
@@ -316,7 +316,7 @@ plotly.box = function(obj, x = NULL, y = NULL, group = NULL, config = NULL, ...)
   if(is.null(L$group)){clrfrml = NULL} else {clrfrml = as.formula('~`' %++% L$group %++% '`')}
 
   p  = plot_ly(obj, x = xfrml, y = yfrml, color = clrfrml, type = "box", ...) %>% plotly.applyConfig(config)
-  if(!is.null(L$group)){p %<>% layout(boxmode = "group")}
+  if(!is.null(L$group)){p %<>% plotly::layout(boxmode = "group")}
   p
 }
 

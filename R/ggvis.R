@@ -21,7 +21,7 @@
 ggvis.shape = c('+' = 'cross', plus = 'cross')
 
 
-ggvis.scatter.defset = defset %>% list.edit(
+ggvis.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x       = 'numeric',
@@ -34,7 +34,7 @@ ggvis.scatter.defset = defset %>% list.edit(
   colorize   = F
 )
 
-ggvis.histogram.defset = defset %>% list.edit(
+ggvis.histogram.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x       = 'numeric'),

@@ -19,7 +19,7 @@
 # ----------------------------------
 # 0.0.1     28 July 2018      Initial issue
 
-dc.bar.defset = defset %>% list.edit(
+dc.bar.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('character'),
     y       = 'numeric'),
@@ -27,7 +27,7 @@ dc.bar.defset = defset %>% list.edit(
   essentials = 'x'
 )
 
-dc.line.defset = defset %>% list.edit(
+dc.line.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('numeric', 'integer', 'character'),
     y       = 'numeric',
@@ -37,7 +37,7 @@ dc.line.defset = defset %>% list.edit(
 )
 
 dc.prepareConfig = function(config){
-  config %>% list.edit(
+  config %<==>% list(
     yAxis.elastic  = T,
     yAxis.padding  = '5%',
     yAxis.offset   = 0,

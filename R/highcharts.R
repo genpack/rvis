@@ -17,7 +17,7 @@
 # ----------------------------------
 # 1.0.0     12 May 2017         Initial issue separated from rCharts.R
 
-highcharts.scatter.molten.defset = defset %>% list.edit(
+highcharts.scatter.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('numeric', 'character'),

@@ -24,7 +24,7 @@
 # 0.0.9     24 July 2018       Functions c3.line() and c3.area() and c3.tsarea() added
 # 0.1.0     17 September 2018  Functions c3.tsarea() modified
 
-c3.combo.defset = defset %>% list.edit(
+c3.combo.defset = defset %<==>% list(
   dimclass   = list(
     x       = c('character', 'Date'),
     y       = 'numeric',
@@ -34,7 +34,7 @@ c3.combo.defset = defset %>% list.edit(
 )
 
 # don't use integer for c3!
-c3.bar.defset = defset %>% list.edit(
+c3.bar.defset = defset %<==>% list(
   dimclass   = list(
     x     = c('numeric', 'character', 'factor'),
     y     = c('numeric', 'character', 'factor'),
@@ -43,7 +43,7 @@ c3.bar.defset = defset %>% list.edit(
   essentials = c('y')
 )
 
-c3.tsline.defset = defset %>% list.edit(
+c3.tsline.defset = defset %<==>% list(
   dimclass   = list(
     x       = 'Date', # POSIXct does not work. Convert to character
     y       = 'numeric',
@@ -52,7 +52,7 @@ c3.tsline.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-c3.pie.defset = defset %>% list.edit(
+c3.pie.defset = defset %<==>% list(
   dimclass   = list(
     label   = 'character',
     theta   = 'numeric'),
@@ -61,7 +61,7 @@ c3.pie.defset = defset %>% list.edit(
 )
 
 
-c3.scatter.molten.defset = defset %>% list.edit(
+c3.scatter.molten.defset = defset %<==>% list(
   dimclass   = list(
     x       = 'numeric',
     y       = 'numeric',
@@ -227,6 +227,6 @@ c3.pie = function(obj, theta = NULL, label = NULL, config = NULL, ...){
 }
 
 c3.gauge = function(theta, config = NULL, ...){
-  theta %>% verify('numeric') %>% data.frame %>% c3 %>% c3_gauge
+  theta %>% verify('numeric') %>% data.frame %>% c3 %>% c3_gauge(...)
 }
 

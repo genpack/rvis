@@ -18,7 +18,7 @@
 # 0.0.1     17 October 2017     Initial issue
 
 # # Default settings for plotter pivot:
-# pivot.defset = defset %>% list.edit(
+# pivot.defset = defset %<==>% list(
 #   # Valid classes for all dimensions
 #   dimclass  = list(x = valid.classes, y = valid.classes),
 #   multiples = c('x','y'),
@@ -92,7 +92,7 @@ pivot <- function(
     x,
     width = width,
     height = height,
-    package = 'viser'
+    package = 'rvis'
   )
 }
 
@@ -111,7 +111,7 @@ pivot <- function(
 ##
 ## @export
 pivotOutput <- function(outputId, width = '100%', height = '500px'){
-  shinyWidgetOutput(outputId, 'pivot', width, height, package = 'viser')
+  shinyWidgetOutput(outputId, 'pivot', width, height, package = 'rvis')
 }
 
 ## Widget render function for use in Shiny

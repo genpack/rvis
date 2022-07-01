@@ -25,7 +25,7 @@
 
 # http://morrisjs.github.io/morris.js/lines.html
 
-morrisjs.tsline.defset = defset %>% list.edit(
+morrisjs.tsline.defset = defset %<==>% list(
   dimclass   = list(
     x       = 'Date',
     y       = 'numeric',
@@ -35,7 +35,7 @@ morrisjs.tsline.defset = defset %>% list.edit(
   smooth = F
 )
 
-morrisjs.pie.defset = defset %>% list.edit(
+morrisjs.pie.defset = defset %<==>% list(
   dimclass   = list(
     theta    = 'numeric',
     color    = valid.classes,

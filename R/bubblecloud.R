@@ -14,7 +14,7 @@
 # 0.1.0     21 June 2018       Initial issue with function bubbleCloud.bubble.molten()
 
 # Default settings for package bubbleCloud:
-bubbleCloud.bubble.molten.defset = defset %>% list.edit(
+bubbleCloud.bubble.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
     size    = valid.numeric.classes,
@@ -77,7 +77,7 @@ bubbleCloud.bubble.molten <- function(obj, size = NULL, group = NULL, tooltip = 
     x,
     width = width,
     height = height,
-    package = 'viser',
+    package = 'rvis',
     sizingPolicy = htmlwidgets::sizingPolicy(
       viewer.padding = 0,
       browser.fill = TRUE
@@ -87,7 +87,7 @@ bubbleCloud.bubble.molten <- function(obj, size = NULL, group = NULL, tooltip = 
 
 
 bubbleCloudOutput <- function(outputId, width = '100%', height = '500px'){
-  shinyWidgetOutput(outputId, 'bubbleforce', width, height, package = 'viser')
+  shinyWidgetOutput(outputId, 'bubbleforce', width, height, package = 'rvis')
 }
 
 renderBubbleCloud <- function(expr, env = parent.frame(), quoted = FALSE) {

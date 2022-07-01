@@ -19,7 +19,7 @@
 # 0.0.1     24 April 2017      Initial issue
 
 
-rbokeh.scatter.defset = defset %>% list.edit(
+rbokeh.scatter.defset = defset %<==>% list(
   dimclass   = list(
     x       = 'numeric',
     y       = 'numeric',

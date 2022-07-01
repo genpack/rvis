@@ -16,7 +16,7 @@
 # ----------------------------------
 # 1.0.0     12 Mary 2017       Initial issue separated from rCharts.R
 
-xCharts.area.molten.defset = defset %>% list.edit(
+xCharts.area.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('character', 'factor'),

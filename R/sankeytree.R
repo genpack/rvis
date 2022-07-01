@@ -5,11 +5,11 @@
 # Header
 # Filename:       sankeytree.R
 # Description:    Contains functions for plotting interactive sankey tree charts in using package sankeyTreeR.
-# Author:         Nicolas Berta
-# Email :         nicolas.berta@gmail.com
+# Author:         Nima Ramezani
+# Email :         nima.ramezani@gmail.com
 # Start Date:     11 September 2018
-# Last Revision:  11 September 2018
-# Version:        0.0.1
+# Last Revision:  04 September 2021
+# Version:        0.0.2
 #
 
 # Version History:
@@ -17,8 +17,9 @@
 # Version   Date               Action
 # ----------------------------------
 # 0.0.1     11 September 2018  Initial issue
+# 0.0.2     04 September 2021  Some config properties passed to the plotter
 
-sankeytree.tree.defset = defset %>% list.edit(
+sankeytree.tree.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     size   = 'numeric',
@@ -26,7 +27,7 @@ sankeytree.tree.defset = defset %>% list.edit(
     color   = valid.classes),
   multiples  = 'label',
   essentials = c('size', 'label'),
-  aggregator.function.string = 'sum'
+  aggregator = 'sum'
 )
 
 sankeytree.prepareConfig = function(config){
@@ -44,13 +45,13 @@ sankeytree.tree = function(obj, label = NULL, size = NULL, color = NULL, config 
 
   config = sankeytree.tree.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
 
-  if (is.null(color)){
-    color = list(colour = size[[1]])
-  } else {
-    names(color) = 'colour'
-    color %<>% as.list
-  }
-
+  # if (is.null(color)){
+  #   color = list(colour = size[[1]])
+  # } else {
+  #   names(color) = 'colour'
+  #   color %<>% as.list
+  # }
+  #
 
   # Preparing Aesthetics:
   a = prepareAesthetics(label = label, size = size, color = color)
@@ -61,9 +62,9 @@ sankeytree.tree = function(obj, label = NULL, size = NULL, color = NULL, config 
   config    %<>% sankeytree.prepareConfig
 
   obj %>% treemap::treemap(index = L$label, vSize = c(L$size), vColor = L$color, fun.aggregate = config$aggregator, draw = F) %>%
-  {.$tm} %>% rename(size = vSize, color = vColor) %>%
-  {.[, c(L$label, 'size', 'color')]} %>% d3r::d3_nest(value_cols=c("size","color"), root = "ROOT", json = F) %>%
+  {.$tm} %>% rename(size = vSize) %>%
+  {.[, c(L$label, 'size', 'color')]} %>% d3r::d3_nest(value_cols=c("size", "color"), root = "ROOT", json = F) %>%
     mutate(size = sum(obj[, L$size])) %>%
     d3r::d3_json(strip = T) %>%
-    sankeytreeR::sankeytree(maxLabelLength = 10, nodeHeight = 90, height = 600, width = 1300, treeColors = T, tooltip = list("size"))
+    sankeytreeR::sankeytree(maxLabelLength = config$node.label.size.max, nodeHeight = config$node.height, tooltip = list("size"), ...)
 }

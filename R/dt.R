@@ -26,7 +26,7 @@
 #' @include visgen.R
 
 # Default settings for package DT:
-DT.defset = defset %>% list.edit(
+DT.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(label = valid.classes),
   multiples = 'label',
@@ -116,7 +116,7 @@ DT.options = function(config, df, sessionobj = NULL){
   opt = config %>% list.extract('autoWidth')
   if(!is.null(config$links) & !is.null(sessionobj)){
     action   <- DT::dataTableAjax(sessionobj, df)
-    opt$ajax %<>% verify('list', default = list()) %>% list.edit(url = action)
+    opt$ajax %<>% verify('list', default = list()) %<==>% list(url = action)
   }
 
   opt$pageLength = config$paging.length %>% verify(c('integer', 'numeric'), lengths = 1, domain = c(1,Inf), default = 10)

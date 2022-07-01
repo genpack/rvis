@@ -23,7 +23,7 @@
 # 1.0.4     24 July 2018        Function dimple.combo() added.
 # 1.0.5     27 July 2018        Function dimple.scatter() added.
 
-dimple.combo.defset = defset %>% list.edit(
+dimple.combo.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c("character", "factor", "Date", "POSIXct", "numeric", "integer"),
@@ -37,7 +37,7 @@ dimple.combo.defset = defset %>% list.edit(
   colorize = F
 )
 
-dimple.scatter.defset = defset %>% list.edit(
+dimple.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = "numeric",

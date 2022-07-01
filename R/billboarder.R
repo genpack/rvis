@@ -26,7 +26,7 @@
 # 0.1.0     24 July 2018        billboarder.bb_opt() removed: applyConfig() and applyColor() now directly modifies object property and data lists
 # 0.1.1     17 Spetember 2018   billboarder.tsarea() added
 
-billboarder.bar.defset = defset %>% list.edit(
+billboarder.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('character', 'factor', 'numeric', 'integer'),
@@ -49,7 +49,7 @@ billboarder.bar.defset = defset %>% list.edit(
 
 
 
-billboarder.scatter.defset = defset %>% list.edit(
+billboarder.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x     = c('numeric','integer'),
@@ -59,7 +59,7 @@ billboarder.scatter.defset = defset %>% list.edit(
   essentials = c('x', 'y')
 )
 
-billboarder.pie.defset = defset %>% list.edit(
+billboarder.pie.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     label = 'character',
@@ -68,7 +68,7 @@ billboarder.pie.defset = defset %>% list.edit(
   essentials = c('label', 'theta')
 )
 
-billboarder.tsline.defset = defset %>% list.edit(
+billboarder.tsline.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     x = c('Date', 'POSIXct'),
@@ -81,8 +81,8 @@ billboarder.tsline.defset = defset %>% list.edit(
 
 
 billboarder.applyColors <- function(bb, colorlist, opacity = 1) {
-  bb$x$bb_opts[["billboarderspecials"]] %<>% list.edit(opacity = opacity)
-  bb$x$bb_opts[["data"]] %<>% list.edit(colors = colorlist)
+  bb$x$bb_opts[["billboarderspecials"]][["opacity"]] <- opacity
+  bb$x$bb_opts[["data"]] <- bb$x$bb_opts[["data"]] %<==>% list(colors = colorlist)
   return(bb)
 }
 
@@ -101,44 +101,42 @@ billboarder.applyConfig = function(bb, config){
   else if(!is.null(config$yAxis.tick.label.suffix)){yAxTckFrmt = billboarder.format.suffix.js(config$yAxis.tick.label.suffix)}
   else {yAxTckFrmt = NULL}
 
-  bb$x$bb_opts[["grid"]] %<>% list.edit(
+  bb$x$bb_opts[["grid"]] <- bb$x$bb_opts[["grid"]] %<==>% list(
     y = list(show = config$yAxis.grid.enabled),
     x = list(show = config$xAxis.grid.enabled)
   )
 
-  bb$x$bb_opts[["axis"]] %<>% list.edit(
+  bb$x$bb_opts[["axis"]] <- bb$x$bb_opts[["axis"]] %<==>% list(
     y = list(tick  = list(format = yAxTckFrmt, fit = FALSE),
              label = list(text = config$yAxis.label, position = config$yAxis.label.position)),
     x = list(tick  = list(format = xAxTckFrmt, fit = FALSE),
              label = list(text = config$xAxis.label, position = config$xAxis.label.position))
   )
 
-  bb$x$bb_opts[["legend"]] %<>% list.edit(
+  bb$x$bb_opts[["legend"]] <- bb$x$bb_opts[["legend"]] %<==>% list(
     show     = config$legend.enabled,
     position = chif(nin, config$legend.position, 'inset'),
     inset    = chif(nin, NULL, list(anchor = config$legend.position))
   )
 
-  bb$x$bb_opts[["title"]] %<>% list.edit(
+  bb$x$bb_opts[["title"]] <- bb$x$bb_opts[["title"]] %<==>% list(
     text     = config$title,
     position = config$title.position
     # todo: padding doesn't work! check why?
     # padding  = list(top = config$title.padding.top, right = config$title.padding.right, left = config$title.padding.left, buttom = config$title.padding.buttom)
   ) %>% list.clean
 
-  bb$x$bb_opts[["caption"]] %<>% list.edit(
+  bb$x$bb_opts[["caption"]] <- bb$x$bb_opts[["caption"]] %<==>% list(
     text = config$subtitle
   )
 
   if(config$stack.enabled){
-    bb$x$bb_opts[["data"]] %<>% list.edit(groups  = config$stack.groups)
+    bb$x$bb_opts[["data"]][["groups"]] <- config$stack.groups
   }
 
-  bb$x$bb_opts[["point"]] %<>% list.edit(
-    r = config$size
-  )
+  bb$x$bb_opts[["point"]][["r"]] <- config$size
 
-  bb$x$bb_opts[["subchart"]] %<>% list.edit(
+  bb$x$bb_opts[["subchart"]] <- bb$x$bb_opts[["subchart"]] %<==>% list(
     show = config$subchart.enabled,
     size = list(height = config$subchart.height)
   )

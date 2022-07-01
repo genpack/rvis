@@ -24,7 +24,7 @@
 # 1.1.5     27 June 2018       Dimension 'key' added to specify id of nodes
 
 
-visNetwork.graph.defset = defset %>% list.edit(
+visNetwork.graph.defset = defset %<==>% list(
   dimclass   = list(
     key     = c('character', 'factor', 'integer'),
     label   = c('character', 'factor'),
@@ -196,7 +196,7 @@ visNetwork.graph = function(obj,
 
   if (is.null(L$labelColor) & !is.null(L$color)){
     obj$nodes$font.color <- obj$nodes$color.background %>%
-      gener::contrastColors()
+      rutils::contrastColors()
   }
 
   visNetwork(obj$nodes, obj$links, ...)  %>% visNetwork.applyConfig(config)

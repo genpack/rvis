@@ -1,9 +1,9 @@
-# viserplot.R ----------------------------------------------------------------
+# rvisplot.R ----------------------------------------------------------------
 # Header
-# Filename:       viserplot.R
-# Description:    Contains the major plotting function for viser: viserplot
-# Author:         Nicolas Berta
-# Email :         nicolas.berta@gmail.com
+# Filename:       rvisplot.R
+# Description:    Contains the major plotting function for rvis: rvisplot
+# Author:         Nima Ramezani
+# Email :         nima.ramezani@gmail.com
 # Start Date:     13 July 2017
 # Last Revision:  13 July 2017
 # Version:        0.0.1
@@ -17,6 +17,6 @@
 
 
 #' @export
-viserPlot = function(type, plotter, ...){
+rvisPlot = function(type, plotter, ...){
   parse(text = paste0(plotter, '.', type, "(...)")) %>% eval
 }

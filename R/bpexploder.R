@@ -18,7 +18,7 @@
 # 0.0.2     18 July 2018        bpexploder.box.molten() renamed to bpexploder.box: Changed argument group to x
 
 # this is a molten chart:
-bpexploder.box.defset = defset %>% list.edit(
+bpexploder.box.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass   = list(
     y = c('numeric','integer'),

@@ -3,7 +3,7 @@
 
 # Header
 # Filename:       jscripts.R
-# Description:    Contains javascript function code for all htmlWidgets used in viser package.
+# Description:    Contains javascript function code for all htmlWidgets used in rvis package.
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com.au
 # Start Date:     13 June 2017

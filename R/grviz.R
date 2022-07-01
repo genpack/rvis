@@ -23,7 +23,7 @@
 # 0.1.8     20 June 2019       grviz.graph() modified: ... Arguments passed to grviz.renderGraph()
 
 
-grviz.graph.defset = defset %>% list.edit(
+grviz.graph.defset = defset %<==>% list(
   dimclass   = list(
     key            = c('character', 'factor', 'integer'),
     label          = c('character', 'factor'),
@@ -108,10 +108,10 @@ grviz.direction = c(up.down = 'TD', left.right = 'LR', right.left = 'RL', down.u
 grviz.applyConfig = function(net, config){
   # shdw = list(enabled = chif(is.null(config$node.shadow.enabled), T, config$node.shadow.enabled),
   #             size    = chif(is.null(config$node.shadow.size), 10, config$node.shadow.size))
-  # scl  = list(min = config$node.size.min, max = config$node.size.max)
+  # scl  = list(min = config[["node.size.min"]], max = config[["node.size.max"]])
 
   dir  = grviz.direction[config$direction %>% verify('character', domain = valid.visNetwork.directions, default = 'up.down')] %>% unname
-  lot  = config$layout %>% verify('character', domain = c('random', 'hierarchical', 'neato', 'twopi', 'circo'), default = 'dot')
+  lot  = verify(config$layout, 'character', domain = c('random', 'hierarchical', 'neato', 'twopi', 'circo'), default = 'dot')
 
   if(lot == 'hierarchical'){lot = 'dot'}
   if(lot == 'random'){lot = 'neato'}
@@ -202,8 +202,8 @@ graphFunctionDuration <- function(start_time) {
 
 grviz.createNodeDF <- function(n, type = NULL, label = NULL, ...){
   fcn_name <- getCallingFcn()
-  gener::assert(inherits(n, "numeric") | inherits(n, "integer"), "The value supplied to `n` must be numeric", fcn_name)
-  gener::assert(length(n) <= 1, "The value supplied to `n` must be a single numeric value", fcn_name)
+  rutils::assert(inherits(n, "numeric") | inherits(n, "integer"), "The value supplied to `n` must be numeric", fcn_name)
+  rutils::assert(length(n) <= 1, "The value supplied to `n` must be a single numeric value", fcn_name)
 
   if (is.null(type)) {type <- rep(as.character(NA), n)}
   if (!is.null(type)) {
@@ -354,8 +354,8 @@ grviz.graph = function(obj,
 
   # if (is.empty(obj$nodes)){obj$nodes <- data.frame(id = nodeIDs)} else {obj$nodes$id = nodeIDs}
 
-  gener::assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
-  gener::assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
+  rutils::assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
+  rutils::assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
 
   if(!inherits(obj$nodes[, L$key], 'integer')){
     nodemap = sequence(nrow(obj$nodes))
@@ -370,17 +370,17 @@ grviz.graph = function(obj,
     obj$nodes[, L$labelColor] = contrastColors(obj$nodes[, L$color])
   }
 
-  if(!is.null(config$node.size.min) & !is.null(config$node.size.max) & !is.null(L$size)){
-    obj$nodes[, L$size] %<>% vect.map(min = config$node.size.min, max = config$node.size.max)
+  if(!is.null(config[["node.size.min"]]) & !is.null(config[["node.size.max"]]) & !is.null(L$size)){
+    obj$nodes[, L$size] %<>% vect.map(min = config[["node.size.min"]], max = config[["node.size.max"]])
 
   }
 
-  if(!is.null(config$link.width.min) & !is.null(config$link.width.max) & !is.null(L$linkWidth)){
-    obj$links[, L$linkWidth] %<>% vect.map(min = config$link.width.min, max = config$link.width.max)
+  if(!is.null(config[["link.width.min"]]) & !is.null(config[["link.width.max"]]) & !is.null(L$linkWidth)){
+    obj$links[, L$linkWidth] %<>% vect.map(min = config[["link.width.min"]], max = config[["link.width.max"]])
   }
 
-  if(!is.null(config$link.length.min) & !is.null(config$link.length.max) & !is.null(L$linkLength)){
-    obj$links[, L$linkLength] %<>% vect.map(min = config$link.length.min, max = config$link.length.max)
+  if(!is.null(config[["link.length.min"]]) & !is.null(config[["link.length.max"]]) & !is.null(L$linkLength)){
+    obj$links[, L$linkLength] %<>% vect.map(min = config[["link.length.min"]], max = config[["link.length.max"]])
   }
 
   if(is.empty(obj$nodes)){
@@ -400,14 +400,14 @@ grviz.graph = function(obj,
       fixedsize = F, # get from config, also fontname
       style     = "rounded,filled") -> nodes_df # todo: get from config
 
-    config$node.size.ratio %<>% verify('numeric', domain = c(0,1), default = 0.7)
+    config[["node.size.ratio"]] <- verify(config[["node.size.ratio"]], 'numeric', domain = c(0,1), default = 0.7)
 
-    if(is.null(config$node.width) & !is.null(config$node.size)){config$node.width  <- config$node.size}
-    if(is.null(config$node.height) & !is.null(config$node.size)){config$node.height <- config$node.size.ratio*config$node.size}
+    if(is.null(config[["node.width"]]) & !is.null(config[["node.size"]])){config[["node.width"]]  <- config[["node.size"]]}
+    if(is.null(config[["node.height"]]) & !is.null(config[["node.size"]])){config[["node.height"]] <- config[["node.size.ratio"]]*config[["node.size"]]}
 
-    if(!is.null(L$size)){nodes_df$width    = obj$nodes[, L$size]} else {nodes_df$width <- config$node.width}
-    if(!is.null(L$size)){nodes_df$height   = config$node.size.ratio*obj$nodes[, L$size]} else {nodes_df$height <- config$node.height}
-    if(!is.null(L$size)){nodes_df$fontsize = (config$node.label.size/mean(obj$nodes[, L$size]))*obj$nodes[, L$size]} else {nodes_df$fontsize <- config$node.label.size}
+    if(!is.null(L$size)){nodes_df$width    = obj$nodes[, L$size]} else {nodes_df$width <- config[["node.width"]]}
+    if(!is.null(L$size)){nodes_df$height   = config[["node.size.ratio"]]*obj$nodes[, L$size]} else {nodes_df$height <- config[["node.height"]]}
+    if(!is.null(L$size)){nodes_df$fontsize = (config$node.label.size/mean(obj$nodes[, L$size], na.rm = T))*obj$nodes[, L$size]} else {nodes_df$fontsize <- config$node.label.size}
 
     if(is.null(nodes_df$fontsize)){
       nodes_df$fontsize = config$node.label.size
@@ -476,7 +476,7 @@ grviz.graph = function(obj,
 }
 
 
-# todo: translate shapes to viser standard
+# todo: translate shapes to rvis standard
 grviz.shape = c(square = 'square', delta = 'triangle', icon = 'icon', triangle = 'triangle', rectangle = 'rectangle', box = 'rectangle', dot = 'point', point = 'point', egg = 'egg', oval = 'oval', text = 'plaintext', bubble = 'circle', circle = gndcd(88,4,1,18,199,94),  star = 'star', ellipse = 'ellipse', cylinder = "database", diamond = 'diamond', rhombus = 'diamond')
 valid.grviz.shapes = grviz.shape %>% names
 
@@ -565,7 +565,7 @@ grviz.createGraph <- function(nodes_df = NULL, edges_df = NULL, directed = TRUE,
                       "white", "Helvetica", "8", "1.5", "gray80", "0.5"),
         attr_type = c(rep("graph", 2), rep("node", 9), "graph", rep("edge", 5)),
         stringsAsFactors = FALSE)
-    } else {gener::assert(F, "The value for `attr_theme` doesn't refer to any available theme", fcn_name)}
+    } else {rutils::assert(F, "The value for `attr_theme` doesn't refer to any available theme", fcn_name)}
   } else if (is.null(attr_theme)) {
     global_attrs <- data.frame(
       attr  = as.character(NA),
@@ -663,7 +663,7 @@ grviz.createGraph <- function(nodes_df = NULL, edges_df = NULL, directed = TRUE,
 
 grviz.generateDot <- function(graph) {
   fcn_name <- getCallingFcn()
-  is.graph.valid(graph) %>% gener::assert("The graph object is not valid", fcn_name)
+  is.graph.valid(graph) %>% rutils::assert("The graph object is not valid", fcn_name)
   attr_type <- attr <- value <- string <- NULL
   # Extract objects from the graph objecct
   nodes_df <- graph$nodes_df
@@ -1233,7 +1233,7 @@ grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, 
 {
   if(nrow(graph$nodes_df) == 0){dotstr = ""} else {
     fcn_name <- getCallingFunctionName()
-    is.grviz.graph(graph) %>% gener::assert("The graph object is not valid", fcn_name)
+    is.grviz.graph(graph) %>% rutils::assert("The graph object is not valid", fcn_name)
     V1 <- V2 <- x <- y <- attr_type <- value_x <- NULL
     value <- hex <- fillcolor <- new_fillcolor <- NULL
     if (!is.null(title)) {
@@ -1350,11 +1350,11 @@ grviz = function(diagram = "", engine = "dot", allow_subst = TRUE,
   # x <- list(diagram = diagram, config = list(engine = engine, options = options))
   viewer.suppress <- rstudioapi::isAvailable() && !rstudioapi::isAvailable("0.99.120")
   htmlwidgets::createWidget(name = "grviz", x = x, width = width,
-                            height = height, package = "viser", htmlwidgets::sizingPolicy(viewer.suppress = viewer.suppress))
+                            height = height, package = "rvis", htmlwidgets::sizingPolicy(viewer.suppress = viewer.suppress))
   }
 
 grvizOutput <- function(outputId, width = '100%', height = '400px') {
-  shinyWidgetOutput(outputId = outputId, 'grviz', width, height, package = 'viser')
+  shinyWidgetOutput(outputId = outputId, 'grviz', width, height, package = 'rvis')
 }
 
 renderGrviz <- function(expr, env = parent.frame(), quoted = FALSE) {

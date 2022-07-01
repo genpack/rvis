@@ -28,7 +28,7 @@
 #' @include visgen.R
 
 # Default settings for package DT:
-TFD3.table.defset = defset %>% list.edit(
+TFD3.table.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
     label = valid.classes,
@@ -38,7 +38,7 @@ TFD3.table.defset = defset %>% list.edit(
   column.filter.enabled = TRUE
 )
 
-TFD3.table.molten.defset = defset %>% list.edit(
+TFD3.table.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
     label = valid.classes,
@@ -325,7 +325,6 @@ TFD3.bgColScales = function(obj, config){
 ## )
 ##
 ##
-#' @import gtools
 #' @import htmlwidgets
 #' @import crosstalk
 ## @export JS
@@ -517,7 +516,7 @@ TFD3 <- function(df, enableTf = TRUE, tableProps = NULL, showRowNames = FALSE, c
 ## @name tableFilter-shiny
 ## @export
 TFD3Output <- function(outputId, width = "100%", height = "400px") {
-  shinyWidgetOutput(outputId, "TFD3", width, height, package = "viser")
+  shinyWidgetOutput(outputId, "TFD3", width, height, package = "rvis")
 }
 ## @rdname tableFilter-shiny
 ## @export

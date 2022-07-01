@@ -108,7 +108,7 @@ valid.colors = c('red', 'yellow', 'aqua', 'blue', 'light-blue', 'green', 'navy',
 valid.input.types = c("textInput", "radioButtons", "sliderInput", "actionButton", "actionBttn", "actionLink", "checkboxInput", "checkboxGroupInput", "selectInput", "dateInput", "airDatepickerInput",
                       "dateRangeInput", "fileInput", "numericInput", "passwordInput")
 
-valid.output.types = c("uiOutput", "dynamicInput", "loginInput", "plotOutput", "verbatimTextOutput", "textOutput", "tableOutput", "dataTableOutput", "htmlOutput",
+valid.output.types = c("uiOutput", "dynamicInput", "loginInput", "plotOutput", "verbatimTextOutput", "textOutput", "imageOutput", "tableOutput", "dataTableOutput", "htmlOutput",
                        "gglVisChartOutput", "rChartsdPlotOutput", 'dygraphOutput', 'plotlyOutput', 'amChartsOutput',
                        "leafletOutput", "infoBoxOutput", "valueBoxOutput", "pivotOutput", "wordcloud2Output", 'bubblesOutput', 'd3plusOutput', 'plotlyOutput',
                        "highcharterOutput", "TFD3Output", "grvizOutput", "c3Output", "sunburstOutput", "sankeyNetworkOutput", "morrisjsOutput",
@@ -166,7 +166,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
 
                          methods = list(
                            # Class constructor
-                           initialize = function(name = "viser Dashboard", objects = list(), ...){
+                           initialize = function(name = "rvis Dashboard", objects = list(), ...){
                              support('shiny')
                              callSuper(...)
                              # Field assignment:
@@ -877,6 +877,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                             items[[i]]$object <<- verbatimTextOutput(i, placeholder = phldr)},
                                           # todo: add arguments container and inline for textOutput and htmlOutput
                                           "textOutput"         = {items[[i]]$object <<- textOutput(i)},
+                                          "imageOutput"        = {items[[i]]$object <<- imageOutput(i)},
                                           "tableOutput"        = {items[[i]]$object <<- tableOutput(i)},
                                           "dataTableOutput"    = {
                                             support('DT')
@@ -1050,6 +1051,10 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                             "plotOutput"         = {script.func = gndcd(31,29, 14, 20, 9, 31, 32, 55, 60, 21)},
                                             "verbatimTextOutput" = {script.func = gndcd(110,94,14,7,94,1, 5,110, 118,27,25)},
                                             "textOutput"         = {script.func = gndcd(31, 29, 183,7,130,121,160,94, 167,196)},
+                                            "imageOutput"        = {
+                                              script.func = 'renderImage'
+                                              arguments   = list2Script(items[[i]], fields = c('deleteFile'))
+                                            },
                                             "tableOutput"        = {
                                               script.func = 'renderTable';
                                               arguments   = list2Script(items[[i]], fields = c('striped', 'hover', 'bordered', 'spacing', gndcd(56,4,150,196,86), 'align', 'rownames', 'colnames', 'digits', 'na'))
