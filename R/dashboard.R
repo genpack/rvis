@@ -4,11 +4,11 @@
 # Filename:      dashboard.R
 # Description:   This project, aims to create a ref class containing multiple objects
 #                that can issue a shiny dashboard
-# Author:        Nicolas Berta
-# Email :        nicolas.berta@gmail.com
+# Author:        Nima Ramezani
+# Email :        nima.ramezani@gmail.com
 # Start Date:    22 January 2016
-# Last Revision: 21 June 2019
-# Version:       2.5.7
+# Last Revision: 16 January 2023
+# Version:       2.6.0
 
 # Version History:
 
@@ -93,6 +93,9 @@
 # 2.5.5     05 November 2018    grviz is now independent
 # 2.5.6     06 November 2018    Argument 'width' added for selectInput
 # 2.5.7     21 June 2019        Argument 'style' added for box cloth
+# 2.5.8     05 January 2023     cloth icon can be of class icon
+# 2.5.9     05 January 2023     Argument 'width' added to slider Input
+# 2.6.0     16 January 2023     upsetjsOuptput added
 
 support('shiny', 'shinydashboard', 'htmlwidgets')
 
@@ -111,7 +114,7 @@ valid.input.types = c("textInput", "radioButtons", "sliderInput", "actionButton"
 valid.output.types = c("uiOutput", "dynamicInput", "loginInput", "plotOutput", "verbatimTextOutput", "textOutput", "imageOutput", "tableOutput", "dataTableOutput", "htmlOutput",
                        "gglVisChartOutput", "rChartsdPlotOutput", 'dygraphOutput', 'plotlyOutput', 'amChartsOutput',
                        "leafletOutput", "infoBoxOutput", "valueBoxOutput", "pivotOutput", "wordcloud2Output", 'bubblesOutput', 'd3plusOutput', 'plotlyOutput',
-                       "highcharterOutput", "TFD3Output", "grvizOutput", "c3Output", "sunburstOutput", "sankeyNetworkOutput", "morrisjsOutput",
+                       "highcharterOutput", "TFD3Output", "grvizOutput", "c3Output", "sunburstOutput", "sankeyNetworkOutput", "morrisjsOutput", "upsetjsOutput",
                        "coffeewheelOutput", "billboarderOutput", 'sankeytreeOutput', "rHandsonTableOutput", "downloadButton", "downloadLink", "static")
 
 valid.container.types = c("column", "box", "bag", "fluidPage", "dashboardPage", "tabsetPanel",
@@ -340,8 +343,11 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                       scr = paste0(scr, "subtitle = ", cloth.str, "$subtitle,")
                                     }
                                     if (!is.null(cloth$icon)){
-                                      verify(cloth$icon, 'character')
-                                      scr   = paste0(scr, "icon = shiny::icon(", cloth.str, "$icon),")
+                                      if(inherits(cloth$icon, 'character')){
+                                        scr   = paste0(scr, "icon = shiny::icon(", cloth.str, "$icon),")
+                                      } else {
+                                        scr   = paste0(scr, "icon = ", cloth.str, "$icon,")
+                                      }
                                     }
                                     if (!is.null(cloth$color)){
                                       verify(cloth$color, 'character', domain = valid.colors)
@@ -555,8 +561,11 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         vl = items[[i]]$value %>% verify(c('numeric', 'integer', 'logical', valid.time.classes), varname = "items[['" %++% i %++% "']]$value", default = 0, domain = c(mn, mx))
                                         an = items[[i]]$animate %>% verify(c("list", "logical"), default = F)
 
+                                        # obj = do.call(items[[i]]$type, args = items[[i]] %>% list.remove('type'))
                                         obj = sliderInput(i, label = lbl, min = mn, max = mx, value = vl, step = items[[i]]$step,
-                                                          sep  = items[[i]]$sep, pre = items[[i]]$pre, post = items[[i]]$post, timeFormat = items[[i]]$timeFormat, animate = an)},
+                                                          sep  = items[[i]]$sep, pre = items[[i]]$pre, post = items[[i]]$post, 
+                                                          timeFormat = items[[i]]$timeFormat, 
+                                                          width = items[[i]]$width, animate = an)},
                                       "actionButton"   = {
                                         obj = actionButton(i, label = lbl, icon = icn, width = items[[i]]$width) %>% buildStyle(inline = items[[i]]$inline, vertical_align = items[[i]]$vertical_align, float = items[[i]]$float, width = items[[i]]$width)},
                                       "actionBttn"     = {
@@ -898,6 +907,10 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                             wdth = items[[i]]$width  %>% verify('character', lengths = 1, default = "100%" , varname = "items[['" %++% i %++% "']]$width")
                                             hght = items[[i]]$height %>% verify('character', lengths = 1, default = "500px" , varname = "items[['" %++% i %++% "']]$height")
                                             items[[i]]$object <<- networkD3::sankeyNetworkOutput(i, width = wdth, height = hght)},
+                                          "upsetjsOutput" = {
+                                            wdth = items[[i]]$width  %>% verify('character', lengths = 1, default = "100%" , varname = "items[['" %++% i %++% "']]$width")
+                                            hght = items[[i]]$height %>% verify('character', lengths = 1, default = "500px" , varname = "items[['" %++% i %++% "']]$height")
+                                            items[[i]]$object <<- upsetjs::upsetjsOutput(i, width = wdth, height = hght)},
                                           "sunburstOutput" = {
                                             wdth = items[[i]]$width  %>% verify('character', lengths = 1, default = "100%" , varname = "items[['" %++% i %++% "']]$width")
                                             hght = items[[i]]$height %>% verify('character', lengths = 1, default = "400px" , varname = "items[['" %++% i %++% "']]$height")
@@ -1067,6 +1080,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                             "grvizOutput"        = {script.func = 'renderGrviz'},
                                             "c3Output"           = {script.func = 'c3::renderC3'},
                                             "sankeyNetworkOutput"= {script.func = 'networkD3::renderSankeyNetwork'},
+                                            "upsetjsOutput"      = {script.func = 'upsetjs::renderUpsetjs'},
                                             "sunburstOutput"     = {script.func = 'sunburstR::renderSunburst'},
                                             "rHandsonTableOutput"= {script.func = 'renderRHandsontable'},
                                             "pivot"              = {script.func = 'renderPivot'},

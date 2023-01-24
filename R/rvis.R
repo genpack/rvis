@@ -200,6 +200,8 @@
 # 5.8.3 (30 July 2021)      - revisit to update
 # 5.8.4 (04 Spetember 2021) - sankeytree changed to version 0.0.2
 # 5.8.6 (13 October 2021)   - imageOutput added to dashboard
+# 5.8.7 (03 January 2023)   - visgen.R updated to version 1.3.8
+# 5.8.9 (05 January 2023)   - dashboard.R updated to version 2.5.9
 NULL
 #> NULL
 

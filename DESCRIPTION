@@ -1,11 +1,11 @@
 Package: rvis
 Type: Package
 Title: NIRASOFT R package for visualization 
-Version: 5.8.6
-Date: 13 October 2021
-Author: Nicolas Berta
-Maintainer: <nicolas.berta@gmail.com>
-Description: A toolbox for generating of more elegant visualizations and easier built of shiny dashboards
+Version: 5.9.0
+Date: 16 January 2023
+Author: Nima Ramezani
+Maintainer: <nima.ramezani@gmail.com>
+Description: A toolbox for generating of more elegant visualizations and easier built of shiny applications
 License: MIT
 Collate: 
     'amcharts.R'

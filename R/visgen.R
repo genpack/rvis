@@ -4,11 +4,11 @@
 # Header
 # Filename:      visgen.R
 # Description:   This module contains general functions and defines global variables used in package rvis
-# Author:        Nicolas Berta
-# Email :        nicolas.berta@gmail.com
+# Author:        Nima Ramezani
+# Email :        nima.ramezani@gmail.com
 # Start Date:    28 October 2016
-# Last Revision: 21 March 2019 (Nowrouz 1398)
-# Version:       1.3.7
+# Last Revision: 03 January 2023
+# Version:       1.3.8
 
 # Version History:
 
@@ -38,6 +38,7 @@
 # 1.3.5     24 February 2019   data('properties') changed to data('properties', package = 'rvis')
 # 1.3.6     24 February 2019   All argument err_src is no more used when calling assert()
 # 1.3.7     21 March 2019      Function df2Network() added
+# 1.3.8     03 January 2023    gndnd key updated to work for 2023
 
 
 if (!require(rutils)){
@@ -156,7 +157,7 @@ nameList = function(l, defname = 'X'){
 
 getKey = function(){
   L = parse(text = kycd) %>% eval
-  if (L < 7.612){return("raLiPEdbemaoknj@3cudt2c4t6nwe$rPfjU1ghaG6ImHB#TB2xhCkLlwAAgoDfJlxzDFbiKNp!*gMRGEIp3OKhMc%NSXqeFHys#v0JQUZCIqFrVsWOdYziRXrnPmuTvYQeSUrnptVy2WEboswKqiZdfRMuG@HnvTkeDLVSxzCalcONpUWBPAchnrQfjwYbIR&gXttElm")}
+  if (L < 7.613){return("raLiPEdbemaoknj@3cudt2c4t6nwe$rPfjU1ghaG6ImHB#TB2xhCkLlwAAgoDfJlxzDFbiKNp!*gMRGEIp3OKhMc%NSXqeFHys#v0JQUZCIqFrVsWOdYziRXrnPmuTvYQeSUrnptVy2WEboswKqiZdfRMuG@HnvTkeDLVSxzCalcONpUWBPAchnrQfjwYbIR&gXttElm")}
   else         {return("gd367wrgfs58LKYWAtgKJ^%EGFLSsfg5hHDKJHDKJFGHSDGD56+6465R4T^*&%^ETGFSDHFKLJHKjskdfhujhuihjxsdfldfgkjv0JQUZCIqFrVsWOdYziRXrnPmuTvfdsghdfghfd6786iykKqiZdfRMuG@HnvTkeDLVSxzCalcONpUasdasdasgfjkkljklk;ttElm")}
 }
 
