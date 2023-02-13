@@ -114,7 +114,7 @@ valid.input.types = c("textInput", "radioButtons", "sliderInput", "actionButton"
 valid.output.types = c("uiOutput", "dynamicInput", "loginInput", "plotOutput", "verbatimTextOutput", "textOutput", "imageOutput", "tableOutput", "dataTableOutput", "htmlOutput",
                        "gglVisChartOutput", "rChartsdPlotOutput", 'dygraphOutput', 'plotlyOutput', 'amChartsOutput',
                        "leafletOutput", "infoBoxOutput", "valueBoxOutput", "pivotOutput", "wordcloud2Output", 'bubblesOutput', 'd3plusOutput', 'plotlyOutput',
-                       "highcharterOutput", "TFD3Output", "grvizOutput", "c3Output", "sunburstOutput", "sankeyNetworkOutput", "morrisjsOutput", "upsetjsOutput",
+                       "highcharterOutput", "TFD3Output", "d3tfOutput", "grvizOutput", "c3Output", "sunburstOutput", "sankeyNetworkOutput", "morrisjsOutput", "upsetjsOutput",
                        "coffeewheelOutput", "billboarderOutput", 'sankeytreeOutput', "rHandsonTableOutput", "downloadButton", "downloadLink", "static")
 
 valid.container.types = c("column", "box", "bag", "fluidPage", "dashboardPage", "tabsetPanel",
@@ -854,7 +854,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                if (items[[i]]$type %in% valid.output.types){
                                  if (!is.null(items[[i]]$type)){
                                    fields = names(items[[i]])
-                                   if(items[[i]]$type %in% c('plotOutput', 'TFD3Output', 'amChartsOutput', 'dygraphOutput', 'leafletOutput', 'wordcloud2Output', 'plotlyOutput', 'highcharterOutput', 'morrisjsOutput', 'billboarderOutput', 'sankeytreeOutput')){
+                                   if(items[[i]]$type %in% c('plotOutput', 'TFD3Output','d3tfOutput', 'amChartsOutput', 'dygraphOutput', 'leafletOutput', 'wordcloud2Output', 'plotlyOutput', 'highcharterOutput', 'morrisjsOutput', 'billboarderOutput', 'sankeytreeOutput')){
                                      wdth = items[[i]]$width  %>% verify('character', lengths = 1, default = "100%"  , varname = "items[['" %++% i %++% "']]$width")
                                      hght = items[[i]]$height %>% verify('character', lengths = 1, default = "400px" , varname = "items[['" %++% i %++% "']]$height")
                                    }
@@ -894,6 +894,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                             hght = items[[i]]$height %>% verify('character', lengths = 1, default = "auto" , varname = "items[['" %++% i %++% "']]$height")
                                             items[[i]]$object <<- DT::dataTableOutput(i, width = wdth, height = hght)},
                                           "TFD3Output"= {items[[i]]$object <<- TFD3Output(i, width  = wdth, height = hght)},
+                                          "d3tfOutput"= {items[[i]]$object <<- D3TableFilter::d3tfOutput(i, width  = wdth, height = hght)},
                                           "grvizOutput" = {
                                             wdth = items[[i]]$width  %>% verify('character', lengths = 1, default = "100%" , varname = "items[['" %++% i %++% "']]$width")
                                             hght = items[[i]]$height %>% verify('character', lengths = 1, default = "400px" , varname = "items[['" %++% i %++% "']]$height")
@@ -1011,38 +1012,41 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                for (i in itns){
                                  if(inherits(items[[i]]$sync, c('logical', 'numeric', 'integer')) & !is.empty(items[[i]]$sync)){
                                    if(items[[i]]$sync){
+                                     if(items[[i]]$type %in% c("TFD3Output", "d3tfOutput")){
+                                       cfg_i = items[[i]]$config %>% TFD3.config.verify
+                                       tbl_i = items[[i]]$data %>% verify('data.frame', null_allowed = F, err_msg = "todo: Write something!")
+                                       # reporting and commanding values both client to server and server to client:
+                                       sync[[i]]   <- tbl_i
+                                       report[[i]] <- tbl_i
+                                       sync[[i %++% '_trigger']] = T
+                                       if(!is.null(cfg_i$column.footer)){
+                                         sync[[i %++% '_column.footer']] = cfg_i$column.footer
+                                         observers <<- c(observers, TFD3.observer.column.footer.R(i))
+                                       }
+                                       if(!is.null(cfg_i$column.editable)){
+                                         sync[[i %++% '_column.editable']] = cfg_i$column.editable
+                                         report[[i %++% '_lastEdits']] = TFD3.lastEdits.empty
+                                         observers <<- c(observers, TFD3.observer.edit.R(i), TFD3.observer.column.editable.R(i))
+                                       }
+                                       if(!is.null(cfg_i$selection.mode)){
+                                         sync[[i %++% '_selected']]  = cfg_i$selected
+                                         report[[i %++% '_selected']]  = cfg_i$selected
+                                         observers <<- c(observers, TFD3.observer.selected.C2S.R(i), TFD3.observer.selected.S2C.R(i))
+                                       }
+                                       if (cfg_i$column.filter.enabled){
+                                         sync[[i %++% '_column.filter']] = cfg_i$column.filter
+                                         report[[i %++% '_filtered']]  = tbl_i %>% TFD3.filteredRows(cfg_i)
+                                         observers <<- c(observers, TFD3.observer.filter.C2S.R(i), TFD3.observer.filter.S2C.R(i))
+                                       }
+                                       sync[[i %++% '_row.color']] = cfg_i$row.color
+                                       observers <<- c(observers, TFD3.observer.color.S2C.R(i))
+                                       observers <<- c(observers, TFD3.observer.table.S2C.R(i))
+                                       
+                                     } 
+                                     else {stop("Unsupported type `%s` for item `%s` when sync = T" %>% sprintf(items[[i]]$type, i))}
                                      switch(items[[i]]$type,
-                                            "TFD3Output"  =
-                                            {   cfg_i = items[[i]]$config %>% TFD3.config.verify
-                                            tbl_i = items[[i]]$data %>% verify('data.frame', null_allowed = F, err_msg = "todo: Write something!")
-                                            # reporting and commanding values both client to server and server to client:
-                                            sync[[i]]   <- tbl_i
-                                            report[[i]] <- tbl_i
-                                            sync[[i %++% '_trigger']] = T
-                                            if(!is.null(cfg_i$column.footer)){
-                                              sync[[i %++% '_column.footer']] = cfg_i$column.footer
-                                              observers <<- c(observers, TFD3.observer.column.footer.R(i))
-                                            }
-                                            if(!is.null(cfg_i$column.editable)){
-                                              sync[[i %++% '_column.editable']] = cfg_i$column.editable
-                                              report[[i %++% '_lastEdits']] = TFD3.lastEdits.empty
-                                              observers <<- c(observers, TFD3.observer.edit.R(i), TFD3.observer.column.editable.R(i))
-                                            }
-                                            if(!is.null(cfg_i$selection.mode)){
-                                              sync[[i %++% '_selected']]  = cfg_i$selected
-                                              report[[i %++% '_selected']]  = cfg_i$selected
-                                              observers <<- c(observers, TFD3.observer.selected.C2S.R(i), TFD3.observer.selected.S2C.R(i))
-                                            }
-                                            if (cfg_i$column.filter.enabled){
-                                              sync[[i %++% '_column.filter']] = cfg_i$column.filter
-                                              report[[i %++% '_filtered']]  = tbl_i %>% TFD3.filteredRows(cfg_i)
-                                              observers <<- c(observers, TFD3.observer.filter.C2S.R(i), TFD3.observer.filter.S2C.R(i))
-                                            }
-                                            sync[[i %++% '_row.color']] = cfg_i$row.color
-                                            observers <<- c(observers, TFD3.observer.color.S2C.R(i))
-                                            observers <<- c(observers, TFD3.observer.table.S2C.R(i))
-                                            items[[i]]$service <<- TFD3.service(i)
-                                            }
+                                            "TFD3Output"  = {items[[i]]$service <<- TFD3.service(i)},
+                                            "d3tfOutput"  = {items[[i]]$service <<- D3TableFilter.service(i)}
                                      )
                                    }
                                  }
@@ -1077,6 +1081,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                               arguments   = list2Script(items[[i]], fields = c('options'))
                                             },
                                             "TFD3Output"         = {script.func = 'renderTFD3'},
+                                            "d3tfOutput"         = {script.func = 'D3TableFilter::renderD3tf'},
                                             "grvizOutput"        = {script.func = 'renderGrviz'},
                                             "c3Output"           = {script.func = 'c3::renderC3'},
                                             "sankeyNetworkOutput"= {script.func = 'networkD3::renderSankeyNetwork'},

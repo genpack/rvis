@@ -336,6 +336,15 @@ TFD3.service = function(itemID){
          ")
 }
 
+D3TableFilter.service = function(itemID){
+  paste0("
+         if(sync[['", itemID, "_trigger']]){
+         sync[['", itemID, "_trigger']] = F
+         }
+         isolate({
+         sync[['", itemID, "']] %>% D3TableFilter.table(config = items[['", itemID, "']]$config)})
+         ")
+}
 
 loginBox = "div(
 textInput('getUser', 'Username'),

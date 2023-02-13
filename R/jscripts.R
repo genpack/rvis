@@ -76,6 +76,7 @@ TFD3.color.single.js = function(col){
   JS('function colorScale(obj, i){
      return "' %++% col %++% '"}')
   }
+D3TableFilter.color.single.js = TFD3.color.single.js
 
 TFD3.color.nominal.js = function(domain, range){
   range %<>% vect.extend(length(domain))
@@ -89,6 +90,7 @@ TFD3.color.nominal.js = function(domain, range){
   return color(i);}'
   return(JS(ss))
 }
+D3TableFilter.color.nominal.js = TFD3.color.nominal.js
 
 TFD3.color.numeric.js = function(domain, range){
   N  = length(range)
@@ -100,7 +102,7 @@ TFD3.color.numeric.js = function(domain, range){
   return color(i);}'
   return(JS(ss))
   }
-
+D3TableFilter.color.numeric.js = TFD3.color.numeric.js
 
 TFD3.shape.bar.js = function(format = '.1f'){
   JS(paste0('function makeGraph(selection){
@@ -163,6 +165,7 @@ TFD3.shape.bar.js = function(format = '.1f'){
             window[tbl + "_" + col + "_init"] = true;
 }'))
 }
+D3TableFilter.shape.bar.js = TFD3.shape.bar.js
 
 TFD3.shape.bubble.js = function(){
 
@@ -222,9 +225,10 @@ TFD3.shape.bubble.js = function(){
 
 }'))
 }
-
+D3TableFilter.shape.bubble.js = TFD3.shape.bubble.js
 
 TFD3.font.bold.js = JS('function makeGraph(selection){selection.style("font-weight", "bold")}')
+D3TableFilter.font.bold.js = TFD3.font.bold.js
 
 TFD3.font.js = function(weight = 'bold', side = 'right', format = '.1f'){
   sidestr   = chif(is.null(side)  , '', paste0('.classed("text-', side, '", true)'))
@@ -233,6 +237,7 @@ TFD3.font.js = function(weight = 'bold', side = 'right', format = '.1f'){
   formatstr1 = chif(is.null(format), '', paste0('var textformat = d3.format("', format, '");'))
   JS(paste0('function makeGraph(selection){', formatstr1, 'selection', sidestr , weightstr, formatstr2, ';}'))
 }
+D3TableFilter.font.js = TFD3.font.js
 
 ### DT:
 DT.link.click.js = function(link){
