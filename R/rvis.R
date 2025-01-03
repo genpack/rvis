@@ -203,6 +203,7 @@
 # 5.8.7 (03 January 2023)   - visgen.R updated to version 1.3.8
 # 5.8.9 (05 January 2023)   - dashboard.R updated to version 2.5.9
 # 5.9.2 (02 February 2023)  - d3tablefilter.R added. (We had an embedded htmlwidget for  the javascript package but we found a similar existing htmlwidget in the github and decided to embed that as well)
+# 5.9.3 (03 January 2025)   - visgen.R updated to version 1.3.9
 NULL
 #> NULL
 
