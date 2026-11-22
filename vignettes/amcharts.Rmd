@@ -1,0 +1,91 @@
+---
+title: "Using the amCharts wrappers"
+author: "rvis authors"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the amCharts wrappers}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+#library(rvis)
+pkgload::load_all()
+
+# The examples below use chart types also provided by billboarder, c3, and
+# plotly. Change this value to one of those wrapper prefixes to try another
+# plotter with the same data and arguments.
+plotter <- "amCharts"
+plotter_package <- switch(
+  plotter,
+  amCharts = "rAmCharts",
+  billboarder = "billboarder",
+  c3 = "c3",
+  plotly = "plotly",
+  stop("Choose amCharts, billboarder, c3, or plotly for these examples.")
+)
+
+if (!requireNamespace(plotter_package, quietly = TRUE)) {
+  knitr::opts_chunk$set(eval = FALSE)
+}
+```
+
+`rvisPlot()` dispatches to a wrapper using the `plotter` prefix and chart
+`type`. The following examples use bar, pie, and time-series line charts,
+which are available in all four plotter wrappers listed above. The default
+`plotter` value calls `amCharts.bar()`, `amCharts.pie()`, and
+`amCharts.tsline()`.
+
+## Bar chart
+
+The built-in `iris` data provides a small example without external data files.
+The data is summarized first so each species has one bar.
+
+```{r bar}
+species_means <- aggregate(Petal.Length ~ Species, data = iris, FUN = mean)
+
+rvisPlot(
+  type = "bar", plotter = plotter, obj = species_means,
+  x = "Species", y = "Petal.Length",
+  config = list(title = "Mean petal length by species")
+)
+```
+
+## Pie chart
+
+The pie wrapper uses a label column and a numeric `theta` column.
+
+```{r pie}
+rvisPlot(
+  type = "pie", plotter = plotter, obj = species_means,
+  label = "Species", theta = "Petal.Length",
+  config = list(title = "Mean petal length")
+)
+```
+
+## Time-series line chart
+
+This synthetic series has a POSIXct time column, which the amCharts wrapper
+expects. The other listed wrappers accept this same input or coerce it to
+their supported date representation.
+
+```{r time-series}
+time_data <- data.frame(
+  time = as.POSIXct("2024-01-01", tz = "UTC") + (0:23) * 30 * 24 * 60 * 60,
+  observed = 20 + sin((0:23) * pi / 6) * 5 + (0:23) * 0.3,
+  forecast = 20 + sin((0:23) * pi / 6) * 4 + (0:23) * 0.35
+)
+
+rvisPlot(
+  type = "tsline", plotter = plotter, obj = time_data,
+  x = "time", y = list(observed = "observed", forecast = "forecast"),
+  config = list(title = "Observed and forecast values")
+)
+```
+
+To try another compatible wrapper, change only the `plotter` assignment in
+the setup chunk to `"billboarder"`, `"c3"`, or `"plotly"` (and install that
+plotter package). Other amCharts chart types, such as gauges and bullet
+charts, have their own input conventions and are not covered by these
+cross-plotter examples.

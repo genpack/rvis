@@ -2,8 +2,12 @@
 % Please edit documentation in R/rvis.R
 \docType{package}
 \name{rvis}
+\alias{rvis-package}
 \alias{rvis}
 \title{rvis: This package is a tool-box for visualization in R and making word-class and elegant shiny dashboards.}
+\description{
+A toolbox for generating of more elegant visualizations and easier built of shiny applications
+}
 \section{Class DASHBOARD}{
 
 rvis provides a Reference class named as DASHBOARD.

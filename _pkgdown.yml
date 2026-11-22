@@ -1,0 +1,113 @@
+template:
+  bootstrap: 5
+navbar:
+  structure:
+    left: [intro, reference, manuals, configuration]
+    right: [search, github]
+  components:
+    manuals:
+      text: Chart manuals
+      menu:
+        - text: Overview
+          href: articles/chart-types.html
+        - text: "Bar charts"
+          href: articles/chart-types.html#bar
+        - text: "Bar charts (molten data)"
+          href: articles/chart-types.html#bar.molten
+        - text: "Box plots"
+          href: articles/chart-types.html#box
+        - text: "Bubble charts"
+          href: articles/chart-types.html#bubble
+        - text: "Bubble charts (molten data)"
+          href: articles/chart-types.html#bubble.molten
+        - text: "Bullet charts"
+          href: articles/chart-types.html#bullet
+        - text: "Calendar charts"
+          href: articles/chart-types.html#calendar
+        - text: "Legacy calheat alias"
+          href: articles/chart-types.html#calheat
+        - text: "Combo charts"
+          href: articles/chart-types.html#combo
+        - text: "Combo charts (molten data)"
+          href: articles/chart-types.html#combo.molten
+        - text: "Funnel charts"
+          href: articles/chart-types.html#funnel
+        - text: "Gauge charts"
+          href: articles/chart-types.html#gauge
+        - text: "Graph and network charts"
+          href: articles/chart-types.html#graph
+        - text: "Graph chart helper"
+          href: articles/chart-types.html#graphchart
+        - text: "Heat map capability entry"
+          href: articles/chart-types.html#heatmap
+        - text: "Histograms"
+          href: articles/chart-types.html#histogram
+        - text: "Line charts"
+          href: articles/chart-types.html#line
+        - text: "Line charts (molten data)"
+          href: articles/chart-types.html#line.molten
+        - text: "Area charts"
+          href: articles/chart-types.html#area
+        - text: "Area charts (molten data)"
+          href: articles/chart-types.html#area.molten
+        - text: "Area range charts"
+          href: articles/chart-types.html#area.range
+        - text: "Maps"
+          href: articles/chart-types.html#map
+        - text: "Legacy motion chart alias"
+          href: articles/chart-types.html#motion
+        - text: "Map plot wrapper"
+          href: articles/chart-types.html#map.plot
+        - text: "Pie charts"
+          href: articles/chart-types.html#pie
+        - text: "Pie charts (molten data)"
+          href: articles/chart-types.html#pie.molten
+        - text: "Pyramid charts"
+          href: articles/chart-types.html#pyramid
+        - text: "Scatter plots"
+          href: articles/chart-types.html#scatter
+        - text: "Scatter plots (molten data)"
+          href: articles/chart-types.html#scatter.molten
+        - text: "Sankey diagrams"
+          href: articles/chart-types.html#sankey
+        - text: "Sunburst charts"
+          href: articles/chart-types.html#sunburst
+        - text: "Tables"
+          href: articles/chart-types.html#table
+        - text: "Tables (molten data)"
+          href: articles/chart-types.html#table.molten
+        - text: "Uppercase Table method"
+          href: articles/chart-types.html#table-upper
+        - text: "Time series lines"
+          href: articles/chart-types.html#tsline
+        - text: "Time series line chart variant"
+          href: articles/chart-types.html#tslinechart
+        - text: "Time series stock chart"
+          href: articles/chart-types.html#tsline.stock
+        - text: "Time series areas"
+          href: articles/chart-types.html#tsarea
+        - text: "Time series areas (molten data)"
+          href: articles/chart-types.html#tsarea.molten
+        - text: "Time series bars"
+          href: articles/chart-types.html#tsbar
+        - text: "Time series bars (molten data)"
+          href: articles/chart-types.html#tsbar.molten
+        - text: "Trees"
+          href: articles/chart-types.html#tree
+        - text: "Treemaps"
+          href: articles/chart-types.html#treemap
+        - text: "Word clouds"
+          href: articles/chart-types.html#wordcloud
+    configuration:
+      text: Configuration
+      href: articles/configuration.html
+articles:
+  - title: User guides
+    contents:
+      - getting-started
+      - chart-types
+      - configuration
+reference:
+  - title: Main entry point
+    contents:
+      - rvisPlot

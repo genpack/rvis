@@ -237,9 +237,16 @@ amCharts.gauge = function(obj = data.frame(), theta = NULL, config = NULL, ...){
 
   if(is.empty(obj)){return(NULL)}
 
-  df = data.frame(min = numeric(), max = numeric(), color = character())
-  for(e in config$thetaAxis.zone){df %<>% rbind(e %>% list.extract(c('min', 'max', 'color')) %>% as.data.frame)}
-  colnames(df) <- c('start', 'end', 'color')
+  zones <- config$thetaAxis.zone
+  if (length(zones)) {
+    bands <- lapply(zones, function(zone) {
+      data.frame(start = zone$min, end = zone$max, color = zone$color,
+                 stringsAsFactors = FALSE)
+    })
+    df <- do.call(rbind, bands)
+  } else {
+    df <- data.frame(start = numeric(), end = numeric(), color = character())
+  }
 
   config$aggregator %>% do.call(list(obj[, L$theta])) %>%
     amAngularGauge(start = config$theta.min, end = config$theta.max,
@@ -282,12 +289,20 @@ amCharts.box = function(obj, x = NULL, y = NULL, config = NULL, ...){
 
   obj %<>% prepare4Plot(A, config = config)
 
-  hor = T
-  for (i in L$x){hor = hor & inherits(obj[,i], c('numeric', 'integer'))}
-  for (i in L$y){hor = hor & inherits(obj[,i], c('character', 'factor'))}
+  hor <- isHorizontal(obj, L$x, L$y)
 
-  if(hor){frml = as.formula(L$x %++% '~' %++% L$y)} else {frml = as.formula(L$y %++% '~' %++% L$x)}
-  amBoxplot(frml, data = obj, horiz = hor, ...)
+  if (hor) {
+    formula <- stats::reformulate(
+      termlabels = paste0("`", L$y, "`"),
+      response = paste0("`", L$x, "`")
+    )
+  } else {
+    formula <- stats::reformulate(
+      termlabels = paste0("`", L$x, "`"),
+      response = paste0("`", L$y, "`")
+    )
+  }
+  amBoxplot(formula, data = obj, horiz = hor, ...)
 }
 
 

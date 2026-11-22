@@ -1,0 +1,345 @@
+---
+title: "Configuration reference"
+author: "rvis authors"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Configuration reference}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+Pass configuration as a named list in `config`:
+
+```r
+rvisPlot(
+  type = "bar", plotter = "amCharts", obj = summary_data,
+  x = "category", y = "value",
+  config = list(
+    title = "Quarterly results",
+    legend.enabled = TRUE,
+    legend.position = "bottom",
+    barMode = "stack"
+  )
+)
+```
+
+Configuration is interpreted by the selected wrapper. The same key may be
+unsupported or have a different default in another plotter. The table below
+lists every property currently recorded in `data/properties.csv`, including
+its wrapper, declared type, default, and allowed values. Use only keys listed
+for the selected wrapper. The property names are case-sensitive.
+
+```{r config-table, echo=FALSE}
+utils::data("properties", package = "rvis")
+config_reference <- as.data.frame(properties, stringsAsFactors = FALSE)
+
+key_meaning <- function(key) {
+  known <- c(
+    "title" = "Chart title text.",
+    "subtitle" = "Chart subtitle text.",
+    "legend.enabled" = "Whether to display the legend.",
+    "legend.position" = "Where to place the legend.",
+    "barMode" = "Whether bars are grouped, stacked, or shown as proportions, as supported by the wrapper.",
+    "stack.enabled" = "Whether compatible series are stacked.",
+    "stack" = "Whether compatible series are stacked.",
+    "additionalColumns" = "Extra data columns retained for use by the chart.",
+    "subchart.enabled" = "Whether to show a secondary overview or range selector.",
+    "subchart.height" = "Height of the secondary overview or range selector.",
+    "colorize" = "Whether the wrapper assigns colors automatically.",
+    "tooltip" = "Tooltip configuration or tooltip field, as supported by the wrapper."
+  )
+  if (key %in% names(known)) return(unname(known[[key]]))
+  parts <- strsplit(key, "\\.", fixed = FALSE)[[1]]
+  axis_names <- c(xAxis = "horizontal axis", yAxis = "vertical axis")
+  node_names <- c(node = "nodes", link = "links")
+  subjects <- c(axis_names, node_names, legend = "legend", subchart = "overview panel")
+  subject <- if (parts[1] %in% names(subjects)) unname(subjects[[parts[1]]]) else parts[1]
+  field <- if (length(parts) > 1) paste(parts[-1], collapse = " ") else "setting"
+  field <- gsub("([a-z])([A-Z])", "\\1 \\2", field)
+  field <- tolower(field)
+  paste0("Controls the ", subject, " ", field, ".")
+}
+
+config_reference$Meaning <- vapply(config_reference$Property, key_meaning, character(1))
+config_reference <- config_reference[, c("plotters", "Property", "Meaning", "Class", "Default", "Domain")]
+names(config_reference) <- c("Plotter", "Key", "Meaning", "Type", "Default", "Allowed values")
+knitr::kable(config_reference, row.names = FALSE, escape = TRUE)
+```
+
+## Additional settings read by wrappers
+
+Some wrappers read settings directly from `config` that are not present in the validation metadata table above. This source inventory includes literal `config$name` and `config[["name"]]` accesses. These settings may not be type-checked centrally; consult the named wrapper implementation for its expected values.
+
+| Wrapper | Key | Meaning / source note |
+|:--|:--|:--|
+| `D3TableFilter` | `column.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.color.auto` | Source-level setting for color auto; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.filter` | Source-level setting for filter; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.filter.enabled` | Source-level setting for filter enabled; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.footer.font` | Source-level setting for footer font; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `column.type` | Source-level setting for type; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `dimclass` | Source-level setting for dimclass; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `extensions` | Source-level setting for extensions; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `height` | Source-level setting for height; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `selection.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `selection.mode` | Source-level setting for mode; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `table.style` | Source-level setting for style; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `width` | Source-level setting for width; see the wrapper listed here for its accepted values and effect. |
+| `D3TableFilter` | `withRowNames` | Source-level setting for with row names; see the wrapper listed here for its accepted values and effect. |
+| `DT` | `links` | Source-level setting for links; see the wrapper listed here for its accepted values and effect. |
+| `DT` | `paging.length` | Source-level setting for length; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.color.auto` | Source-level setting for color auto; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.editable` | Source-level setting for editable; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.filter` | Source-level setting for filter; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.filter.enabled` | Source-level setting for filter enabled; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.footer` | Source-level setting for footer; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.footer.font` | Source-level setting for footer font; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `column.type` | Source-level setting for type; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `dimclass` | Source-level setting for dimclass; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `extensions` | Source-level setting for extensions; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `footer.font.adjust` | Source-level setting for font adjust; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `footer.font.format` | Source-level setting for font format; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `footer.font.weight` | Source-level setting for font weight; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `height` | Source-level setting for height; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `paging.length` | Source-level setting for length; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `row.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `selected` | Source-level setting for selected; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `selection.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `selection.mode` | Source-level setting for mode; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `sort` | Source-level setting for sort; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `sort_config` | Source-level setting for sort_config; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `sort_types` | Source-level setting for sort_types; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `table.style` | Source-level setting for style; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `width` | Source-level setting for width; see the wrapper listed here for its accepted values and effect. |
+| `TFD3` | `withRowNames` | Source-level setting for with row names; see the wrapper listed here for its accepted values and effect. |
+| `amCharts` | `aggregator` | Aggregation function applied to values. |
+| `amCharts` | `colorder` | Color order used by the chart. |
+| `amCharts` | `legend` | Whether and how the legend is displayed. |
+| `amCharts` | `line.width` | Width of plotted lines. |
+| `amCharts` | `point.size` | Size of plotted points. |
+| `amCharts` | `thetaAxis.zone` | Value ranges and colors for gauge bands. |
+| `amCharts` | `yAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `billboarder` | `color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `billboarder` | `point.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `billboarder` | `point.label.enabled` | Source-level setting for label enabled; see the wrapper listed here for its accepted values and effect. |
+| `billboarder` | `stack.groups` | Source-level setting for groups; see the wrapper listed here for its accepted values and effect. |
+| `billboarder` | `title.padding.buttom` | Source-level setting for padding buttom; see the wrapper listed here for its accepted values and effect. |
+| `billboarder` | `yAxis.tick.label.format` | Source-level setting for tick label format; see the wrapper listed here for its accepted values and effect. |
+| `bpexploder` | `feedAdditionalColumns` | Whether additional columns are included in the box plot data. |
+| `bpexploder` | `point.size` | Size of plotted points. |
+| `bpexploder` | `point.tooltip` | Tooltip field or setting for points. |
+| `bubbles` | `point.label.threshold` | Source-level setting for label threshold; see the wrapper listed here for its accepted values and effect. |
+| `c3` | `aggregator` | Aggregation function applied to values. |
+| `c3` | `shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `c3` | `stack.enabled` | Source-level setting for enabled; see the wrapper listed here for its accepted values and effect. |
+| `c3` | `stack.groups` | Source-level setting for groups; see the wrapper listed here for its accepted values and effect. |
+| `c3` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `calheatmap` | `colorize` | Source-level setting for colorize; see the wrapper listed here for its accepted values and effect. |
+| `d3plus` | `currency` | Source-level setting for currency; see the wrapper listed here for its accepted values and effect. |
+| `d3plus` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `legend.height` | Source-level setting for height; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `legend.horizontalAlign` | Source-level setting for horizontal align; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `legend.position.x` | Source-level setting for position x; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `legend.position.y` | Source-level setting for position y; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `legend.width` | Source-level setting for width; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `maxSizeOverride` | Source-level setting for max size override; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `xAxis.tick.label.format` | Source-level setting for tick label format; see the wrapper listed here for its accepted values and effect. |
+| `dimple` | `yAxis.tick.label.format` | Source-level setting for tick label format; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `RangeSelector` | Range selector settings for the time axis. |
+| `dygraphs` | `Roller` | Smoothing roller settings for time-series data. |
+| `dygraphs` | `color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `colors` | Palette used for series. |
+| `dygraphs` | `fillGraph` | Whether to fill the area below a line. |
+| `dygraphs` | `legend` | Whether and how the legend is displayed. |
+| `dygraphs` | `shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `size` | Source-level setting for size; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `stackedGraph` | Source-level setting for stacked graph; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `xAxis.max` | Source-level setting for max; see the wrapper listed here for its accepted values and effect. |
+| `dygraphs` | `xAxis.min` | Source-level setting for min; see the wrapper listed here for its accepted values and effect. |
+| `echarts` | `aggrigator.function` | Source-level setting for function; see the wrapper listed here for its accepted values and effect. |
+| `echarts` | `point.size.max` | Source-level setting for size max; see the wrapper listed here for its accepted values and effect. |
+| `echarts` | `point.size.min` | Source-level setting for size min; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `hist.bar.center` | Source-level setting for bar center; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `hist.bar.width` | Source-level setting for bar width; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `point.border.color` | Source-level setting for border color; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `point.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `point.opacity` | Source-level setting for opacity; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `point.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `ggvis` | `point.size` | Size of plotted points. |
+| `ggvis` | `point.tooltip` | Tooltip field or setting for points. |
+| `googleVis` | `greenFrom` | Source-level setting for green from; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `greenTo` | Source-level setting for green to; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `max` | Source-level setting for max; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `min` | Source-level setting for min; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `redFrom` | Source-level setting for red from; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `redTo` | Source-level setting for red to; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `theta.max` | Source-level setting for max; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `theta.min` | Source-level setting for min; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `thetaAxis.zone` | Value ranges and colors for gauge bands. |
+| `googleVis` | `y2Axis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `yAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `yellowFrom` | Source-level setting for yellow from; see the wrapper listed here for its accepted values and effect. |
+| `googleVis` | `yellowTo` | Source-level setting for yellow to; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `direction` | Source-level setting for direction; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `layout` | Source-level setting for layout; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.arrow.head` | Source-level setting for arrow head; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.arrow.size` | Source-level setting for arrow size; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.arrow.tail` | Source-level setting for arrow tail; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.direction` | Source-level setting for direction; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.label.color` | Source-level setting for label color; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.label.font` | Source-level setting for label font; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.label.size` | Source-level setting for label size; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.length.max` | Source-level setting for length max; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.length.min` | Source-level setting for length min; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.width.max` | Source-level setting for width max; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `link.width.min` | Source-level setting for width min; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.border.color` | Source-level setting for border color; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.border.peripheries` | Source-level setting for border peripheries; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.distortion` | Source-level setting for distortion; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.fixedSize` | Source-level setting for fixed size; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.height` | Fixed node height. |
+| `grviz` | `node.highlight.color` | Source-level setting for highlight color; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.label.color` | Source-level setting for label color; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.label.font` | Source-level setting for label font; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.label.size` | Source-level setting for label size; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.shadow.enabled` | Source-level setting for shadow enabled; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.shadow.size` | Source-level setting for shadow size; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.size` | Source-level setting for size; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.size.max` | Source-level setting for size max; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.size.min` | Source-level setting for size min; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.size.ratio` | Ratio used to convert node size to node height. |
+| `grviz` | `node.tooltip` | Source-level setting for tooltip; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `node.width` | Fixed node width. |
+| `grviz` | `shinyInput.click` | Source-level setting for click; see the wrapper listed here for its accepted values and effect. |
+| `grviz` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `aggregator` | Aggregation function applied to values. |
+| `highcharter` | `background.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `barMode` | Source-level setting for bar mode; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `border.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `border.radius` | Source-level setting for radius; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `border.width` | Source-level setting for width; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `legend` | Whether and how the legend is displayed. |
+| `highcharter` | `legend.item.color` | Source-level setting for item color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `legend.item.font` | Source-level setting for item font; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `legend.item.hover.color` | Source-level setting for item hover color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `legend.item.hover.font` | Source-level setting for item hover font; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `link.smooth.enabled` | Source-level setting for smooth enabled; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `subtitle` | Source-level setting for subtitle; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `subtitle.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `subtitle.font` | Source-level setting for font; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `title.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `title.font` | Source-level setting for font; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `tooltip` | Source-level setting for tooltip; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `xAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `yAxis.gridLine.width` | Source-level setting for grid line width; see the wrapper listed here for its accepted values and effect. |
+| `highcharter` | `yAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `highcharts` | `horizontal` | Source-level setting for horizontal; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `resize` | Source-level setting for resize; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `smooth` | Source-level setting for smooth; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `tooltip` | Source-level setting for tooltip; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `yAxis.max` | Source-level setting for max; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `yAxis.min` | Source-level setting for min; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `yAxis.tick.label.prefix` | Source-level setting for tick label prefix; see the wrapper listed here for its accepted values and effect. |
+| `morrisjs` | `yAxis.tick.label.suffix` | Source-level setting for tick label suffix; see the wrapper listed here for its accepted values and effect. |
+| `networkD3` | `node.label.size` | Source-level setting for label size; see the wrapper listed here for its accepted values and effect. |
+| `networkD3` | `node.width` | Fixed node width. |
+| `nvd3` | `donut` | Source-level setting for donut; see the wrapper listed here for its accepted values and effect. |
+| `nvd3` | `palette` | Source-level setting for palette; see the wrapper listed here for its accepted values and effect. |
+| `nvd3` | `xAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `nvd3` | `yAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `nvd3` | `zoomWindow` | Source-level setting for zoom window; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `legend.background` | Source-level setting for background; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `legend.enabled` | Source-level setting for enabled; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `palette.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `palette.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `point.border.color` | Source-level setting for border color; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `point.border.width` | Source-level setting for border width; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `point.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `point.size` | Size of plotted points. |
+| `plotly` | `point.size.max` | Source-level setting for size max; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `point.size.min` | Source-level setting for size min; see the wrapper listed here for its accepted values and effect. |
+| `plotly` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `rCharts` | `horizontal` | Source-level setting for horizontal; see the wrapper listed here for its accepted values and effect. |
+| `rbokeh` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `rbokeh` | `tooltip` | Source-level setting for tooltip; see the wrapper listed here for its accepted values and effect. |
+| `rbokeh` | `xAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `rbokeh` | `yAxis.label` | Source-level setting for label; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `column.acceptor` | Source-level setting for acceptor; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `column.editable` | Source-level setting for editable; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `column.filter` | Source-level setting for filter; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `column.footer` | Source-level setting for footer; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `column.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `row.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `selected` | Source-level setting for selected; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `selection.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `rscripts` | `withRowNames` | Source-level setting for with row names; see the wrapper listed here for its accepted values and effect. |
+| `sankeytree` | `aggregator` | Aggregation function applied to values. |
+| `sankeytree` | `height` | Source-level setting for height; see the wrapper listed here for its accepted values and effect. |
+| `sankeytree` | `node.height` | Fixed node height. |
+| `sankeytree` | `node.label.size.max` | Source-level setting for label size max; see the wrapper listed here for its accepted values and effect. |
+| `sankeytree` | `title` | Source-level setting for title; see the wrapper listed here for its accepted values and effect. |
+| `sankeytree` | `width` | Source-level setting for width; see the wrapper listed here for its accepted values and effect. |
+| `streamgraph` | `aggregator` | Aggregation function applied to values. |
+| `streamgraph` | `shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `streamgraph` | `stack.enabled` | Source-level setting for enabled; see the wrapper listed here for its accepted values and effect. |
+| `streamgraph` | `stack.groups` | Source-level setting for groups; see the wrapper listed here for its accepted values and effect. |
+| `streamgraph` | `xAxis.tick.format` | Source-level setting for tick format; see the wrapper listed here for its accepted values and effect. |
+| `streamgraph` | `xAxis.tick.interval` | Source-level setting for tick interval; see the wrapper listed here for its accepted values and effect. |
+| `streamgraph` | `xAxis.tick.unit` | Source-level setting for tick unit; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.color.inherit` | Source-level setting for color inherit; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.color.opacity` | Source-level setting for color opacity; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.dashed` | Source-level setting for dashed; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.highlight.color` | Source-level setting for highlight color; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.hover.color` | Source-level setting for hover color; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.label.background` | Source-level setting for label background; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.label.font` | Source-level setting for label font; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.loop.size` | Source-level setting for loop size; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.selection.width` | Source-level setting for selection width; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.shape` | Source-level setting for shape; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `link.smooth` | Link curve or smoothing setting. |
+| `visNetwork` | `node.label.background` | Source-level setting for label background; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `node.label.color` | Source-level setting for label color; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `node.label.size` | Source-level setting for label size; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `node.shadow.size` | Source-level setting for shadow size; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `node.size` | Source-level setting for size; see the wrapper listed here for its accepted values and effect. |
+| `visNetwork` | `node.tooltip` | Source-level setting for tooltip; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `additionalColumns` | Source-level setting for additional columns; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `color` | Source-level setting for color; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `colorize` | Source-level setting for colorize; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `dimClass` | Source-level setting for dim class; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `dimclass` | Source-level setting for dimclass; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `multiples` | Source-level setting for multiples; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `palette` | Source-level setting for palette; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `presort` | Source-level setting for presort; see the wrapper listed here for its accepted values and effect. |
+| `visgen` | `withRowNames` | Source-level setting for with row names; see the wrapper listed here for its accepted values and effect. |
+
+## General interpretation
+
+Axis keys control labels, ticks, grid lines, ranges, and scrollbars. Legend
+keys control visibility, placement, and appearance. `title` and `subtitle`
+set chart headings. Graph wrappers use `node.*` and `link.*` keys for network
+elements. Keys such as `additionalColumns` retain extra columns for custom
+tooltips or formatting. The exact wrapper behavior is implemented in that
+wrapper's manual and source code; values and defaults in the table are the
+package's current validation metadata.
+
+When a key is not present in this table, check the wrapper's function
+documentation and the `...` arguments it forwards to its underlying plotting
+package.

@@ -1,6 +1,6 @@
 # dashboard.R ----------------------------------------------------------------
 
-# Header
+# Headerdata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAbElEQVR4Xs2RQQrAMAgEfZgf7W9LAguybljJpR3wEse5JOL3ZObDb4x1loDhHbBOFU6i2Ddnw2KNiXcdAXygJlwE8OFVBHDgKrLgSInN4WMe9iXiqIVsTMjH7z/GhNTEibOxQswcYIWYOR/zAjBJfiXh3jZ6AAAAAElFTkSuQmCC
 # Filename:      dashboard.R
 # Description:   This project, aims to create a ref class containing multiple objects
 #                that can issue a shiny dashboard

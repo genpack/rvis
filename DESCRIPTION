@@ -7,6 +7,9 @@ Author: Nima Ramezani
 Maintainer: <nima.ramezani@gmail.com>
 Description: A toolbox for generating of more elegant visualizations and easier built of shiny applications
 License: MIT
+Encoding: UTF-8
+Suggests: knitr, rmarkdown, pkgdown
+VignetteBuilder: knitr
 Collate: 
     'amcharts.R'
     'billboarder.R'
@@ -20,6 +23,8 @@ Collate:
     'coffeewheel.R'
     'csscripts.R'
     'd3plus.R'
+    'tfd3.R'
+    'd3tablefilter.R'
     'dashboard.R'
     'dashtools.R'
     'dc.R'
@@ -47,9 +52,7 @@ Collate:
     'rvisplot.R'
     'xcharts.R'
     'visnetwork.R'
-    'tfd3.R'
-    'd3tablefilter.R'
     'rvis.R'
     'sankeytree.R'
     'streamgraph.R'
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.3

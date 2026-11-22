@@ -188,7 +188,8 @@ billboarder.scatter = function(obj, x = NULL, y = NULL, group = NULL, config = N
   if (is.empty(obj)){return(NULL)}
 
   assert(require('billboarder'), "Package 'billboarder' is not installed!", err_src = match.call()[[1]])
-  config = billboarder.scatter.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  config = billboarder.scatter.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
+    verifyConfig(plotter = 'billboarder')
 
   # Preparing Aesthetics:
   a = prepareAesthetics(x = x, y = y, group = group)
