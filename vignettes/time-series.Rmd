@@ -1,0 +1,180 @@
+---
+title: "Time series: line, area, bar and calendar charts over time"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Time series: line, area, bar and calendar charts over time}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("rvis-setup.R")
+```
+
+Time series charts put a date (`Date`) or date-time (`POSIXct`) column on the horizontal axis.
+Examples are evaluated when the plotting package of the wrapper is installed; otherwise only
+their code is shown.
+
+## Data: New York air quality in 1973 (`airquality`)
+
+`airquality` has daily measurements in New York from May to September 1973.
+
+```{r data}
+air <- airquality
+air$date <- as.Date(sprintf("1973-%02d-%02d", air$Month, air$Day))
+air$time <- as.POSIXct(air$date, tz = "UTC")           # date-time version, for plotters that need it
+air <- air[, c("date", "time", "Temp", "Wind", "Ozone", "Solar.R")]
+head(air)
+
+# Long (molten) table: one row per day and measure
+air_long <- data.frame(
+  date    = rep(air$date, times = 2),
+  measure = factor(rep(c("Temp", "Wind"), each = nrow(air))),
+  value   = c(air$Temp, air$Wind))
+head(air_long)
+
+# Weekly means, for bar charts
+air$week <- as.Date(cut(air$date, "week"))
+weekly <- aggregate(cbind(Temp, Wind) ~ week, data = air, FUN = mean)
+names(weekly)[1] <- "date"
+head(weekly)
+```
+
+## Time series line charts {#tsline}
+
+### amCharts
+
+`amCharts` time series need a date-time (`POSIXct`) column. `low` and `high` add a range around a series.
+
+```{r, eval=has_plotter("rAmCharts")}
+rvisPlot(type = "tsline", plotter = "amCharts", obj = air, x = "time", y = list("Temp", "Wind"),
+         config = list(title = "Temperature and wind"))
+```
+
+### dygraphs
+
+```{r, eval=has_plotter("dygraphs")}
+rvisPlot(type = "tsline", plotter = "dygraphs", obj = air, x = "date", y = "Temp", y2 = "Wind",
+         config = list(title = "Temperature (left) and wind (right)"))
+```
+
+### plotly
+
+```{r, eval=has_plotter("plotly")}
+rvisPlot(type = "tsline", plotter = "plotly", obj = air, x = "date", y = "Temp")
+```
+
+### billboarder
+
+```{r, eval=has_plotter("billboarder")}
+rvisPlot(type = "tsline", plotter = "billboarder", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+### c3
+
+```{r, eval=has_plotter("c3")}
+rvisPlot(type = "tsline", plotter = "c3", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "tsline", plotter = "d3plus", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+### morrisjs
+
+```{r, eval=has_plotter("morrisjs")}
+rvisPlot(type = "tsline", plotter = "morrisjs", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+## Time series line charts from a long table {#tsline.molten}
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "tsline.molten", plotter = "d3plus", obj = air_long, x = "date", y = "value", group = "measure")
+```
+
+## Line chart with a choice of line type {#tsLineChart}
+
+`billboarder.tsLineChart()` takes the line type as `shape` (`"line"`, `"spline"`, `"step"`,
+`"area"`, ...) and one colour per series.
+
+### billboarder
+
+```{r, eval=has_plotter("billboarder")}
+rvisPlot(type = "tsLineChart", plotter = "billboarder", obj = air, x = "date", y = "Temp",
+         shape = "step", color = "firebrick")
+```
+
+## Stock chart {#tsline.stock}
+
+A Highcharts stock chart adds a navigator and a range selector.
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "tsline.stock", plotter = "highcharter", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+## Time series area charts {#tsarea}
+
+### billboarder
+
+```{r, eval=has_plotter("billboarder")}
+rvisPlot(type = "tsarea", plotter = "billboarder", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+### c3
+
+```{r, eval=has_plotter("c3")}
+rvisPlot(type = "tsarea", plotter = "c3", obj = air, x = "date", y = list("Temp", "Wind"))
+```
+
+### streamgraph
+
+```{r, eval=has_plotter("streamgraph")}
+rvisPlot(type = "tsarea", plotter = "streamgraph", obj = air_long, x = "date", y = "value", group = "measure")
+```
+
+## Time series area charts from a long table {#tsarea.molten}
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "tsarea.molten", plotter = "d3plus", obj = air_long, x = "date", y = "value", group = "measure")
+```
+
+## Time series bar charts {#tsbar}
+
+### plotly
+
+```{r, eval=has_plotter("plotly")}
+rvisPlot(type = "tsbar", plotter = "plotly", obj = weekly, x = "date", y = "Temp")
+```
+
+### morrisjs
+
+```{r, eval=has_plotter("morrisjs")}
+rvisPlot(type = "tsbar", plotter = "morrisjs", obj = weekly, x = "date", y = list("Temp", "Wind"))
+```
+
+## Time series bar charts from a long table {#tsbar.molten}
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "tsbar.molten", plotter = "d3plus", obj = air_long[air_long$date >= as.Date("1973-09-01"), ],
+         x = "date", y = "value", group = "measure")
+```
+
+## Calendar heat maps {#calendar}
+
+A calendar heat map colours each day by a numeric column.
+
+### calheatmap
+
+```{r, eval=has_plotter("rChartsCalmap")}
+rvisPlot(type = "calendar", plotter = "calheatmap", obj = air, t = "date", color = "Temp")
+```

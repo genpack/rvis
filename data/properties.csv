@@ -34,8 +34,8 @@ visNetwork,node.border.color,character,,
 diagramer,node.border.color,character,,
 diagramer,node.border.width,numeric integer,2,0 10
 echarts,cloud.shape,character,circle,circle
-echarts,size.min,character,1,0 20
-echarts,size.max,character,30,20 100
+echarts,size.min,numeric integer,12,0 100
+echarts,size.max,numeric integer,60,0 200
 echarts,colorize,logical,T,T F
 echarts,additionalColumns,character,,
 plotly,xAxis.enabled,logical,T,T F

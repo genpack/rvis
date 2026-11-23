@@ -8,7 +8,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     26 April 2017
 # Last Revision:  23 November 2026
-# Version:        0.1.2
+# Version:        0.1.3
 #
 
 # Version History:
@@ -37,6 +37,9 @@
 #                               tfd3.js registered its shiny message handlers outside shiny too, which threw an error on static pages and
 #                               stopped later widgets from rendering; reset message name aligned with resetInput() ('resetTFD3Value').
 # 0.1.2     23 November 2026    Bundled jQuery updated from 1.12.4 to 3.7.1 (security issues CVE-2015-9251 and CVE-2019-11358).
+# 0.1.3     23 November 2026    tfd3.js: in self-contained pages (R Markdown) TableFilter tried to load its stylesheet from a data: URI and
+#                               stopped initialising (no filter row); the embedded stylesheet is used instead. Tables scroll within
+#                               the widget (TableFilter 0.6 has no fixed-height grid any more), so they no longer overflow it.
 
 #' @include visgen.R
 

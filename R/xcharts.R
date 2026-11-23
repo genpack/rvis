@@ -7,7 +7,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     12 May 2017
 # Last Revision:  23 November 2026
-# Version:        1.0.1
+# Version:        1.0.2
 #
 
 # Version History:
@@ -16,6 +16,7 @@
 # ----------------------------------
 # 1.0.0     12 May 2017        Initial issue separated from rCharts.R
 # 1.0.1     23 November 2026   Header tidied, @include visgen.R added for correct collation
+# 1.0.2     23 November 2026   Bug fix: rCharts' xPlot() formula method is called directly (it is not registered, so xPlot() failed).
 
 #' @include visgen.R
 
@@ -42,5 +43,7 @@ xCharts.area.molten = function(obj, x = NULL, y = NULL, group = NULL, config = N
 
   obj %<>% prepare4Plot(A, config = config)
 
-  xPlot(as.formula(paste(L$y, '~', L$x)), group = L$group, data = obj, type = "line-dotted")
+  # rCharts does not register its xPlot() formula method, so it is called directly:
+  xPlot.formula = utils::getFromNamespace("xPlot.formula", "rCharts")
+  xPlot.formula(as.formula(paste(L$y, "~", L$x)), group = L$group, data = obj, type = "line-dotted")
 }

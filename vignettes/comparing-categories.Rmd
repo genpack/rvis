@@ -1,0 +1,262 @@
+---
+title: "Comparing categories: bar, line, area and combo charts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comparing categories: bar, line, area and combo charts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("rvis-setup.R")
+```
+
+These charts compare values across categories: one bar, point or area per category, and
+optionally several series side by side. Every example calls `rvisPlot(type, plotter, ...)`
+with the same data and dimension names, so switching plotter is mostly a matter of changing
+the `plotter` argument. Examples are evaluated when the plotting package of the wrapper is
+installed; otherwise only their code is shown.
+
+## Data: death rates in Virginia (`VADeaths`)
+
+`VADeaths` gives death rates per 1000 people in Virginia (1940) for five age groups, in four
+population groups. The *wide* table has one column per population group; the *long* (molten)
+table has one row per age group and population group, which is the input of the
+`*.molten` chart types.
+
+```{r data}
+deaths <- data.frame(age = rownames(VADeaths), VADeaths, stringsAsFactors = FALSE)
+names(deaths) <- c("age", "rural_male", "rural_female", "urban_male", "urban_female")
+deaths$lowest  <- apply(VADeaths, 1, min)
+deaths$highest <- apply(VADeaths, 1, max)
+deaths
+
+groups <- c("rural_male", "rural_female", "urban_male", "urban_female")
+deaths_long <- data.frame(
+  age   = rep(deaths$age, times = length(groups)),
+  group = factor(rep(groups, each = nrow(deaths))),
+  rate  = unlist(deaths[, groups], use.names = FALSE),
+  stringsAsFactors = FALSE)
+head(deaths_long)
+```
+
+Several series are given to a dimension as a list of column names, for example
+`y = list("rural_male", "urban_male")`. Names of the list (if any) become series labels.
+
+## Bar charts {#bar}
+
+A bar chart compares one or more numeric columns (`y`) across the categories of `x`.
+Most wrappers draw horizontal bars when `x` is numeric and `y` is categorical.
+
+### amCharts
+
+```{r, eval=has_plotter("rAmCharts")}
+rvisPlot(type = "bar", plotter = "amCharts", obj = deaths, x = "age",
+         y = list("rural_male", "rural_female", "urban_male", "urban_female"),
+         config = list(title = "Death rates by age group"))
+```
+
+### billboarder
+
+```{r, eval=has_plotter("billboarder")}
+rvisPlot(type = "bar", plotter = "billboarder", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"),
+         config = list(title = "Male death rates", yAxis.label = "per 1000"))
+```
+
+### c3
+
+```{r, eval=has_plotter("c3")}
+rvisPlot(type = "bar", plotter = "c3", obj = deaths, x = "age",
+         y = list("rural_female", "urban_female"))
+```
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "bar", plotter = "d3plus", obj = deaths, x = "age",
+         y = list("rural_male", "rural_female"), config = list(title = "Rural death rates"))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "bar", plotter = "echarts", obj = deaths, x = "age",
+         y = list("urban_male", "urban_female"))
+```
+
+### googleVis
+
+```{r, eval=has_plotter("googleVis")}
+rvisPlot(type = "bar", plotter = "googleVis", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"))
+```
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "bar", plotter = "highcharter", obj = deaths, x = "age",
+         y = list("rural_male", "rural_female", "urban_male", "urban_female"),
+         config = list(title = "Death rates by age group", yAxis.label = "per 1000"))
+```
+
+### nvd3
+
+```{r, eval=has_plotter("rCharts")}
+rvisPlot(type = "bar", plotter = "nvd3", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"))
+```
+
+### plotly
+
+```{r, eval=has_plotter("plotly")}
+rvisPlot(type = "bar", plotter = "plotly", obj = deaths, x = "age",
+         y = list("rural_male", "rural_female", "urban_male", "urban_female"),
+         config = list(barMode = "group", yAxis.label = "per 1000"))
+```
+
+### candela
+
+`candela` draws a single measure coloured by a grouping column, so it uses the long table.
+
+```{r, eval=has_plotter("candela")}
+rvisPlot(type = "bar", plotter = "candela", obj = deaths_long, x = "age", y = "rate", color = "group")
+```
+
+### dc
+
+```{r, eval=has_plotter("dcr")}
+rvisPlot(type = "bar", plotter = "dc", obj = deaths, x = "age", y = "urban_male")
+```
+
+## Bar charts from a long table {#bar.molten}
+
+The series come from the values of a grouping column instead of separate columns.
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "bar.molten", plotter = "d3plus", obj = deaths_long,
+         x = "age", y = "rate", group = "group")
+```
+
+## Line charts {#line}
+
+### c3
+
+```{r, eval=has_plotter("c3")}
+rvisPlot(type = "line", plotter = "c3", obj = deaths, x = "age", y = list("rural_male", "urban_male"))
+```
+
+### googleVis
+
+`googleVis` line charts can put series on a second axis with `y2`.
+
+```{r, eval=has_plotter("googleVis")}
+rvisPlot(type = "line", plotter = "googleVis", obj = deaths, x = "age",
+         y = "rural_male", y2 = "urban_female",
+         config = list(yAxis.label = "rural male", y2Axis.label = "urban female"))
+```
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "line", plotter = "highcharter", obj = deaths, x = "age",
+         y = list("rural_male", "rural_female", "urban_male", "urban_female"))
+```
+
+## Line charts from a long table {#line.molten}
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "line.molten", plotter = "d3plus", obj = deaths_long, x = "age", y = "rate", group = "group")
+```
+
+## Area charts {#area}
+
+### c3
+
+```{r, eval=has_plotter("c3")}
+rvisPlot(type = "area", plotter = "c3", obj = deaths, x = "age", y = list("rural_male", "rural_female"))
+```
+
+### googleVis
+
+```{r, eval=has_plotter("googleVis")}
+rvisPlot(type = "area", plotter = "googleVis", obj = deaths, x = "age", y = list("urban_male", "urban_female"))
+```
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "area", plotter = "highcharter", obj = deaths, x = "age", y = list("rural_male", "urban_male"))
+```
+
+## Area charts from a long table {#area.molten}
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "area.molten", plotter = "d3plus", obj = deaths_long, x = "age", y = "rate", group = "group")
+```
+
+### xCharts
+
+```{r, eval=has_plotter("rCharts")}
+rvisPlot(type = "area.molten", plotter = "xCharts", obj = deaths_long, x = "age", y = "rate", group = "group")
+```
+
+## Area range charts {#area.range}
+
+An area range chart shows an interval per category: here the lowest and highest death rate
+of the four population groups.
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "area.range", plotter = "highcharter", obj = deaths, x = "age",
+         low = "lowest", high = "highest", config = list(title = "Range of death rates"))
+```
+
+## Combo charts {#combo}
+
+A combo chart mixes shapes (bars, lines, points, ...) in one chart; `shape` gives one shape
+per series of `y`.
+
+### c3
+
+```{r, eval=has_plotter("c3")}
+rvisPlot(type = "combo", plotter = "c3", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male", "rural_female"), shape = list("bar", "bar", "line"))
+```
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "combo", plotter = "highcharter", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"), shape = list("column", "line"))
+```
+
+### plotly
+
+```{r, eval=has_plotter("plotly")}
+rvisPlot(type = "combo", plotter = "plotly", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"), shape = list("bar", "line.point"))
+```
+
+### dimple
+
+```{r, eval=has_plotter("rCharts")}
+rvisPlot(type = "combo", plotter = "dimple", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"), shape = list("bar", "line"))
+```
+
+### dygraphs
+
+`dygraphs` puts series on the left (`y`) or right (`y2`) axis.
+
+```{r, eval=has_plotter("dygraphs")}
+rvisPlot(type = "combo", plotter = "dygraphs", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"), y2 = "urban_female")
+```

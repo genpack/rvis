@@ -12,32 +12,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse=TRUE, comment='#>')
-library(rvis)
-
-# Examples are evaluated only when the plotting package of their wrapper is installed
-has_plotter <- function(pkg) requireNamespace(pkg, quietly = TRUE)
-
-# Charts of different plotters bring different versions of the d3 javascript library: c3 and billboarder use
-# d3 version 5, ggvis d3 3.5.2 and d3plus d3 3.5.15. Only one global d3 can exist on a page, so c3, billboarder
-# and ggvis charts are shown in their own frame, which keeps all charts of this page working.
-show_in_frame <- function(x, ...) {
-  f <- tempfile(fileext = ".html")
-  if (inherits(x, "ggvis")) {
-    spec <- ggvis:::as.vega(x, dynamic = FALSE)
-    htmltools::save_html(ggvis:::ggvisOutputElements(spec = spec, shiny = FALSE), f)
-    rmarkdown::pandoc_self_contained_html(f, f)
-  } else {
-    htmlwidgets::saveWidget(x, f, selfcontained = TRUE)
-  }
-  html <- paste(readLines(f, warn = FALSE), collapse = "\n")
-  html <- gsub("&", "&amp;", html, fixed = TRUE)
-  html <- gsub("\"", "&quot;", html, fixed = TRUE)
-  knitr::asis_output(paste0("<iframe srcdoc=\"", html, "\" style=\"width:100%; height:420px; border:none;\"></iframe>"))
-}
-# ggvis registers its own knit_print method when it is loaded, so it is loaded first to be overridden here
-if (has_plotter("ggvis")) loadNamespace("ggvis")
-for (cls in c("c3", "billboarder", "ggvis")) registerS3method("knit_print", cls, show_in_frame, envir = asNamespace("knitr"))
+knitr::opts_chunk$set(collapse = TRUE, comment = '#>', eval = FALSE)
 ```
 
 This reference documents the chart methods callable through
@@ -53,33 +28,21 @@ of wrapper-specific settings; the [configuration
 reference](configuration.html) lists all keys currently recorded by the
 package.
 
-## Example data
+Rendered examples of every chart type and plotter are in the topic
+guides, each built on its own dataset. Each section below links to the
+examples of its chart type.
 
-The examples use synthetic category, measure, date, range, and network
-columns. Each example is evaluated when the plotting package of its
-wrapper is installed; otherwise only the code is shown, because plotting
-packages are optional dependencies of rvis.
+| Guide | Chart types | Data |
+|:---|:---|:---|
+| [Comparing categories](comparing-categories.html) | bar, line, area, area range, combo | `VADeaths` |
+| [Parts of a whole](parts-of-a-whole.html) | pie, funnel, pyramid, gauge, bullet, word cloud | `HairEyeColor` |
+| [Relationships and distributions](relationships-distributions.html) | scatter, bubble, histogram, box | `iris` |
+| [Time series](time-series.html) | time series line, area and bar, stock, calendar | `airquality` |
+| [Networks and hierarchies](networks-hierarchies.html) | graph, sankey, sunburst, tree, treemap | `Titanic` |
+| [Tables](tables.html) | interactive, filterable and pivot tables | `USArrests` |
 
-```{r}
-example_data <- data.frame(
-  category = factor(c('North', 'South', 'East', 'West', 'North', 'South')),
-  group = factor(c('Actual', 'Actual', 'Actual', 'Actual', 'Plan', 'Plan')),
-  value = c(18, 14, 21, 17, 20, 16), value2 = c(15, 12, 19, 16, 18, 15),
-  calendar_value = c(4, 7, 2, 9, 5, 8),
-  size = c(12, 9, 15, 11, 13, 10), low = c(15, 11, 18, 14, 17, 13),
-  high = c(21, 17, 24, 20, 23, 19), date = as.POSIXct('2025-01-01', tz='UTC') + (0:5)*86400,
-  day = as.Date('2025-01-01') + 0:5,
-  source = c('A','A','B','C','C','D'), target = c('B','C','C','D','A','A'),
-  linkWidth = c(2,3,1,2,1,2), stringsAsFactors = FALSE)
-example_graph <- list(
-  nodes = data.frame(id = LETTERS[1:4], label = LETTERS[1:4], size = c(18, 14, 21, 17)),
-  links = data.frame(from = c('A','A','B','C'), to = c('B','C','C','D'), weight = c(2,3,1,2))
-)
-example_sankey <- list(
-  nodes = data.frame(id = LETTERS[1:4]),
-  links = data.frame(from = c('A','A','B','C'), to = c('B','C','C','D'), weight = c(2,3,1,2))
-)
-```
+Packages that are not wrapped yet, and how to add a plotter, are in
+[Adding plotters](adding-plotters.html).
 
 ## Common argument conventions
 
@@ -114,23 +77,9 @@ chart method.
 | `candela` | `candela.bar` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 | `dc` | `dc.bar` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "bar",
-  plotter = "amCharts",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#bar).
 
 ### Arguments
 
@@ -165,23 +114,9 @@ select this chart method.
 |:---|:---|:---|
 | `d3plus` | `d3plus.bar.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "bar.molten",
-  plotter = "d3plus",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#bar.molten).
 
 ### Arguments
 
@@ -221,22 +156,9 @@ chart method.
 | `morrisjs` | `morrisjs.pie` | `obj = data.frame(), theta = NULL, label = NULL, color = NULL, config = NULL, ...` |
 | `nvd3` | `nvd3.pie` | `obj, theta = NULL, label = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "pie",
-  plotter = "amCharts",
-  obj = example_data,
-  label = 'category',
-  theta = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#pie).
 
 ### Arguments
 
@@ -270,21 +192,9 @@ select this chart method.
 |:----------------|:------------------|:----------------------------------------|
 | `nvd3`          | `nvd3.pie.molten` | `obj, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rCharts")}
-rvisPlot(
-  type = "pie.molten",
-  plotter = "nvd3",
-  obj = example_data,
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#pie.molten).
 
 ### Arguments
 
@@ -326,23 +236,9 @@ this chart method.
 | `rbokeh` | `rbokeh.scatter` | `obj, x = NULL, y = NULL, color = NULL, shape = NULL, config = NULL, ...` |
 | `rCharts` | `rCharts.scatter` | `obj, x = NULL, y = NULL, size = NULL, shape = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("billboarder")}
-rvisPlot(
-  type = "scatter",
-  plotter = "billboarder",
-  obj = example_data,
-  x = 'value',
-  y = 'value2',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#scatter).
 
 ### Arguments
 
@@ -385,24 +281,9 @@ select this chart method.
 | `highcharter` | `highcharter.scatter.molten` | `obj, x = NULL, y = NULL, size = NULL, group = NULL, color = NULL, config = NULL, ...` |
 | `highcharts` | `highcharts.scatter.molten` | `obj, x = NULL, y = NULL, size = NULL, shape = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("c3")}
-rvisPlot(
-  type = "scatter.molten",
-  plotter = "c3",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  shape = 'group',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#scatter.molten).
 
 ### Arguments
 
@@ -443,25 +324,9 @@ this chart method.
 | `dimple` | `dimple.combo` | `obj, x = NULL, y = NULL, t = NULL, size = NULL, group = NULL, shape = NULL, color = NULL, config = NULL, ...` |
 | `dygraphs` | `dygraphs.combo` | `obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("plotly")}
-rvisPlot(
-  type = "combo",
-  plotter = "plotly",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  shape = 'group',
-  color = 'group',
-  config = list(title = 'Example chart'),
-  tooltip = 'category'
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#combo).
 
 ### Arguments
 
@@ -518,20 +383,7 @@ a wrapper today.
 
 The capability table calls the Leaflet method `map`, while the function
 is `leaflet.map.plot`. Use the exact wrapper dispatch shown in the
-[`map.plot` section](#map.plot). \| `size` \| Mark or node size field or
-value. \| \| `low` \| Lower bound for a range or interval. \| \| `high`
-\| Upper bound for a range or interval. \| \| `linkColor` \| Column or
-color value for network links. \| \| `t` \| Time or grouping field. \|
-\| `group` \| Series or category grouping field. \| \| `y2` \| Secondary
-vertical-axis measure or series. \|
-
-### Configuration
-
-Use only settings accepted by the selected wrapper. Configuration keys
-are not universal: a key supported by one plotter may be ignored or
-rejected by another. See the [configuration
-reference](configuration.html) for key types, defaults, allowed values,
-and a plain-language description.
+[`map.plot` section](#map.plot).
 
 ## `box` charts {#box}
 
@@ -552,22 +404,9 @@ fail unless an unrelated `x` object exists in the calling environment.
 Use `amCharts.box()` or `plotly.box()` for this example until the
 wrapper is repaired.
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "box",
-  plotter = "amCharts",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#box).
 
 ### Arguments
 
@@ -603,22 +442,9 @@ this chart method.
 | `highcharter` | `highcharter.line` | `obj, x = NULL, y = NULL, color = NULL, config = NULL` |
 | `googleVis` | `googleVis.line` | `obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("c3")}
-rvisPlot(
-  type = "line",
-  plotter = "c3",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#line).
 
 ### Arguments
 
@@ -653,23 +479,9 @@ select this chart method.
 |:---|:---|:---|
 | `d3plus` | `d3plus.line.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "line.molten",
-  plotter = "d3plus",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#line.molten).
 
 ### Arguments
 
@@ -705,22 +517,9 @@ this chart method.
 | `highcharter` | `highcharter.area` | `obj, x = NULL, y = NULL, color = NULL, config = NULL` |
 | `googleVis` | `googleVis.area` | `obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("c3")}
-rvisPlot(
-  type = "area",
-  plotter = "c3",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area).
 
 ### Arguments
 
@@ -756,23 +555,9 @@ select this chart method.
 | `d3plus` | `d3plus.area.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 | `xCharts` | `xCharts.area.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "area.molten",
-  plotter = "d3plus",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area.molten).
 
 ### Arguments
 
@@ -806,24 +591,9 @@ select this chart method.
 |:---|:---|:---|
 | `highcharter` | `highcharter.area.range` | `obj, x = NULL, low = NULL, high = NULL, color = NULL, config = NULL` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("highcharter")}
-rvisPlot(
-  type = "area.range",
-  plotter = "highcharter",
-  obj = example_data,
-  x = 'category',
-  low = 'low',
-  high = 'high',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area.range).
 
 ### Arguments
 
@@ -858,26 +628,9 @@ this chart method.
 | `grviz` | `grviz.graph` | `obj, key = NULL, label = NULL, shape = NULL, size = NULL, color = NULL, borderColor = NULL, tooltip = NULL, labelColor = NULL, source = NULL, target = NULL, linkColor = NULL, linkTooltip = NULL, linkWidth = NULL, linkLabel = NULL, linkLabelColor = NULL, linkLabelSize = NULL, config = NULL, ...` |
 | `visNetwork` | `visNetwork.graph` | `obj, key = NULL, label = NULL, shape = NULL, size = NULL, color = NULL, borderColor = NULL, tooltip = NULL, source = NULL, target = NULL, linkColor = NULL, linkLength = NULL, linkWidth = NULL, linkLabel = NULL, linkLabelColor = NULL, linkLabelSize = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r}
-rvisPlot(
-  type = "graph",
-  plotter = "grviz",
-  obj = example_graph,
-  key = 'id',
-  label = 'label',
-  size = 'size',
-  source = 'from',
-  target = 'to',
-  linkWidth = 'weight',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Networks and hierarchies](networks-hierarchies.html#graph).
 
 ### Arguments
 
@@ -970,24 +723,9 @@ this chart method.
 | `d3plus` | `d3plus.bubble` | `obj, size = NULL, label = NULL, config = NULL, ...` |
 | `bubbles` | `bubbles.bubble` | `obj, size = NULL, color = NULL, label = NULL, labelColor = NULL, tooltip = NULL, config = bubbles.defset, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("highcharter")}
-rvisPlot(
-  type = "bubble",
-  plotter = "highcharter",
-  obj = example_data,
-  x = 'category',
-  y = 'value',
-  size = 'size',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#bubble).
 
 ### Arguments
 
@@ -1026,23 +764,9 @@ select this chart method.
 | `d3plus` | `d3plus.bubble.molten` | `obj, size = NULL, label = NULL, group = NULL, config = NULL, ...` |
 | `bubbleCloud` | `bubbleCloud.bubble.molten` | `obj, size = NULL, group = NULL, tooltip = NULL, config = bubbleCloud.bubble.molten.defset, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "bubble.molten",
-  plotter = "d3plus",
-  obj = example_data,
-  size = 'size',
-  label = 'category',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#bubble.molten).
 
 ### Arguments
 
@@ -1078,23 +802,9 @@ this chart method.
 | `d3plus` | `d3plus.tree` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 | `sankeytree` | `sankeytree.tree` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "tree",
-  plotter = "d3plus",
-  obj = example_data,
-  label = 'category',
-  size = 'size',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Networks and hierarchies](networks-hierarchies.html#tree).
 
 ### Arguments
 
@@ -1129,23 +839,9 @@ this chart method.
 | `highcharter` | `highcharter.treemap` | `obj, label = NULL, size = NULL, color = NULL, config = NULL` |
 | `d3plus` | `d3plus.treemap` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("highcharter")}
-rvisPlot(
-  type = "treemap",
-  plotter = "highcharter",
-  obj = example_data,
-  label = 'category',
-  size = 'size',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Networks and hierarchies](networks-hierarchies.html#treemap).
 
 ### Arguments
 
@@ -1182,21 +878,9 @@ this chart method.
 | `pivot` | `pivot.table` | `obj, ...` |
 | `TFD3` | `TFD3.table` | `obj, label = NULL, color = NULL, shape = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("DT")}
-rvisPlot(
-  type = "table",
-  plotter = "DT",
-  obj = example_data,
-  label = 'category',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Tables](tables.html#table).
 
 ### Arguments
 
@@ -1231,24 +915,9 @@ select this chart method.
 |:---|:---|:---|
 | `TFD3` | `TFD3.table.molten` | `obj, label = NULL, color = NULL, shape = NULL, group = NULL, config = NULL` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r}
-rvisPlot(
-  type = "table.molten",
-  plotter = "TFD3",
-  obj = example_data,
-  label = 'category',
-  color = 'group',
-  shape = 'group',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Tables](tables.html#table.molten).
 
 ### Arguments
 
@@ -1282,19 +951,9 @@ this chart method.
 |:---|:---|:---|
 | `DT` | `DT.Table` | `x, links = NULL, session = NULL, options = list(), rownames = T` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("DT")}
-rvisPlot(
-  type = "Table",
-  plotter = "DT",
-  x = example_data
-)
-```
+Examples for every plotter of this chart type are in [Tables](tables.html#Table).
 
 ### Arguments
 
@@ -1327,21 +986,9 @@ select this chart method.
 |:----------------|:------------------|:------------------------------------|
 | `ggvis`         | `ggvis.histogram` | `obj, x = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("ggvis")}
-rvisPlot(
-  type = "histogram",
-  plotter = "ggvis",
-  obj = example_data,
-  x = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#histogram).
 
 ### Arguments
 
@@ -1419,31 +1066,9 @@ this chart method.
 | `morrisjs` | `morrisjs.tsline` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 | `dygraphs` | `dygraphs.tsline` | `obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-In `amCharts.tsline`, `shape`, `size` and `color` are set per series
-(one line style, point size and colour for each `y` column), not mapped
-from data columns. `high` and `low` add a range around each series.
-
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "tsline",
-  plotter = "amCharts",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  shape = 'line.bubble',
-  size = 3,
-  color = 'steelblue',
-  high = 'high',
-  low = 'low',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsline).
 
 ### Arguments
 
@@ -1472,6 +1097,32 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
+## `tsline.molten` charts {#tsline.molten}
+
+Call `rvisPlot(type = "tsline.molten", plotter = "<wrapper>", ...)` to
+select this chart method. The series come from the values of `group`.
+
+### Wrapper methods
+
+| `plotter` value | Function | Formal arguments |
+|:---|:---|:---|
+| `d3plus` | `d3plus.tsline.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
+
+### Examples
+
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsline.molten).
+
+### Arguments
+
+| Argument | Meaning |
+|:---|:---|
+| `obj` | Input data frame in long format. |
+| `x` | Time column. |
+| `y` | Measure column. |
+| `group` | Column whose values give the series. |
+| `config` | Named list of settings supported by this wrapper. |
+| `...` | Additional arguments forwarded to the plotting function. |
+
 ## `tsLineChart` charts {#tslinechart}
 
 Call `rvisPlot(type = "tsLineChart", plotter = "<wrapper>", ...)` to
@@ -1483,28 +1134,9 @@ select this chart method.
 |:---|:---|:---|
 | `billboarder` | `billboarder.tsLineChart` | `obj, x = NULL, y = NULL, color = NULL, shape = "spline", config = NULL, ...` |
 
-### Example
+### Examples
 
-In `billboarder.tsLineChart`, `shape` is the line type (for example
-`"line"`, `"spline"`, `"step"` or `"area"`) and `color` gives one colour
-per series.
-
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("billboarder")}
-rvisPlot(
-  type = "tsLineChart",
-  plotter = "billboarder",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  color = 'steelblue',
-  shape = 'spline',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsLineChart).
 
 ### Arguments
 
@@ -1539,22 +1171,9 @@ select this chart method.
 |:---|:---|:---|
 | `highcharter` | `highcharter.tsline.stock` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("highcharter")}
-rvisPlot(
-  type = "tsline.stock",
-  plotter = "highcharter",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsline.stock).
 
 ### Arguments
 
@@ -1589,23 +1208,9 @@ this chart method.
 | `c3` | `c3.tsarea` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `streamgraph` | `streamgraph.tsarea` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("billboarder")}
-rvisPlot(
-  type = "tsarea",
-  plotter = "billboarder",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsarea).
 
 ### Arguments
 
@@ -1640,23 +1245,9 @@ select this chart method.
 |:---|:---|:---|
 | `d3plus` | `d3plus.tsarea.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "tsarea.molten",
-  plotter = "d3plus",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsarea.molten).
 
 ### Arguments
 
@@ -1691,22 +1282,9 @@ this chart method.
 | `plotly` | `plotly.tsbar` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `morrisjs` | `morrisjs.tsbar` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("plotly")}
-rvisPlot(
-  type = "tsbar",
-  plotter = "plotly",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsbar).
 
 ### Arguments
 
@@ -1740,23 +1318,9 @@ select this chart method.
 |:---|:---|:---|
 | `d3plus` | `d3plus.tsbar.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("D3plusR")}
-rvisPlot(
-  type = "tsbar.molten",
-  plotter = "d3plus",
-  obj = example_data,
-  x = 'date',
-  y = 'value',
-  group = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsbar.molten).
 
 ### Arguments
 
@@ -1791,24 +1355,9 @@ this chart method.
 | `googleVis` | `googleVis.sankey` | `obj, key = NULL, source = NULL, target = NULL, linkWidth = NULL, config = NULL` |
 | `networkD3` | `networkD3.sankey` | `obj, key = NULL, label = NULL, tooltip = NULL, source = NULL, target = NULL, linkWidth = NULL, linkTooltip = NULL, config = NULL` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("googleVis")}
-rvisPlot(
-  type = "sankey",
-  plotter = "googleVis",
-  obj = example_sankey,
-  key = 'id',
-  source = 'from',
-  target = 'to',
-  linkWidth = 'weight',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Networks and hierarchies](networks-hierarchies.html#sankey).
 
 ### Arguments
 
@@ -1845,23 +1394,9 @@ select this chart method.
 |:---|:---|:---|
 | `echarts` | `echarts.wordCloud` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("echarts4r")}
-rvisPlot(
-  type = "wordCloud",
-  plotter = "echarts",
-  obj = example_data,
-  label = 'category',
-  size = 'size',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#wordCloud).
 
 ### Arguments
 
@@ -1897,22 +1432,9 @@ this chart method.
 | `highcharter` | `highcharter.funnel` | `obj, label = NULL, size = NULL, color = NULL, config = NULL` |
 | `echarts` | `echarts.funnel` | `obj, label = NULL, size = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "funnel",
-  plotter = "amCharts",
-  obj = example_data,
-  y = 'value',
-  label = 'category',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#funnel).
 
 ### Arguments
 
@@ -1949,21 +1471,9 @@ this chart method.
 | `c3` | `c3.gauge` | `theta, config = NULL, ...` |
 | `googleVis` | `googleVis.gauge` | `obj = data.frame(), theta = NULL, label = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "gauge",
-  plotter = "amCharts",
-  obj = example_data,
-  theta = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#gauge).
 
 ### Arguments
 
@@ -1996,21 +1506,9 @@ this chart method.
 |:---|:---|:---|
 | `amCharts` | `amCharts.bullet` | `obj = data.frame(), x = NULL, y = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rAmCharts")}
-rvisPlot(
-  type = "bullet",
-  plotter = "amCharts",
-  obj = example_data,
-  x = 'value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#bullet).
 
 ### Arguments
 
@@ -2043,23 +1541,9 @@ this chart method.
 |:---|:---|:---|
 | `coffeewheel` | `coffeewheel.sunburst` | `obj, theta = NULL, label = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r}
-rvisPlot(
-  type = "sunburst",
-  plotter = "coffeewheel",
-  obj = example_data,
-  theta = 'value',
-  label = 'category',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Networks and hierarchies](networks-hierarchies.html#sunburst).
 
 ### Arguments
 
@@ -2093,22 +1577,9 @@ this chart method.
 |:---|:---|:---|
 | `calheatmap` | `calheatmap.calendar` | `obj, t = NULL, color = NULL, config = NULL, ...` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("rChartsCalmap")}
-rvisPlot(
-  type = "calendar",
-  plotter = "calheatmap",
-  obj = example_data,
-  t = 'day',
-  color = 'calendar_value',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Time series](time-series.html#calendar).
 
 ### Arguments
 
@@ -2141,23 +1612,9 @@ this chart method.
 |:---|:---|:---|
 | `highcharter` | `highcharter.pyramid` | `obj, label = NULL, size = NULL, color = NULL, config = NULL` |
 
-### Example
+### Examples
 
-This example uses the first listed implementation. Choose another
-`plotter` only when its method appears in the table above, and follow
-that method's signature.
-
-```{r, eval=has_plotter("highcharter")}
-rvisPlot(
-  type = "pyramid",
-  plotter = "highcharter",
-  obj = example_data,
-  label = 'category',
-  size = 'size',
-  color = 'group',
-  config = list(title = 'Example chart')
-)
-```
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#pyramid).
 
 ### Arguments
 

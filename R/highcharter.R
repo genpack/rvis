@@ -7,7 +7,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 October 2016
 # Last Revision:  23 November 2026
-# Version:        1.4.0
+# Version:        1.4.1
 #
 
 # Version History:
@@ -34,6 +34,8 @@
 #                              highcharter.tsline.stock() used undefined highcharter.tsline.defset, highcharter.applyConfig() passed the
 #                              barMode value as variable name. Clear error messages for unsupported axis classes and missing series.
 #                              Package functions namespaced (datetime_to_timestamp, hc_drilldown).
+# 1.4.1     23 November 2026   highcharter.combo() accepts numeric x and y (bubble charts of two numeric columns failed).
+#                              highcharter.tsline.stock() completed: it passed the column names instead of the data (chart was empty).
 
 #' @include visgen.R
 
@@ -305,7 +307,8 @@ highcharter.combo = function(obj, x = NULL, y = NULL, size = NULL, low = NULL, h
 
   # todo: care for timedate class for x and y axis
   dd = list() # drilldown series
-  if(ynum & !xnum){
+  # numeric y (with categorical, time or numeric x): one series per y column
+  if(ynum){
     # series are determined by y, otherwise by size, otherwise by low:
     if(!is.null(L$y)){
       sercount  = sequence(length(L$y))
@@ -377,7 +380,7 @@ highcharter.combo = function(obj, x = NULL, y = NULL, size = NULL, low = NULL, h
       }
     }
   } else {
-    stop('either x or y must be categorical!')
+    stop('Either x or y must be numeric!')
   }
   if(drll){h %<>% highcharter::hc_drilldown(allowPointDrilldown = TRUE, series = dd)}
 
@@ -515,7 +518,7 @@ highcharter.scatter.molten = function(obj, x = NULL, y = NULL, size = NULL, grou
   eval(parse(text = scr)) %>% highcharter.applyConfig(config)
 }
 
-# This function is incomplete and does not work! We need to resolve host for quantmod::getSymbol() function to get data first
+# Highcharts stock chart (with navigator and range selector) of one or more numeric columns y over a time column x
 highcharter.tsline.stock = function(obj, x = NULL, y = NULL, config = NULL, ...){
   # Verifications:
   assert(require(highcharter), "Package highcharter is not installed!", err_src = match.call()[[1]])
@@ -529,9 +532,12 @@ highcharter.tsline.stock = function(obj, x = NULL, y = NULL, config = NULL, ...)
 
   obj %<>% prepare4Plot(A, config)
 
-  hc = highcharter::highchart(type = 'stock') %>% highcharter::hc_add_series(L$x)
+  # Each series is sent as (timestamp, value) pairs
+  time = highcharter::datetime_to_timestamp(obj[, L$x])
+  hc = highcharter::highchart(type = 'stock')
   for (i in L$y){
-    hc %<>% highcharter::hc_add_series(i)
+    hc %<>% highcharter::hc_add_series(data = highcharter::list_parse2(data.frame(x = time, y = obj[, i])), name = i, type = 'line')
   }
+  if (!is.null(config$title)){hc %<>% highcharter::hc_title(text = config$title)}
   return(hc)
 }

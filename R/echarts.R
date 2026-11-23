@@ -9,7 +9,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     19 June 2018
 # Last Revision:  23 November 2026
-# Version:        0.1.2
+# Version:        0.1.3
 #
 
 # Version History:
@@ -23,6 +23,7 @@
 # 0.1.2     23 November 2026   ecloud() delegates to echarts4r::e_cloud_() which adds the echarts-wordcloud plugin (word clouds were empty).
 #                              Word size range taken from config properties size.min/size.max (it read non-existent point.size.min/max,
 #                              so the plugin got no size range and failed).
+# 0.1.3     23 November 2026   Config properties size.min and size.max are numbers (were recorded as character) with defaults 12 and 60.
 
 #' @include visgen.R
 

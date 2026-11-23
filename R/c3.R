@@ -8,7 +8,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 April 2017
 # Last Revision:  23 November 2026
-# Version:        0.1.1
+# Version:        0.1.2
 #
 
 # Version History:
@@ -27,6 +27,8 @@
 #                              NULL config and NULL stack.enabled were not handled).
 #                              c3.gauge() also accepts the standard (obj, theta) arguments (column aggregated by config$aggregator, default mean);
 #                              a numeric value as first argument still works.
+# 0.1.2     23 November 2026   Column names with dots are converted like c3::c3() does (c3.combo, c3.line, c3.area, c3.tsline,
+#                              c3.tsarea and c3.scatter.molten failed for such columns, e.g. iris columns).
 #                              c3.combo() aggregation builds the summarise call directly instead of eval(parse()).
 
 #' @include visgen.R
@@ -96,6 +98,15 @@ c3.mostCommon = function(x) {
   values[which.max(tabulate(match(x, values)))]
 }
 
+# c3::c3() replaces dots by underscores in column names and then looks columns up by their original
+# names, so charts failed for column names containing dots. Column names of 'obj' and the dimension
+# labels in 'L' (x, y, group) are converted the same way before calling c3().
+c3.dotless = function(obj, L){
+  names(obj) <- gsub(".", "_", names(obj), fixed = TRUE)
+  for (d in intersect(c('x', 'y', 'group'), names(L))){if (!is.null(L[[d]])) L[[d]] <- gsub(".", "_", L[[d]], fixed = TRUE)}
+  list(obj = obj, L = L)
+}
+
 c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
   # Verifications:
   if (is.empty(obj)){return(NULL)}
@@ -118,6 +129,8 @@ c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
     obj = obj %>% dplyr::group_by(dplyr::across(dplyr::all_of(L$x))) %>%
       dplyr::summarise(dplyr::across(dplyr::all_of(L$y), aggfun)) %>% as.data.frame
   }
+
+  d = c3.dotless(obj, L); obj = d$obj; L = d$L
 
   if (!is.null(L$x)){
     if (inherits(obj[,L$x], 'Date')){ct = obj %>% c3(x = L$x)} else {
@@ -178,6 +191,7 @@ c3.scatter.molten = function(obj, x = NULL, y = NULL, shape = NULL, group = NULL
   A = a$aesthetics %>% list.remove('shape')
 
   obj %<>% prepare4Plot(A, config)
+  d = c3.dotless(obj, L); obj = d$obj; L = d$L
 
   ct = obj %>% c3(x = L$x, y = L$y, group = L$group)
 

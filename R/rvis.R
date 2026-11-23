@@ -247,5 +247,20 @@
 #                             * Vignette chart-types: every example is evaluated when its plotting package is installed.
 # 5.10.2 (23 November 2026) - Security: bundled jQuery (inst/lib/jquery, used by TFD3 tables) updated from 1.12.4 to 3.7.1,
 #                             fixing CVE-2015-9251 and CVE-2019-11358 (GitHub Dependabot alerts #2 and #5).
+# 5.11.0 (23 November 2026) - Documentation: six chart guides with rendered examples of every chart type and plotter, each on
+#                             its own R dataset: comparing categories (VADeaths), parts of a whole (HairEyeColor), relationships
+#                             and distributions (iris), time series (airquality), networks and hierarchies (Titanic) and tables
+#                             (USArrests). Vignette 'adding-plotters' lists the plotters covered, the htmlwidgets packages planned
+#                             and how to write a wrapper. Vignette 'chart-types' is now a reference linking to the guides (its
+#                             examples moved there), vignette 'amcharts' merged into the guides. Bug fixes found by the guides:
+#                             * xCharts: formula method of rCharts::xPlot() called directly (it is not registered); rCharts charts
+#                               embed their libraries from package rCharts in knitr (the xCharts CDN no longer exists).
+#                             * c3: column names with dots (c3 renames them) broke combo and scatter.molten charts.
+#                             * highcharter: bubble charts with numeric x; stock chart (tsline.stock) drew no data.
+#                             * pivot: tables are drawn by package rpivotTable (the bundled widget had no javascript libraries).
+#                             * TFD3: filter row missing in self-contained pages; tables overflowed their widget.
+#                             * echarts: config properties size.min/size.max recorded as numbers.
+#                             * d3plus: helper d3plus.bubbles() renamed d3plusBubbles() (it was dispatchable as a chart type).
+#                             See the version history of each file for details.
 NULL
 #> NULL

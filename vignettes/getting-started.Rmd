@@ -36,6 +36,14 @@ implement `bar`, such as `billboarder`, `c3`, `googleVis`, `highcharter`, or
 additional data requirements. The [chart type manual](chart-types.html) lists
 the exact wrapper methods and their arguments.
 
+Examples of every chart type with each of its plotters are in the chart guides:
+[comparing categories](comparing-categories.html),
+[parts of a whole](parts-of-a-whole.html),
+[relationships and distributions](relationships-distributions.html),
+[time series](time-series.html),
+[networks and hierarchies](networks-hierarchies.html) and
+[tables](tables.html).
+
 ## Dimension arguments
 
 Dimension arguments such as `x`, `y`, `label`, and `theta` refer to columns in

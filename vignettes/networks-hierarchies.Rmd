@@ -1,0 +1,132 @@
+---
+title: "Networks, flows and hierarchies: graph, sankey, sunburst, tree and treemap charts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Networks, flows and hierarchies: graph, sankey, sunburst, tree and treemap charts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("rvis-setup.R")
+```
+
+Graphs and sankey diagrams show links between nodes; sunbursts, trees and treemaps show how a
+total splits along nested categories. Examples are evaluated when the plotting package of the
+wrapper is installed; otherwise only their code is shown.
+
+## Data: passengers of the Titanic (`Titanic`)
+
+`Titanic` counts the 2201 people on board by class, sex, age and survival.
+
+```{r data}
+titanic <- as.data.frame(Titanic, stringsAsFactors = FALSE)
+head(titanic)
+
+# People per class, for single level charts
+classes <- aggregate(Freq ~ Class, data = titanic, FUN = sum)
+classes$survived <- aggregate(Freq ~ Class, data = titanic[titanic$Survived == "Yes", ], FUN = sum)$Freq
+classes$survival_rate <- round(classes$survived / classes$Freq, 2)
+classes
+```
+
+Graph and sankey wrappers take a list with two tables: `nodes` (one row per node) and `links`
+(one row per link between two nodes). rvis function `df2Network()` builds them from the
+consecutive levels of a table: here class, then sex, then survival.
+
+```{r network}
+flows <- df2Network(titanic, id_cols = c("Class", "Sex", "Survived"), value_col = "Freq")
+flows$nodes$label <- sub(".*=", "", flows$nodes$label)    # "Class=1st" is shown as "1st"
+flows$links <- as.data.frame(flows$links)
+head(flows$nodes)
+head(flows$links[, c("source", "target", "value", "ratio")])
+```
+
+## Graphs {#graph}
+
+A graph draws nodes (`key`, `label`, ...) connected by links (`source`, `target`, `linkWidth`, ...).
+
+### visNetwork
+
+```{r, eval=has_plotter("visNetwork")}
+rvisPlot(type = "graph", plotter = "visNetwork", obj = flows, key = "id", label = "label",
+         source = "source", target = "target", linkWidth = "value",
+         config = list(layout = "hierarchical", direction = "left.right"))
+```
+
+### grviz (Graphviz)
+
+`grviz` is embedded in rvis and draws the graph with Graphviz.
+
+```{r}
+rvisPlot(type = "graph", plotter = "grviz", obj = flows, key = "id", label = "label",
+         source = "source", target = "target", linkWidth = "value",
+         config = list(direction = "left.right", link.width.min = 1, link.width.max = 8,
+                       title = "Titanic: class, sex and survival"))
+```
+
+## Sankey diagrams {#sankey}
+
+A sankey diagram draws links as bands whose width is proportional to `linkWidth`.
+
+### networkD3
+
+```{r, eval=has_plotter("networkD3")}
+rvisPlot(type = "sankey", plotter = "networkD3", obj = flows, key = "id", label = "label",
+         source = "source", target = "target", linkWidth = "value",
+         config = list(node.label.size = 24))
+```
+
+### googleVis
+
+```{r, eval=has_plotter("googleVis")}
+rvisPlot(type = "sankey", plotter = "googleVis", obj = flows, key = "id",
+         source = "source", target = "target", linkWidth = "value")
+```
+
+## Sunburst charts {#sunburst}
+
+A sunburst shows nested categories (`label`, from the inner to the outer ring) sized by
+`theta`. Click a slice to zoom in.
+
+### coffeewheel
+
+`coffeewheel` is embedded in rvis.
+
+```{r}
+rvisPlot(type = "sunburst", plotter = "coffeewheel", obj = titanic, theta = "Freq",
+         label = list("Class", "Sex", "Survived"), config = list(width = 600, height = 600))
+```
+
+## Trees {#tree}
+
+### sankeytree
+
+```{r, eval=has_plotter("sankeytreeR")}
+rvisPlot(type = "tree", plotter = "sankeytree", obj = titanic, size = "Freq",
+         label = list("Class", "Sex", "Survived"))
+```
+
+### d3plus
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "tree", plotter = "d3plus", obj = classes, label = "Class", size = "Freq", color = "survival_rate")
+```
+
+## Treemaps {#treemap}
+
+A treemap shows categories as rectangles with areas proportional to `size`.
+
+### highcharter
+
+```{r, eval=has_plotter("highcharter")}
+rvisPlot(type = "treemap", plotter = "highcharter", obj = classes, label = "Class", size = "Freq")
+```
+
+### d3plus
+
+`d3plus` treemaps can nest several `label` levels.
+
+```{r, eval=has_plotter("D3plusR")}
+rvisPlot(type = "treemap", plotter = "d3plus", obj = titanic, label = list("Class", "Survived"), size = "Freq")
+```

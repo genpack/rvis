@@ -22,8 +22,16 @@ the plotting package for the wrapper you want to use.
 ## User guides
 
 - [Getting started with `rvisPlot`](articles/getting-started.html)
+- Chart guides, with examples of every chart type and plotter:
+  - [Comparing categories: bar, line, area and combo charts](articles/comparing-categories.html)
+  - [Parts of a whole: pie, funnel, pyramid, gauge, bullet and word cloud charts](articles/parts-of-a-whole.html)
+  - [Relationships and distributions: scatter, bubble, histogram and box plots](articles/relationships-distributions.html)
+  - [Time series: line, area, bar and calendar charts over time](articles/time-series.html)
+  - [Networks, flows and hierarchies: graph, sankey, sunburst, tree and treemap charts](articles/networks-hierarchies.html)
+  - [Tables: interactive, filterable and pivot tables](articles/tables.html)
 - [Chart type and plotter reference](articles/chart-types.html)
 - [Configuration reference](articles/configuration.html)
+- [Plotters: what is covered and how to add more](articles/adding-plotters.html)
 
 ## Main function
 

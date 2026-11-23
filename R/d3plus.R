@@ -23,7 +23,7 @@
 #                              d3plus.scatter() passed 'config' as a dimension; typo 'integr' in d3plus.bar.defset corrected.
 # 1.2.0     23 November 2026   d3plus.scatter(), d3plus.bubble(), d3plus.bubble.molten() and d3plus.tree() re-written with package D3plusR.
 #                              They used the old GitHub version of package 'd3plus' (d3plus(type, data)) whose API differs from the
-#                              CRAN package, so they could not be displayed. Helper d3plus.bubbles() added.
+#                              CRAN package, so they could not be displayed. Helper d3plusBubbles() added.
 
 #' @include visgen.R
 
@@ -121,7 +121,7 @@ d3plus.treemap.defset = defset %<==>% list(
 
 d3plus.shape = c(bar = 'bar', line = 'line', area = 'stacked')
 # Bubble chart of table 'obj' (column 'size': bubble size, 'label': bubble name, 'group': bubble group/colour), using package D3plusR
-d3plus.bubbles = function(obj, size, label, group, config){
+d3plusBubbles = function(obj, size, label, group, config){
   d3 = D3plusR::d3plus(data = obj, type = 'bubbles', id = c(group, label), width = config$width, height = config$height) %>%
     D3plusR::d3plusDepth(1) %>%
     D3plusR::d3plusSize(value = size) %>%
@@ -176,7 +176,7 @@ d3plus.bubble = function(obj, size = NULL, label = NULL, config = NULL, ...){
   names(L$label) <- L$size
   obj = cbind(name = obj[, L$label[obj$variable]] %>% as.matrix %>% diag, obj[, c('variable', 'value')]) %>% na.omit
 
-  obj %>% d3plus.bubbles(size = 'value', label = 'name', group = 'variable', config = config)
+  obj %>% d3plusBubbles(size = 'value', label = 'name', group = 'variable', config = config)
 }
 
 d3plus.bubble.molten = function(obj, size = NULL, label = NULL, group = NULL, config = NULL, ...){
@@ -194,7 +194,7 @@ d3plus.bubble.molten = function(obj, size = NULL, label = NULL, group = NULL, co
 
   obj %<>% prepare4Plot(A, config = config)
 
-  obj %>% d3plus.bubbles(size = L$size, label = L$label, group = L$group, config = config)
+  obj %>% d3plusBubbles(size = L$size, label = L$label, group = L$group, config = config)
 }
 
 # Tree chart: rectangles (tree map) sized by 'size' and coloured by 'color'

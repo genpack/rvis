@@ -29,8 +29,21 @@ HTMLWidgets.widget({
     // set TF base path depending on mode: the first attachment of dependency 'tablefilter' is
     // style/themes/blank.png, so the base path is its url without that part
     var url = window.HTMLWidgets.getAttachmentUrl("tablefilter", 1);
-    url = url.replace(/style\/themes\/blank\.png.*$/, '');
+    if (url.indexOf("data:") === 0) {
+      // self-contained page (R Markdown): attachments are inlined, so there is no base path to load files from.
+      // The TableFilter stylesheet is already embedded as a widget dependency: an empty one is loaded instead
+      // (see tfStylesheet below), otherwise TableFilter fails to load it and stops initialising (no filter row).
+      url = "";
+      var tfStylesheet = "data:text/css,";
+    } else {
+      url = url.replace(/style\/themes\/blank\.png.*$/, '');
+    }
     data.tableProps["base_path"] = url;
+
+    // TableFilter 0.6 no longer has a fixed-height grid (options grid_height and fixed_headers):
+    // the widget scrolls instead, so that a table does not overflow a container of fixed height
+    el.style.overflow = "auto";
+    el.style.position = "relative";
 
     // adjust path for tablefilter extensions
     if(data.tableProps.hasOwnProperty("extensions")) {
@@ -880,6 +893,10 @@ HTMLWidgets.widget({
     if(data.enableTf == true) {
       //      window[tfName] = setFilterGrid(tableID, data.tableProps);
       window[tfName] = new TableFilter(tableID, data.tableProps);
+      // TableFilter 0.6.2 ignores its 'stylesheet' option (it reads it from a method), so the path is set on the instance
+      if (typeof tfStylesheet !== "undefined") {
+        window[tfName].getStylesheetPath = function() { return tfStylesheet; };
+      }
       window[tfName].init();
 
       // initial filter settings
