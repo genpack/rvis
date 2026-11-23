@@ -8,7 +8,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     26 April 2017
 # Last Revision:  23 November 2026
-# Version:        0.1.1
+# Version:        0.1.2
 #
 
 # Version History:
@@ -36,6 +36,7 @@
 #                               tfd3.js and its colour functions use window.d3v3 so a newer d3 loaded by another widget does not break them.
 #                               tfd3.js registered its shiny message handlers outside shiny too, which threw an error on static pages and
 #                               stopped later widgets from rendering; reset message name aligned with resetInput() ('resetTFD3Value').
+# 0.1.2     23 November 2026    Bundled jQuery updated from 1.12.4 to 3.7.1 (security issues CVE-2015-9251 and CVE-2019-11358).
 
 #' @include visgen.R
 

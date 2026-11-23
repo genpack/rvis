@@ -71,8 +71,9 @@ dependencies:
       - style/themes/skyblue/images/icn_clear_filters.png
       - style/themes/skyblue/images/img_loading.gif
       - style/themes/skyblue/skyblue.css
+  # jQuery 3.7.1 (taken from package shiny): 1.12.4 had security issues CVE-2015-9251 and CVE-2019-11358
   - name: jquery
-    version: 1.12.4
+    version: 3.7.1
     src: "lib/jquery"
     script: jquery.min.js
   - name: bootstrap

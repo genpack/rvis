@@ -245,5 +245,7 @@
 #                             * echarts word clouds: plugin dependency and size range added.
 #                             * knitr/R Markdown printing added for rCharts and googleVis objects (knit_print methods).
 #                             * Vignette chart-types: every example is evaluated when its plotting package is installed.
+# 5.10.2 (23 November 2026) - Security: bundled jQuery (inst/lib/jquery, used by TFD3 tables) updated from 1.12.4 to 3.7.1,
+#                             fixing CVE-2015-9251 and CVE-2019-11358 (GitHub Dependabot alerts #2 and #5).
 NULL
 #> NULL
