@@ -10,8 +10,7 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-#library(rvis)
-pkgload::load_all()
+library(rvis)
 
 # The examples below use chart types also provided by billboarder, c3, and
 # plotly. Change this value to one of those wrapper prefixes to try another

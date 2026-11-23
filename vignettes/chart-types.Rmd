@@ -13,8 +13,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse=TRUE, comment='#>')
-#library(rvis)
-pkgload::load_all()
+library(rvis)
 ```
 
 This reference documents the chart methods callable through
@@ -1398,6 +1397,10 @@ this chart method.
 
 ### Example
 
+In `amCharts.tsline`, `shape`, `size` and `color` are set per series
+(one line style, point size and colour for each `y` column), not mapped
+from data columns. `high` and `low` add a range around each series.
+
 This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
@@ -1409,9 +1412,9 @@ rvisPlot(
   obj = example_data,
   x = 'date',
   y = 'value',
-  shape = 'group',
-  size = 'size',
-  color = 'group',
+  shape = 'line.bubble',
+  size = 3,
+  color = 'steelblue',
   high = 'high',
   low = 'low',
   config = list(title = 'Example chart')
@@ -1458,6 +1461,10 @@ select this chart method.
 
 ### Example
 
+In `billboarder.tsLineChart`, `shape` is the line type (for example
+`"line"`, `"spline"`, `"step"` or `"area"`) and `color` gives one colour
+per series.
+
 This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
@@ -1469,8 +1476,8 @@ rvisPlot(
   obj = example_data,
   x = 'date',
   y = 'value',
-  color = 'group',
-  shape = 'group',
+  color = 'steelblue',
+  shape = 'spline',
   config = list(title = 'Example chart')
 )
 ```
