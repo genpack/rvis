@@ -1,6 +1,13 @@
 # /htmlwidgets/tfd3.yaml -----------------------------------------------------------------------------
 
 dependencies:
+  # tfd3.js and the colour/cell functions generated in R (jscripts.R) use the global d3 version 3 API
+  - name: d3v3
+    version: 3.5.15
+    src: "lib/d3v3"
+    script:
+      - d3.min.js
+      - d3v3-alias.js
   - name: d3tf
     version: 4.7.4
     src: "lib/d3"
@@ -20,7 +27,6 @@ dependencies:
       - style/filtersVisibility.css
       - style/tablefilter.css
     attachment:
-      - ''
       - style/themes/blank.png
       - style/themes/btn_clear_filters.png
       - style/themes/btn_filter.png
@@ -86,8 +92,7 @@ dependencies:
     version: 1.6
     src: "lib/colsresizable/"
     script: colResizable-1.6.min.js
-    stylesheet:
-      colsResizable.css
+    stylesheet: colsResizable.css
     attachment:
-      grip.png
-      slider.png
+      - grip.png
+      - slider.png

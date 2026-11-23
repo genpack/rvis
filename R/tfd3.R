@@ -8,7 +8,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     26 April 2017
 # Last Revision:  23 November 2026
-# Version:        0.1.0
+# Version:        0.1.1
 #
 
 # Version History:
@@ -27,6 +27,15 @@
 # 0.1.0     23 November 2026    Table preparation moved to TFD3.prepare(), shared with D3TableFilter.table().
 #                               Bug fixes: radio button columns were only passed when checkbox columns existed;
 #                               TFD3.addColumnTypes() looked up the literal 'type' instead of column classes.
+# 0.1.1     23 November 2026    TFD3.table.molten() returned the column names instead of a table (function was unfinished);
+#                               it now draws the table using TFD3.table.molten.defset (no row names, no column filters).
+#                               Bug fixes: TFD3() created the widget without package = 'rvis', so its JavaScript was never loaded
+#                               (tables were empty everywhere); d3 version 3, used by tfd3.js, added to the widget dependencies.
+#                               Tables with a single column were broken: the table was passed as a vector (drop = FALSE added) and the
+#                               column names as a string instead of an array (header showed one letter per column).
+#                               tfd3.js and its colour functions use window.d3v3 so a newer d3 loaded by another widget does not break them.
+#                               tfd3.js registered its shiny message handlers outside shiny too, which threw an error on static pages and
+#                               stopped later widgets from rendering; reset message name aligned with resetInput() ('resetTFD3Value').
 
 #' @include visgen.R
 
@@ -424,7 +433,7 @@ TFD3 <- function(df, enableTf = TRUE, tableProps = NULL, showRowNames = FALSE, c
         clrs <- unlist(strsplit(colScales[[i]], ':', fixed = TRUE));
         startColour <- clrs[2];
         endColour <- clrs[3];
-        scale <- JS(paste0('function colorScale(tbl, i){
+        scale <- JS(paste0('function colorScale(tbl, i){ var d3 = window.d3v3 || window.d3;
                            var color = d3.scale.linear()
                            .domain(colExtent(tbl, "', cols[i] ,'"))
                            .range(["', startColour, '", "', endColour, '"])
@@ -465,13 +474,13 @@ TFD3 <- function(df, enableTf = TRUE, tableProps = NULL, showRowNames = FALSE, c
 
   x <- list(
     data = df,
-    columns = colnames(df),
+    columns = I(colnames(df)),   # I(): keep an array in JSON even for a single column
     enableTf = enableTf,
     tableProps = tableProps,
     selectableRows = selectableRows,
     selectableRowsClass = selectableRowsClass,
     tableStyle = tableStyle,
-    rowStyles = rowStyles,
+    rowStyles = chif(is.null(rowStyles), NULL, I(rowStyles)),
     bgColScales = bgColScales,
     fgColScales = fgColScales,
     cellFunctions = cellFunctions,
@@ -492,7 +501,7 @@ TFD3 <- function(df, enableTf = TRUE, tableProps = NULL, showRowNames = FALSE, c
 
   # create the widget
   htmlwidgets::createWidget("TFD3",
-                            x,
+                            x, package = "rvis",
                             width = width,
                             height = height, sizingPolicy = htmlwidgets::sizingPolicy(
                               viewer.padding = 0,
@@ -776,7 +785,7 @@ TFD3.prepare = function(obj, label = NULL, color = NULL, shape = NULL, config = 
   wrb = which(L$shape == 'radioButtons')
 
   list(
-    table = obj[, L$label],
+    table = obj[, L$label, drop = FALSE],
     args  = list(
       colNames     = TFD3.colNames(config) %>% unname,
       bgColScales  = bgColScales,
@@ -789,11 +798,11 @@ TFD3.prepare = function(obj, label = NULL, color = NULL, shape = NULL, config = 
       checkBoxes   = chif(is.empty(wcb), NULL, 'col_' %++% wcb),
       radioButtons = chif(is.empty(wrb), NULL, 'col_' %++% wrb),
       initialFilters = TFD3.initialFilters(L$label, config),
-      footData = TFD3.footData(obj[, L$label], config),
+      footData = TFD3.footData(obj[, L$label, drop = FALSE], config),
       tableStyle = config$table.style,
       selectableRows = config$selection.mode,
       selectableRowsClass = config$selection.color,
-      rowStyles = TFD3.rowStyles(obj[, L$label], config),
+      rowStyles = TFD3.rowStyles(obj[, L$label, drop = FALSE], config),
       tableProps = config %>% TFD3.tableprops,
       extensions = config$extensions,
       height = config$height,
@@ -807,23 +816,9 @@ TFD3.table = function(obj, label = NULL, color = NULL, shape = NULL, config = NU
 }
 
 
-TFD3.table.molten = function(obj, label = NULL, color = NULL, shape = NULL, group = NULL, config = NULL){
-  if (is.null(label)){label = as.list(names(obj))}
-  # Verifications:
-  # assert(require(TFD3), "Package TFD3 is not installed!", err_src = match.call()[[1]])
-  config = TFD3.table.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
-    TFD3.config.verify
-
-  # Preparing Aesthetics:
-  # Preparing Aesthetics:
-  a = prepareAesthetics(label = label, color = color, shape = shape, extend = c('label','color', 'shape'))
-  L = a$labels
-  A = a$aesthetics %>% list.remove('shape')
-
-  obj %<>% prepare4Plot(A, config)
-  if (is.empty(obj)){return(NULL)}
-
-  names(obj) <- names(obj) %>% make.unique('.1')
-
-  # Modify later for sparline tables
+# Table chart with the default settings of molten tables (no row names, no column filters).
+# Argument 'group' is reserved for grouped (sparkline) tables and is not used yet.
+TFD3.table.molten = function(obj, label = NULL, color = NULL, shape = NULL, group = NULL, config = NULL, ...){
+  config = TFD3.table.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  TFD3.table(obj, label = label, color = color, shape = shape, config = config, ...)
 }

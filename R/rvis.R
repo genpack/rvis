@@ -234,5 +234,16 @@
 #                               DT.addLinks(), dygraphs series helper, grviz helpers), dead commented code and an unused debug
 #                               object removed, comments and error messages made clearer. Unused man/hello.Rd removed.
 #                               See the version history of each file for details.
+# 5.10.1 (23 November 2026) - Charts that were created without error but could not be displayed (found by evaluating every
+#                             example of the chart types vignette and checking each chart in a browser):
+#                             * TFD3 tables: widget was created without package = 'rvis' so its javascript never loaded; it also
+#                               needed d3 version 3, broke single-column tables, and threw an error outside shiny that stopped
+#                               other widgets of the page from rendering. Widget assets fixed (missing font and image files,
+#                               invalid yaml entries). TFD3.table.molten() now draws a table (it was unfinished).
+#                             * coffeewheel: its d3 dependency pointed to a missing file; d3 3.5.15 bundled in inst/lib/d3v3.
+#                             * d3plus.scatter/bubble/bubble.molten/tree ported from the old GitHub 'd3plus' API to D3plusR.
+#                             * echarts word clouds: plugin dependency and size range added.
+#                             * knitr/R Markdown printing added for rCharts and googleVis objects (knit_print methods).
+#                             * Vignette chart-types: every example is evaluated when its plotting package is installed.
 NULL
 #> NULL

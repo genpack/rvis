@@ -10,7 +10,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 April 2017
 # Last Revision:  23 November 2026
-# Version:        0.0.4
+# Version:        0.0.5
 #
 
 # Version History:
@@ -21,6 +21,8 @@
 # 0.0.2     20 July 2017       widget embedded in the package
 # 0.0.3     29 August 2017     config$tree.function added to apply user's desired function to nibe tree elements: leafs and branches
 # 0.0.4     23 November 2026   Comments added, commented code removed
+# 0.0.5     23 November 2026   Widget fixed: its d3 (version 3) dependency pointed to a missing file, so the sunburst was never drawn.
+#                              d3 3.5.15 is now bundled in inst/lib/d3v3 (dependency 'd3v3', saved as window.d3v3 for coffeewheel).
 
 #' @include visgen.R
 

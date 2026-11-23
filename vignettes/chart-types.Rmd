@@ -14,6 +14,30 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse=TRUE, comment='#>')
 library(rvis)
+
+# Examples are evaluated only when the plotting package of their wrapper is installed
+has_plotter <- function(pkg) requireNamespace(pkg, quietly = TRUE)
+
+# Charts of different plotters bring different versions of the d3 javascript library: c3 and billboarder use
+# d3 version 5, ggvis d3 3.5.2 and d3plus d3 3.5.15. Only one global d3 can exist on a page, so c3, billboarder
+# and ggvis charts are shown in their own frame, which keeps all charts of this page working.
+show_in_frame <- function(x, ...) {
+  f <- tempfile(fileext = ".html")
+  if (inherits(x, "ggvis")) {
+    spec <- ggvis:::as.vega(x, dynamic = FALSE)
+    htmltools::save_html(ggvis:::ggvisOutputElements(spec = spec, shiny = FALSE), f)
+    rmarkdown::pandoc_self_contained_html(f, f)
+  } else {
+    htmlwidgets::saveWidget(x, f, selfcontained = TRUE)
+  }
+  html <- paste(readLines(f, warn = FALSE), collapse = "\n")
+  html <- gsub("&", "&amp;", html, fixed = TRUE)
+  html <- gsub("\"", "&quot;", html, fixed = TRUE)
+  knitr::asis_output(paste0("<iframe srcdoc=\"", html, "\" style=\"width:100%; height:420px; border:none;\"></iframe>"))
+}
+# ggvis registers its own knit_print method when it is loaded, so it is loaded first to be overridden here
+if (has_plotter("ggvis")) loadNamespace("ggvis")
+for (cls in c("c3", "billboarder", "ggvis")) registerS3method("knit_print", cls, show_in_frame, envir = asNamespace("knitr"))
 ```
 
 This reference documents the chart methods callable through
@@ -32,9 +56,9 @@ package.
 ## Example data
 
 The examples use synthetic category, measure, date, range, and network
-columns. Example calls are shown without evaluation because plotting
-packages are optional dependencies and not every wrapper is installed in
-every R library.
+columns. Each example is evaluated when the plotting package of its
+wrapper is installed; otherwise only the code is shown, because plotting
+packages are optional dependencies of rvis.
 
 ```{r}
 example_data <- data.frame(
@@ -96,7 +120,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "bar",
   plotter = "amCharts",
@@ -147,7 +171,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "bar.molten",
   plotter = "d3plus",
@@ -203,7 +227,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "pie",
   plotter = "amCharts",
@@ -252,7 +276,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rCharts")}
 rvisPlot(
   type = "pie.molten",
   plotter = "nvd3",
@@ -308,7 +332,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("billboarder")}
 rvisPlot(
   type = "scatter",
   plotter = "billboarder",
@@ -367,7 +391,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("c3")}
 rvisPlot(
   type = "scatter.molten",
   plotter = "c3",
@@ -425,7 +449,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("plotly")}
 rvisPlot(
   type = "combo",
   plotter = "plotly",
@@ -534,7 +558,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "box",
   plotter = "amCharts",
@@ -585,7 +609,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("c3")}
 rvisPlot(
   type = "line",
   plotter = "c3",
@@ -635,7 +659,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "line.molten",
   plotter = "d3plus",
@@ -687,7 +711,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("c3")}
 rvisPlot(
   type = "area",
   plotter = "c3",
@@ -738,7 +762,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "area.molten",
   plotter = "d3plus",
@@ -788,7 +812,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("highcharter")}
 rvisPlot(
   type = "area.range",
   plotter = "highcharter",
@@ -840,7 +864,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r}
 rvisPlot(
   type = "graph",
   plotter = "grviz",
@@ -952,7 +976,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("highcharter")}
 rvisPlot(
   type = "bubble",
   plotter = "highcharter",
@@ -1008,7 +1032,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "bubble.molten",
   plotter = "d3plus",
@@ -1060,7 +1084,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "tree",
   plotter = "d3plus",
@@ -1111,7 +1135,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("highcharter")}
 rvisPlot(
   type = "treemap",
   plotter = "highcharter",
@@ -1164,7 +1188,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("DT")}
 rvisPlot(
   type = "table",
   plotter = "DT",
@@ -1213,7 +1237,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r}
 rvisPlot(
   type = "table.molten",
   plotter = "TFD3",
@@ -1264,7 +1288,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("DT")}
 rvisPlot(
   type = "Table",
   plotter = "DT",
@@ -1309,7 +1333,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("ggvis")}
 rvisPlot(
   type = "histogram",
   plotter = "ggvis",
@@ -1405,7 +1429,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "tsline",
   plotter = "amCharts",
@@ -1469,7 +1493,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("billboarder")}
 rvisPlot(
   type = "tsLineChart",
   plotter = "billboarder",
@@ -1521,7 +1545,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("highcharter")}
 rvisPlot(
   type = "tsline.stock",
   plotter = "highcharter",
@@ -1571,7 +1595,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("billboarder")}
 rvisPlot(
   type = "tsarea",
   plotter = "billboarder",
@@ -1622,7 +1646,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "tsarea.molten",
   plotter = "d3plus",
@@ -1673,7 +1697,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("plotly")}
 rvisPlot(
   type = "tsbar",
   plotter = "plotly",
@@ -1722,7 +1746,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("D3plusR")}
 rvisPlot(
   type = "tsbar.molten",
   plotter = "d3plus",
@@ -1773,7 +1797,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("googleVis")}
 rvisPlot(
   type = "sankey",
   plotter = "googleVis",
@@ -1827,7 +1851,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("echarts4r")}
 rvisPlot(
   type = "wordCloud",
   plotter = "echarts",
@@ -1879,7 +1903,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "funnel",
   plotter = "amCharts",
@@ -1931,7 +1955,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "gauge",
   plotter = "amCharts",
@@ -1978,7 +2002,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rAmCharts")}
 rvisPlot(
   type = "bullet",
   plotter = "amCharts",
@@ -2025,7 +2049,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r}
 rvisPlot(
   type = "sunburst",
   plotter = "coffeewheel",
@@ -2075,7 +2099,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("rChartsCalmap")}
 rvisPlot(
   type = "calendar",
   plotter = "calheatmap",
@@ -2123,7 +2147,7 @@ This example uses the first listed implementation. Choose another
 `plotter` only when its method appears in the table above, and follow
 that method's signature.
 
-```{r, eval=FALSE}
+```{r, eval=has_plotter("highcharter")}
 rvisPlot(
   type = "pyramid",
   plotter = "highcharter",

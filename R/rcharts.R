@@ -8,7 +8,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     31 March 2017
 # Last Revision:  23 November 2026
-# Version:        1.1.4
+# Version:        1.1.5
 #
 
 # Version History:
@@ -24,6 +24,8 @@
 # 1.1.3     12 May 2017         highcharts charts separated and transferred to highcharts.R
 # 1.1.4     23 November 2026    Bug fix: rCharts.scatter() used undefined rCharts.scatter.defset and translateShape (always failed).
 #                               Defset added; shapes translated by rCharts.hPlotType() (highcharts.R); colour mapped to hPlot groups.
+# 1.1.5     23 November 2026    knit_print.rCharts() added: rCharts objects are embedded in knitr/R Markdown documents
+#                               (failed with "object 'opts_current' not found" unless knitr was attached).
 
 #' @include visgen.R
 #' @include highcharts.R
@@ -58,4 +60,13 @@ rCharts.scatter = function(obj, x = NULL, y = NULL, size = NULL, shape = NULL, c
 
   hPlot(x = L$x, y = L$y, data = obj,
         type = rCharts.hPlotType(L$shape, config$horizontal), group = L$color, size = L$size)
+}
+
+# Displays rCharts objects (nvd3, dimple, highcharts hPlot, xCharts charts) in knitr/R Markdown documents.
+# rCharts' own show() method needs knitr to be attached and writes the chart to a separate html file;
+# this method embeds the chart into the document as a self-contained iframe (chart libraries are loaded from CDN).
+#' @exportS3Method knitr::knit_print
+knit_print.rCharts = function(x, ...){
+  html = utils::capture.output(x$show('iframesrc', cdn = TRUE))
+  knitr::asis_output(paste(html, collapse = '\n'))
 }

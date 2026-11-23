@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com.au
 # Start Date:     13 June 2017
-# Last Revision:  23 February 2018
-# Version:        0.0.3
+# Last Revision:  23 November 2026
+# Version:        0.0.4
 #
 
 # Version History:
@@ -18,6 +18,8 @@
 # 0.0.1     13 June 2017       Initial issue
 # 0.0.2     23 February 2018   Function DT.link.click.js() added
 # 0.0.3     23 February 2018   Function DT.links.click.js() added and exported
+# 0.0.4     23 November 2026   TFD3 javascript functions use window.d3v3 (d3 version 3) when available, so they keep working when
+#                              another widget on the page loads a newer d3.
 
 #### dimple:
 dimple.js = function(field_name = 'group'){
@@ -83,7 +85,7 @@ TFD3.color.nominal.js = function(domain, range){
   dp = paste(domain, range) %>% duplicated
   domain = domain[!dp]
   range  = range[!dp]
-  ss = 'function colorScale(obj,i){
+  ss = 'function colorScale(obj,i){ var d3 = window.d3v3 || window.d3;
   var color = d3.scale.ordinal().domain([' %++%
     paste('"' %++% domain %++% '"', collapse = ',') %++% ']).range([' %++%
     paste('"' %++% range  %++% '"', collapse = ',') %++% ']);
@@ -95,7 +97,7 @@ D3TableFilter.color.nominal.js = TFD3.color.nominal.js
 TFD3.color.numeric.js = function(domain, range){
   N  = length(range)
   q  = domain %>% quantile(probs = (0:(N-1))/(N-1))
-  ss = 'function colorScale(obj,i){
+  ss = 'function colorScale(obj,i){ var d3 = window.d3v3 || window.d3;
   var color = d3.scale.linear().domain([' %++%
     paste(q, collapse = ',') %++% ']).range([' %++%
     paste('"' %++% range  %++% '"', collapse = ',') %++% ']);
@@ -105,7 +107,7 @@ TFD3.color.numeric.js = function(domain, range){
 D3TableFilter.color.numeric.js = TFD3.color.numeric.js
 
 TFD3.shape.bar.js = function(format = '.1f'){
-  JS(paste0('function makeGraph(selection){
+  JS(paste0('function makeGraph(selection){ var d3 = window.d3v3 || window.d3;
             // find out wich table and column
             var regex = /(col_\\d+)/;
             var col = regex.exec(this[0][0].className)[0];
@@ -169,7 +171,7 @@ D3TableFilter.shape.bar.js = TFD3.shape.bar.js
 
 TFD3.shape.bubble.js = function(){
 
-  JS(paste0('function makeGraph(selection){
+  JS(paste0('function makeGraph(selection){ var d3 = window.d3v3 || window.d3;
 
             // find out wich table and column
             var regex = /(col_\\d+)/;
@@ -235,7 +237,7 @@ TFD3.font.js = function(weight = 'bold', side = 'right', format = '.1f'){
   weightstr = chif(is.null(weight), '', paste0('.style("font-weight", "', weight ,'")'))
   formatstr2 = chif(is.null(format), '', paste0('.text(function(d) { return textformat(d.value); })'))
   formatstr1 = chif(is.null(format), '', paste0('var textformat = d3.format("', format, '");'))
-  JS(paste0('function makeGraph(selection){', formatstr1, 'selection', sidestr , weightstr, formatstr2, ';}'))
+  JS(paste0('function makeGraph(selection){ var d3 = window.d3v3 || window.d3;', formatstr1, 'selection', sidestr , weightstr, formatstr2, ';}'))
 }
 D3TableFilter.font.js = TFD3.font.js
 

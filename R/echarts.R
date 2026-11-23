@@ -9,7 +9,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     19 June 2018
 # Last Revision:  23 November 2026
-# Version:        0.1.1
+# Version:        0.1.2
 #
 
 # Version History:
@@ -20,6 +20,9 @@
 # 0.1.1     23 November 2026   Bug fix: internal echarts4r helpers (.rm_axis, .set_y_axis, .set_x_axis) are not exported;
 #                              they are now fetched from the echarts4r namespace (funnel and wordCloud always failed).
 #                              Data access works with recent echarts4r versions which keep data as a list (all charts failed).
+# 0.1.2     23 November 2026   ecloud() delegates to echarts4r::e_cloud_() which adds the echarts-wordcloud plugin (word clouds were empty).
+#                              Word size range taken from config properties size.min/size.max (it read non-existent point.size.min/max,
+#                              so the plugin got no size range and failed).
 
 #' @include visgen.R
 
@@ -157,39 +160,10 @@ efunnel <- function(e, values, labels, name = NULL, legend = TRUE, rm.x = TRUE, 
 
 }
 
+# Word cloud series. Uses echarts4r::e_cloud_(), which also adds the echarts-wordcloud plugin needed to draw it
+# (the series was empty without the plugin).
 ecloud <- function(e, word, freq, color = NULL, rm.x = TRUE, rm.y = TRUE, ...){
-
-  if(missing(e))
-    stop("missing e", call. = FALSE)
-
-  e <- echarts.internal(".rm_axis")(e, rm.x, "x")
-  e <- echarts.internal(".rm_axis")(e, rm.y, "y")
-
-  data <- echarts.build_data(e, freq)
-  data <- echarts.add_bind(e, data, word)
-
-  if(!is.null(color)){
-    color <- echarts.get_data(e, color)
-    for(i in 1:length(data)){
-      col <- list(
-        normal = list(
-          color = color[i]
-        )
-      )
-      data[[i]]$textStyle <- col
-    }
-  }
-
-  serie <- list(
-    type = "wordCloud",
-    data = data,
-    ...
-  )
-
-  e$x$opts$series <- append(e$x$opts$series, list(serie))
-
-  e
-
+  echarts4r::e_cloud_(e, word = word, freq = freq, color = color, rm_x = rm.x, rm_y = rm.y, ...)
 }
 
 egauge <- function(e, theta, label, config = NULL, ...){
@@ -252,6 +226,13 @@ echarts.funnel = function(obj, label = NULL, size = NULL, config = NULL, ...){
   obj %>% e_charts() %>% efunnel(L$size, L$label, ...)
 }
 
+# Font size range of word clouds from config properties size.min and size.max (defaults 12 and 60 if missing)
+echarts.sizeRange = function(config){
+  rng = suppressWarnings(as.numeric(c(config$size.min, config$size.max)))
+  if (length(rng) != 2 || anyNA(rng)){rng = c(12, 60)}
+  return(rng)
+}
+
 echarts.wordCloud = function(obj, label = NULL, size = NULL, color = NULL, config = NULL, ...){
   # Verifications:
   if (is.empty(obj)){return(NULL)}
@@ -267,5 +248,5 @@ echarts.wordCloud = function(obj, label = NULL, size = NULL, color = NULL, confi
 
   obj %<>% prepare4Plot(A, config)
 
-  obj %>% e_charts() %>% ecloud(L$label, L$size, L$color, shape = config$cloud.shape, sizeRange = c(config$point.size.min, config$point.size.max))
+  obj %>% e_charts() %>% ecloud(L$label, L$size, L$color, shape = config$cloud.shape, sizeRange = echarts.sizeRange(config))
 }

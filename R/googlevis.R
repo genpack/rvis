@@ -7,7 +7,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     06 October 2016
 # Last Revision:  23 November 2026
-# Version:        1.3.5
+# Version:        1.3.6
 #
 
 # Version History:
@@ -25,6 +25,8 @@
 # 1.3.4     20 June 2018       Function googleVis.bar() and googleVis.line() modified: y2 is now a new diemnsion
 # 1.3.5     23 November 2026   Bug fixes: googleVis.options() used undefined 'L' instead of its arguments, googleVis.line() used
 #                              undefined 'yy' (both functions always failed). googleVis.bar() uses isHorizontal(). Old commented code removed.
+# 1.3.6     23 November 2026   knit_print.gvis() added: googleVis charts are displayed in knitr/R Markdown documents, each in its own
+#                              frame (Google Charts loads its own d3 version which broke other widgets of the page).
 
 #' @include visgen.R
 
@@ -195,4 +197,20 @@ googleVis.sankey = function(obj, key = NULL, source = NULL, target = NULL, linkW
   assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a subset of node IDs'", err_src = 'googleVis.sankey')
 
   obj$links %>% gvisSankey(from = L$source, to = L$target, weight = L$linkWidth)
+}
+
+# Displays googleVis charts in knitr/R Markdown documents (they were printed as raw html text unless the chunk
+# had results = 'asis'). The chart is drawn by Google Charts, so viewing it needs an internet connection.
+# Each chart is shown as a complete page inside its own frame because:
+#  - Google Charts loads its own libraries (for example d3 version 5 for sankey charts) into the page, which breaks
+#    other widgets of the document that need another d3 version (d3plus, ggvis, ...);
+#  - in self-contained documents pandoc would inline a copy of the Google loader that never calls the chart callback.
+#' @exportS3Method knitr::knit_print
+knit_print.gvis = function(x, ...){
+  page = paste(c(x$html$header, x$html$chart, x$html$footer), collapse = '\n')
+  page = gsub('&', '&amp;', page, fixed = TRUE)
+  page = gsub('"', '&quot;', page, fixed = TRUE)
+  height = suppressWarnings(as.numeric(sub('.*options\\["height"\\] = ([0-9]+);.*', '\\1', paste(x$html$chart[['jsDrawChart']], collapse = ' '))))
+  if (is.na(height)){height = 400}
+  knitr::asis_output(sprintf('<iframe srcdoc="%s" style="width:100%%; height:%dpx; border:none;"></iframe>', page, as.integer(height + 40)))
 }

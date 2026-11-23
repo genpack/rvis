@@ -8,7 +8,7 @@
 # Email :         nicolas.berta@gmail.com
 # Start Date:     28 March 2017
 # Last Revision:  23 November 2026
-# Version:        1.1.7
+# Version:        1.2.0
 #
 # Version   Date               Action
 # -----------------------------------
@@ -21,6 +21,9 @@
 # 1.1.7     23 November 2026   Bug fixes: function d3plus() is now called with its namespace (d3plus:: or D3plusR::) because both packages
 #                              export d3plus() and the one attached last was used; melt() called as reshape2::melt();
 #                              d3plus.scatter() passed 'config' as a dimension; typo 'integr' in d3plus.bar.defset corrected.
+# 1.2.0     23 November 2026   d3plus.scatter(), d3plus.bubble(), d3plus.bubble.molten() and d3plus.tree() re-written with package D3plusR.
+#                              They used the old GitHub version of package 'd3plus' (d3plus(type, data)) whose API differs from the
+#                              CRAN package, so they could not be displayed. Helper d3plus.bubbles() added.
 
 #' @include visgen.R
 
@@ -117,13 +120,25 @@ d3plus.treemap.defset = defset %<==>% list(
 
 
 d3plus.shape = c(bar = 'bar', line = 'line', area = 'stacked')
-# Charts based on package 'd3plus' (old htmlwidget): scatter, bubble, bubble.molten and tree
+# Bubble chart of table 'obj' (column 'size': bubble size, 'label': bubble name, 'group': bubble group/colour), using package D3plusR
+d3plus.bubbles = function(obj, size, label, group, config){
+  d3 = D3plusR::d3plus(data = obj, type = 'bubbles', id = c(group, label), width = config$width, height = config$height) %>%
+    D3plusR::d3plusDepth(1) %>%
+    D3plusR::d3plusSize(value = size) %>%
+    D3plusR::d3plusColor(value = group) %>%
+    D3plusR::d3plusLabels(value = TRUE, valign = 'top')
+  d3 %>% d3plus.applyConfig(config)
+}
+
+# Scatter, bubble and tree charts (until version 1.1.7 these used the old GitHub version of package 'd3plus'
+# with function d3plus(type, data), which is not compatible with the CRAN package; they now use D3plusR)
 d3plus.scatter = function(obj, x = NULL, y = NULL, size = NULL, label = NULL, config = NULL, ...){
 
   # Verifications:
   if (is.empty(obj)){return(NULL)}
-  assert(require(d3plus), "Package d3plus is not installed!", err_src = match.call()[[1]])
-  config = d3plus.scatter.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  assert(require(D3plusR), "Package D3plusR is not installed!", err_src = match.call()[[1]])
+  config = d3plus.scatter.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
+    verifyConfig(plotter = 'd3plus')
 
   # Preparing Aesthetics:
   a = prepareAesthetics(x = x, y = y, size = size, label = label)
@@ -132,36 +147,46 @@ d3plus.scatter = function(obj, x = NULL, y = NULL, size = NULL, label = NULL, co
 
   obj %<>% prepare4Plot(A, config = config)
 
-  d3plus::d3plus('scatter', obj, ...)
+  # Each point needs an id: label if given, otherwise the row number
+  if (is.null(L$label)){obj$point = as.character(sequence(nrow(obj))); L$label = 'point'}
+
+  d3 = D3plusR::d3plus(data = obj, type = 'scatter', id = L$label, width = config$width, height = config$height) %>%
+    D3plusR::d3plusX(value = L$x) %>%
+    D3plusR::d3plusY(value = L$y)
+  if (!is.null(L$size)){d3 %<>% D3plusR::d3plusSize(value = L$size)}
+  d3 %>% d3plus.applyConfig(config)
 }
 
 d3plus.bubble = function(obj, size = NULL, label = NULL, config = NULL, ...){
   # Verifications:
-  assert(require(d3plus), "Package d3plus is not installed!", err_src = match.call()[[1]])
-  config = d3plus.bubble.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  assert(require(D3plusR), "Package D3plusR is not installed!", err_src = match.call()[[1]])
+  config = d3plus.bubble.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
+    verifyConfig(plotter = 'd3plus')
 
   # Preparing Aesthetics:
   a = prepareAesthetics(size = size, label = label, extend = c('size', 'label'))
   L = a$labels
   A = a$aesthetics
 
-  # Function d3plus with type 'bubbles' uses melted table for multiple series of bubbles
-  # This is what they called as Grouped bubbles. The series name comes in a column named as group between label and size columns
+  # Each (size, label) pair is a group of bubbles: the table is melted so that column 'variable' holds the group
+  # (name of the size column), 'value' the bubble size and 'name' the bubble label
   obj %<>% prepare4Plot(A, config = config) %>%
     reshape2::melt(id.vars = unique(L$label))
 
   names(L$label) <- L$size
   obj = cbind(name = obj[, L$label[obj$variable]] %>% as.matrix %>% diag, obj[, c('variable', 'value')]) %>% na.omit
 
-  d3plus::d3plus('bubbles', obj, ...)
+  obj %>% d3plus.bubbles(size = 'value', label = 'name', group = 'variable', config = config)
 }
 
 d3plus.bubble.molten = function(obj, size = NULL, label = NULL, group = NULL, config = NULL, ...){
   # Verifications:
-  assert(require(d3plus), "Package d3plus is not installed!", err_src = match.call()[[1]])
-  config = d3plus.bubble.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  assert(require(D3plusR), "Package D3plusR is not installed!", err_src = match.call()[[1]])
+  config = d3plus.bubble.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
+    verifyConfig(plotter = 'd3plus')
 
-  if(is.null(group)){group = 1}
+  # Without a group, all bubbles belong to one group:
+  if(is.null(group)){group = list(group = 'All')}
   # Preparing Aesthetics:
   a = prepareAesthetics(label = label, group = group, size = size)
   L = a$labels
@@ -169,13 +194,15 @@ d3plus.bubble.molten = function(obj, size = NULL, label = NULL, group = NULL, co
 
   obj %<>% prepare4Plot(A, config = config)
 
-  d3plus::d3plus('bubbles', obj, ...)
+  obj %>% d3plus.bubbles(size = L$size, label = L$label, group = L$group, config = config)
 }
 
+# Tree chart: rectangles (tree map) sized by 'size' and coloured by 'color'
 d3plus.tree = function(obj, label = NULL, size = NULL, color = NULL, config = NULL, ...){
   # Verifications:
-  assert(require(d3plus), "Package d3plus is not installed!", err_src = match.call()[[1]])
-  config = d3plus.tree.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  assert(require(D3plusR), "Package D3plusR is not installed!", err_src = match.call()[[1]])
+  config = d3plus.tree.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
+    verifyConfig(plotter = 'd3plus')
 
   # Preparing Aesthetics:
   a = prepareAesthetics(label = label, size = size, color = color)
@@ -184,7 +211,10 @@ d3plus.tree = function(obj, label = NULL, size = NULL, color = NULL, config = NU
 
   obj %<>% prepare4Plot(A, config = config)
 
-  d3plus::d3plus('tree', obj, ...)
+  d3 = D3plusR::d3plus(data = obj, type = 'tree_map', id = L$label, width = config$width, height = config$height) %>%
+    D3plusR::d3plusSize(value = L$size)
+  if (!is.null(L$color)){d3 %<>% D3plusR::d3plusColor(value = L$color)}
+  d3 %>% D3plusR::d3plusLabels(value = TRUE, valign = 'top') %>% d3plus.applyConfig(config)
 }
 
 d3plus.bar = function(obj, x = NULL, y = NULL, group = NULL, color = NULL, config = NULL, ...){

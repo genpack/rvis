@@ -1,3 +1,7 @@
+// TFD3 uses the d3 version 3 API. It uses window.d3v3, saved by dependency 'd3v3' (lib/d3v3/d3v3-alias.js),
+// so that other widgets loading a newer d3 on the same page do not break it.
+(function(d3) {
+
 HTMLWidgets.widget({
 
   name: "TFD3",
@@ -22,9 +26,10 @@ HTMLWidgets.widget({
 
     var columns = data.columns;
 
-    // set TF base path depending on mode
-    var url = window.HTMLWidgets.getAttachmentUrl(id="tablefilter", key = 1);
-    url = url.replace(/TF_Themes.*/, '');
+    // set TF base path depending on mode: the first attachment of dependency 'tablefilter' is
+    // style/themes/blank.png, so the base path is its url without that part
+    var url = window.HTMLWidgets.getAttachmentUrl("tablefilter", 1);
+    url = url.replace(/style\/themes\/blank\.png.*$/, '');
     data.tableProps["base_path"] = url;
 
     // adjust path for tablefilter extensions
@@ -288,8 +293,16 @@ HTMLWidgets.widget({
       }
     }
 
-    // allow to reset an input value
-    Shiny.addCustomMessageHandler('resetD3tfValue', function(variableName) {
+    // Shiny message handlers are only registered in shiny apps: on static pages (R Markdown, saved widgets) Shiny
+    // does not exist and registering them threw an error that stopped other widgets of the page from rendering.
+    function addShinyHandler(type, handler) {
+      if (window.HTMLWidgets.shinyMode && typeof Shiny !== "undefined") {
+        Shiny.addCustomMessageHandler(type, handler);
+      }
+    }
+
+    // allow to reset an input value (sent by resetInput() in R)
+    addShinyHandler('resetTFD3Value', function(variableName) {
       Shiny.onInputChange(variableName, null);
     });
 
@@ -344,7 +357,7 @@ HTMLWidgets.widget({
     }
 
     // server side edit, confirm or reject
-    Shiny.addCustomMessageHandler("setCellValue",
+    addShinyHandler("setCellValue",
                                   function(message) {
                                     var row = 'row_' + (Number(message["row"]) - 1);
                                     if(data.showRowNames) {
@@ -468,7 +481,7 @@ HTMLWidgets.widget({
 
 
     // enable editing of a table
-    Shiny.addCustomMessageHandler("enableEdit",
+    addShinyHandler("enableEdit",
                                   function(message) {
                                     var cells = d3.selectAll('#' + message["tbl"])
                                     .selectAll('tbody');
@@ -482,7 +495,7 @@ HTMLWidgets.widget({
                                   });
 
     // disable editing of a table
-    Shiny.addCustomMessageHandler("disableEdit",
+    addShinyHandler("disableEdit",
                                   function(message) {
                                     var cells = d3.selectAll('#' + message["tbl"])
                                     .selectAll('tbody');
@@ -496,7 +509,7 @@ HTMLWidgets.widget({
                                   });
 
     // set filter
-    Shiny.addCustomMessageHandler("setFilter",
+    addShinyHandler("setFilter",
                                   function(message) {
                                     var tfName = 'tf_' + message["tbl"];
                                     window[tfName].setFilterValue(message["col"], message["filterString"]);
@@ -507,7 +520,7 @@ HTMLWidgets.widget({
                                   });
 
     // highlight a table row
-    Shiny.addCustomMessageHandler("rowClass",
+    addShinyHandler("rowClass",
                                   function(message) {
                                     var clss = message["class"];
                                     var tbl = message["tbl"];
@@ -627,7 +640,7 @@ HTMLWidgets.widget({
     }
 
     // clear filters from table
-    Shiny.addCustomMessageHandler("clearFilters",
+    addShinyHandler("clearFilters",
                                   function(message) {
                                     var tfName = 'tf_' + message["tbl"];
                                     window[tfName].ClearFilters();
@@ -899,4 +912,6 @@ HTMLWidgets.widget({
   } // end of renderValue !!
 
 }); // end of HTMLWIDGET !!
+
+})(window.d3v3 || window.d3);
 

@@ -1,4 +1,7 @@
-var initializeCoffeeWheel = function(data, el, width, height, partitionAttribute, mainTitle) {
+// coffeewheel uses the d3 version 3 API (d3.svg.arc, d3.layout.partition, ...). It uses window.d3v3, saved by
+// dependency 'd3v3' (lib/d3v3/d3v3-alias.js), so that other widgets loading a newer d3 on the same page do not break it.
+var initializeCoffeeWheel = (function(d3) {
+return function(data, el, width, height, partitionAttribute, mainTitle) {
   var minSize = Math.min(width, height)-20;
 
   var div = d3.select(el);
@@ -163,3 +166,4 @@ var initializeCoffeeWheel = function(data, el, width, height, partitionAttribute
   })(data);
 
 };
+})(window.d3v3 || window.d3);
