@@ -1,14 +1,13 @@
 # visgen.R ----------------------------------------------------------------
 
-
 # Header
 # Filename:      visgen.R
-# Description:   This module contains general functions and defines global variables used in package rvis
+# Description:   General functions and global variables shared by all plotter wrappers of package rvis
 # Author:        Nima Ramezani
 # Email :        nima.ramezani@gmail.com
 # Start Date:    28 October 2016
-# Last Revision: 03 January 2023
-# Version:       1.3.8
+# Last Revision: 23 November 2026
+# Version:       1.4.0
 
 # Version History:
 
@@ -40,6 +39,10 @@
 # 1.3.7     21 March 2019      Function df2Network() added
 # 1.3.8     03 January 2023    gndcd key updated to work for 2023
 # 1.3.9     03 January 2025    gndcd key updated to work until 2028
+# 1.4.0     23 November 2026   Code review: verifyConfig() caches the parsed properties table (no more data() call per plot),
+#                              verifyConfigDimProperties() now processes all requested dimensions (returned after the first one),
+#                              df2Network() uses namespaced dplyr calls instead of eval(parse()), gndcd() vectorised,
+#                              defset moved here as the single definition shared by all wrappers, documentation comments added.
 
 
 if (!require(rutils)){
@@ -47,14 +50,13 @@ if (!require(rutils)){
   stop()
 }
 
-# dataPath = 'data/'
-#dataPath = ''
-# properties = read.csv('data/properties.csv' , as.is = T)
-# save.image("data/properties.RData")
-# Before building the package, everytime you update table properties, you need to load it, save in folder data/ as properties.RData
+# Note: data/properties.RData must be regenerated from data/properties.csv every time the csv is changed:
+# properties = read.csv('data/properties.csv', as.is = T); save(properties, file = 'data/properties.RData')
 
 support('magrittr', 'shiny', 'shinydashboard', 'htmlwidgets')
 
+
+# Global variables ---------------------------------------------------------
 
 #' @export
 valid.dim.names  = c('key', 'x', 'y', 'y2', 'z', 't', 'high', 'low', 'color', 'size', 'shape', 'label', 'tooltip', 'labelColor',
@@ -67,11 +69,13 @@ valid.plot.types = c('bar', 'calheat', 'line', 'motion', 'pie', 'tsline', 'gauge
 #' @export
 valid.plotters    = c('googleVis', 'dygraphs', 'rAmCharts', 'rCharts', 'highcharter', 'plotly', 'bubbles')
 
-# General settings for all the plots
+# Dimensions whose values are converted into colours when config$colorize is TRUE
+color.dim.names  = c('color', 'labelColor', 'borderColor', 'linkColor', 'linkLabelColor')
+
+# General settings for all the plots. Every wrapper builds its own default settings (*.defset) on top of this list.
 #' @export
 defset = list(
   palette= list(
-    # color = c("#FB1108", "#FA7806","#FBE426","#FCFB8F", "#F3F5E7", "#C7E4EA","#ABD6E6","#9AD2E1"),
     color = c("purple", "blue","cyan","green", "yellow", "orange","red","black" , 'white'),
     shape = c('circle', 'x', 'o', 'plus', 'square.hollow', 'rhombus.hollow')
   ),
@@ -80,16 +84,23 @@ defset = list(
   colorize     = T
 )
 
-# if a column name is convertable to numerics, it adds a prefix to it. Argument 'colNamePrefix' will be used.
+# Package-level cache (parsed properties table, ...)
+.rvis.cache = new.env(parent = emptyenv())
+
+
+# Column/table preparation ---------------------------------------------------
+
+# If a column name is convertible to numeric, adds prefix 'colNamePrefix' to it.
 addPrefix = function(figures, colNamePrefix = 'X'){
   if (is.null(figures)){return(NULL)}
-  options(warn = -1)
-  nms = !is.na(as.numeric(figures))
-  options(warn = 0)
+  nms = !is.na(suppressWarnings(as.numeric(figures)))
   figures[nms] = colNamePrefix %++% figures[nms]
   return(figures)
 }
 
+# Appends the column(s) associated with dimension 'dim' to table 'tbl'.
+# col: a column name of 'obj', a constant value, or a named list of them (one element per series).
+# cln: name of the column added to 'tbl'.
 addcol = function(tbl, obj, col, dim, config, cln){
   if (is.empty(col)){return(tbl)}
   if (inherits(col, 'list')){
@@ -105,16 +116,18 @@ addcol = function(tbl, obj, col, dim, config, cln){
   }
   assert(!is.null(cln))
 
+  # Case 1: col refers to a column of obj
   flag <- (col %<% names(obj)) %>% verify(err_msg = "Argument 'col' is of class " %++% class(col) %++% " which is not valid for any chart", err_src = match.call()[[1]])
   if (flag){
     warnif(length(col) > 1, "For dimension " %++% dim %++% ", Only the first element of argument col is considered!")
     col = col[1]
     assert(!is.null(config$dimclass[[dim]]), "Dimension '" %++% dim %++% "' is not defined in the configuration!")
     if (!inherits(obj[,col], config$dimclass[[dim]])){obj[, col] <- try(obj[,col] %>% rutils::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
-    if ((dim %in% c('color', 'labelColor', 'borderColor', 'linkColor', 'linkLabelColor')) & config$colorize){obj[, col] %<>% colorise(palette = config$palette[[dim]])}
+    if ((dim %in% color.dim.names) & config$colorize){obj[, col] %<>% colorise(palette = config$palette[[dim]])}
     return(tbl %>% appendCol(obj[,col], cln))
   }
 
+  # Case 2: col is a constant colour value (or a vector of values to be colourised)
   if ((dim %in% c('color', 'labelColor', 'borderColor', 'linkColor')) & config$colorize){
     clr = try(col2rgb(col), silent = T)
     if(inherits(clr, paste(gndcd(136,133,97),gndcd(29,110,1,12,184), sep = '-'))){
@@ -122,11 +135,11 @@ addcol = function(tbl, obj, col, dim, config, cln){
     } else {
       clr %<>% apply(2, vect.normalize)
       tbl %<>% appendCol(rgb(red = clr['red', ], green = clr['green', ], blue = clr['blue', ]), cln)
-      # tbl[,cln] %<>% as.factor # Not sure if required for all packages! later, run this line conditional to value of an argument like color2Factor
     }
     return(tbl)
   }
 
+  # Case 3: col is a constant value
   assert(!is.null(config$dimclass[[dim]]), 'Dimension ' %++% dim %++% ' is not defined in config$dimclass!')
   if(!inherits(col, config$dimclass[[dim]])){col <- try(col %>% rutils::coerce(config$dimclass[[dim]][1]), silent = T) %>% verify()}
 
@@ -134,15 +147,17 @@ addcol = function(tbl, obj, col, dim, config, cln){
   if (inherits(col,'character')){tbl[,cln] %<>% as.character}
   return(tbl)
 }
+
 kycd = "Sys.Date() %>% format('%Y') %>% as.integer %>% log"
+
+# Converts 'l' into a named list. Unnamed character elements are named by their first value,
+# other unnamed elements are named '<defname>.<index>'.
 nameList = function(l, defname = 'X'){
   if(is.null(l)){return(l)}
   if (!inherits(l,'list')){
     l %<>% list
     names(l) <- names(l[[1]])
   }
-  nms = names(l)
-
   if(is.null(names(l))){names(l) <- rep('', length(l))}
 
   nms = names(l)
@@ -162,6 +177,8 @@ getKey = function(){
   else         {return("gd367wrgfs58LKYWAtgKJ^%EGFLSsfg5hHDKJHDKJFGHSDGD56+6465R4T^*&%^ETGFSDHFKLJHKjskdfhujhuihjxsdfldfgkjv0JQUZCIqFrVsWOdYziRXrnPmuTvfdsghdfghfd6786iykKqiZdfRMuG@HnvTkeDLVSxzCalcONpUasdasdasgfjkkljklk;ttElm")}
 }
 
+# Builds the plotting table from 'obj' using the dimension mapping 'aesthetics'
+# (output of prepareAesthetics()$aesthetics) and the wrapper settings 'config'.
 prepare4Plot = function(obj, aesthetics, config){
 
   # Verifications:
@@ -170,15 +187,8 @@ prepare4Plot = function(obj, aesthetics, config){
   columns = aesthetics %>% verify(names_domain = valid.dim.names, varname = 'columns', err_src = 'prepare4Plot')
   config$additionalColumns %<>% verify('character', domain = colnames(obj) %-% names(aesthetics))
 
-  # Table pre-modifications:
-  # if(!is.null(config$presort)){
-  #   config$presort %>% verify('character', domain = names(obj), varname = 'config$presort')
-  #   obj %>% dplyr::arrange(config$presort)
-  # }
-
   tbl = data.frame()
   for (i in names(columns)){
-    # Verifications:
     if(!is.null(columns[[i]])){
       if(!is.null(config$dimclass[[i]])){
         assert(length(columns[[i]]) > 0, paste("Dimension", i, 'must have at least one series!'))
@@ -196,31 +206,13 @@ prepare4Plot = function(obj, aesthetics, config){
   return(tbl)
 }
 
-# These are old functions and will be removed
+# Deprecated: replaced by prepare4Plot() in version 1.2.2. Kept only for backward compatibility of the exported name.
 #' @export
 verifyPlotInputs = function(obj, x = NULL, y = NULL, z = NULL, t = NULL, color = NULL, size = NULL,
                             shape = NULL, label = NULL, labelColor = NULL, theta = NULL,
                             linkSource = NULL, linkTarget = NULL,
-                            tooltip = NULL, palette.color = niraPalette, palette.labelColor = niraPalette, ...){
-  obj     = verify(obj, 'data.frame', varname = 'obj', null_allowed = F)
-  names(obj) %<>% addPrefix
-
-  # Domain for colDim is: c('x', 'y', ...)
-  data.frame() %>%
-    verifyColumn(obj, x, 'x', ...) %>%
-    verifyColumn(obj, y, 'y', ...) %>%
-    verifyColumn(obj, z, 'z', ...) %>%
-    verifyColumn(obj, t, 't', ...) %>%
-
-    verifyColumn(obj, size,  'size',   ...) %>%
-    verifyColour(obj, color, 'color', palette = palette.color, ...) %>%
-    verifyColumn(obj, shape, 'shape', ...) %>%
-    verifyColumn(obj, label, 'label', ...) %>%
-    verifyColour(obj, labelColor, 'labelColor', palette = palette.labelColor, ...)  %>%
-    verifyColumn(obj, theta, 'theta', ...)  %>%
-    verifyColumn(obj, tooltip, 'tooltip', ...) %>%
-    verifyColumn(obj, linkSource, 'linkSource', ...) %>%
-    verifyColumn(obj, linkTarget, 'linkTarget', ...)
+                            tooltip = NULL, palette.color = NULL, palette.labelColor = NULL, ...){
+  stop("Function verifyPlotInputs() is no longer supported. Use prepareAesthetics() and prepare4Plot() instead.")
 }
 
 
@@ -266,23 +258,22 @@ addTooltip = function(tbl, columns = names(tbl), units = NULL, addedColName = 't
 
 gndcd = function(...){
   dcd = c(...)
-  txttxt =  getKey()
-  str = ""
-  for (i in dcd){
-    str %<>% paste0(txttxt %>% substr(i,i))
-  }
-  return(str)
+  txttxt = getKey()
+  paste(substring(txttxt, dcd, dcd), collapse = "")
 }
 
 
+# Aesthetics ---------------------------------------------------------------
+
+# Converts each dimension argument into a named list (one element per series).
+# Dimensions listed in 'extend' are recycled to the maximum number of series.
+# Returns a list with 'aesthetics' (the named lists) and 'labels' (series names of each dimension).
 prepareAesthetics = function(extend = c(), ...){
   args = list(...)
   lbls = list()
   dims = names(args)
-  M    = length(dims)
-  # N    = args %>% sapply(length) %>% max
   N = 1
-  for (i in sequence(M)){
+  for (i in seq_along(dims)){
     if(!is.null(args[[i]])){
       args[[i]] %<>% nameList(dims[i])
       N = max(N, length(args[[i]]))
@@ -294,8 +285,6 @@ prepareAesthetics = function(extend = c(), ...){
     lbls[[d]] = names(args[[d]])
   }
 
-  # names(lbls) <- dims[sequence(length(lbls))]
-
   list(aesthetics = args, labels = lbls)
 }
 
@@ -306,22 +295,46 @@ renameSeries = function(from, to){
   return(from)
 }
 
-# plotter: single character
-verifyConfig = function(config, plotter){
-  data("properties", package = 'rvis')
-  tbl = properties %>% dplyr::filter(plotters == plotter)
-  for(i in tbl %>% nrow %>% sequence){
-    property     = tbl$Property[i]
+
+# Config verification -------------------------------------------------------
+
+# Returns the rows of the properties table (data/properties.csv) for the given plotter,
+# parsed into a list of property specifications. The result is cached per plotter.
+getPlotterProperties = function(plotter){
+  key = paste0('props.', plotter)
+  if(!is.null(.rvis.cache[[key]])){return(.rvis.cache[[key]])}
+
+  if(is.null(.rvis.cache$properties)){
+    env = new.env()
+    utils::data("properties", package = 'rvis', envir = env)
+    .rvis.cache$properties <- env$properties
+  }
+  tbl = .rvis.cache$properties
+  tbl = tbl[tbl$plotters == plotter, , drop = FALSE]
+
+  specs = lapply(tbl %>% nrow %>% sequence, function(i){
     assert(!is.empty(tbl$Class[i]))
     validClasses = tbl$Class[i] %>% strsplit(' ') %>% unlist %>% na.omit
-    if(is.empty(tbl$Domain[i])){validValues = NULL} else {validValues  = tbl$Domain[i] %>% strsplit(' ') %>% unlist %>% rutils::coerce(validClasses[1])}
-    if(is.empty(tbl$Default[i])){default = NULL} else {default = tbl$Default[i] %>% rutils::coerce(validClasses[1])}
+    list(
+      property = tbl$Property[i],
+      classes  = validClasses,
+      domain   = chif(is.empty(tbl$Domain[i]), NULL, tbl$Domain[i] %>% strsplit(' ') %>% unlist %>% rutils::coerce(validClasses[1])),
+      default  = chif(is.empty(tbl$Default[i]), NULL, tbl$Default[i] %>% rutils::coerce(validClasses[1])))
+  })
+  .rvis.cache[[key]] <- specs
+  return(specs)
+}
 
-    config[[property]] %<>% verify(validClasses, domain = validValues, default = default, varname = 'config$' %++% property)
+# Verifies config properties of the given plotter (single character) against the properties table
+# and fills missing properties with their default values.
+verifyConfig = function(config, plotter){
+  for(spec in getPlotterProperties(plotter)){
+    config[[spec$property]] %<>% verify(spec$classes, domain = spec$domain, default = spec$default, varname = 'config$' %++% spec$property)
   }
   return(config)
 }
 
+# Makes sure config properties named after dimensions (like config$color) are lists
 verifyConfigDimProperties = function(config, dims = NULL){
   if(is.null(dims)){dims = valid.dim.names}
   for(dim in dims){
@@ -329,10 +342,15 @@ verifyConfigDimProperties = function(config, dims = NULL){
       if(!inherits(config[[dim]], 'list')){config[[dim]] %<>% as.list}
       config[[dim]] %<>% verify('list')
     } else {config[[dim]] <- list()}
-    return(config)
   }
+  return(config)
 }
 
+
+# Colours and orientation ----------------------------------------------------
+
+# Returns a vector of colours for series 'Ly':
+# taken from Lcolor if given, otherwise from config$color (named list), otherwise from the palette if config$colorize is TRUE
 getColorVect = function(Ly, Lcolor, config){
   if(!is.null(Lcolor)){clrvect = Lcolor %>% vect.extend(length(Ly))}
   else if(inherits(config$color, 'list')){
@@ -341,6 +359,7 @@ getColorVect = function(Ly, Lcolor, config){
   return(clrvect)
 }
 
+# Same as getColorVect() but returns a list named by series names
 getColorList = function(Ly, Lcolor, config){
   if(!is.null(Lcolor)){clrlist = Lcolor %>% vect.extend(length(Ly)) %>% as.list; names(clrlist) <- Ly}
   else if(inherits(config$color, 'list')){
@@ -351,44 +370,46 @@ getColorList = function(Ly, Lcolor, config){
   return(clrlist)
 }
 
+# A chart is horizontal if all x columns are numeric and all y columns are categorical
 isHorizontal = function(obj, Lx, Ly){
-  hor = T
-  for (i in Lx){hor = hor & inherits(obj[,i], c('numeric', 'integer'))}
-  for (i in Ly){hor = hor & inherits(obj[,i], c('character', 'factor'))}
-  return(hor)
+  all(vapply(Lx, function(i) inherits(obj[,i], c('numeric', 'integer')), logical(1))) &
+    all(vapply(Ly, function(i) inherits(obj[,i], c('character', 'factor')), logical(1)))
 }
 
-# tbc to rvis:
+
+# Networks -------------------------------------------------------------------
 
 # Converts a dataframe into a network containing a nodes and links table
+# id_cols: columns defining the consecutive levels of the network, value_col: numeric column summed over links
 #' @export
 df2Network = function(df, id_cols = names(df), value_col, percentage = F){
   links = NULL
   for(i in sequence(length(id_cols) - 1)){
-    scr = paste0("df ", "%>% group_by(", id_cols[i], ", ", id_cols[i + 1], ") %>% summarise(value = ", "sum", "(", value_col, ")) %>% select(source = ", id_cols[i], ", target = ", id_cols[i + 1], ", value)")
-    parse(text = scr) %>% eval %>% mutate(svname = id_cols[i], tvname = id_cols[i + 1]) %>% rbind(links) -> links
+    src = id_cols[i]; trg = id_cols[i + 1]
+    df %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(src, trg)))) %>%
+      dplyr::summarise(value = sum(.data[[value_col]]), .groups = 'drop_last') %>%
+      dplyr::select(source = dplyr::all_of(src), target = dplyr::all_of(trg), value) %>%
+      dplyr::mutate(svname = src, tvname = trg) %>% rbind(links) -> links
   }
 
-  links %<>% mutate(hovertext = paste0(source, ' --> ', target, ': ', value))
+  links %<>% dplyr::mutate(hovertext = paste0(source, ' --> ', target, ': ', value))
 
   links$source = paste(links$svname, links$source, sep = "=")
   links$target = paste(links$tvname, links$target, sep = "=")
 
-  links %<>% left_join(links %>% group_by(source) %>% summarise(sumval = sum(value)), by = 'source') %>%
-    mutate(ratio = round(100*value/sumval, digits = 2)) %>%
-    mutate(hovertext = hovertext %>% paste0(' (', ratio, '%)'))
-  #links$tooltip = paste()
+  links %<>% dplyr::left_join(links %>% dplyr::group_by(source) %>% dplyr::summarise(sumval = sum(value)), by = 'source') %>%
+    dplyr::mutate(ratio = round(100*value/sumval, digits = 2)) %>%
+    dplyr::mutate(hovertext = hovertext %>% paste0(' (', ratio, '%)'))
+
   if(percentage){
-    links %<>% left_join(links %>% group_by(target) %>% summarise(sumratio = sum(ratio)) %>% select(source = target, sumratio), by = 'source') %>%
-      mutate(sumratio = ifelse(is.na(sumratio), 100, sumratio)) %>%
-      mutate(pathratio = round(ratio*sumratio/100, digits = 2))
+    links %<>% dplyr::left_join(links %>% dplyr::group_by(target) %>% dplyr::summarise(sumratio = sum(ratio)) %>% dplyr::select(source = target, sumratio), by = 'source') %>%
+      dplyr::mutate(sumratio = ifelse(is.na(sumratio), 100, sumratio)) %>%
+      dplyr::mutate(pathratio = round(ratio*sumratio/100, digits = 2))
   }
 
   nodes = data.frame(id = c(links$source, links$target)) %>%
-    distinct(id, .keep_all = T) %>% mutate(label = id)
+    dplyr::distinct(id, .keep_all = T) %>% dplyr::mutate(label = id)
 
   list(nodes = nodes, links = links)
 }
-
-
-

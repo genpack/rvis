@@ -6,8 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     06 October 2016
-# Last Revision:  20 June 2018
-# Version:        1.3.4
+# Last Revision:  23 November 2026
+# Version:        1.3.5
 #
 
 # Version History:
@@ -23,7 +23,10 @@
 # 1.3.0     02 April 2017      Fundamental changes to the functions: Using standard visgen.R fucnctions prepare4Plot() and prepareAesthetics()
 # 1.3.2     19 June 2018       Function googleVis.gauge() added.
 # 1.3.4     20 June 2018       Function googleVis.bar() and googleVis.line() modified: y2 is now a new diemnsion
+# 1.3.5     23 November 2026   Bug fixes: googleVis.options() used undefined 'L' instead of its arguments, googleVis.line() used
+#                              undefined 'yy' (both functions always failed). googleVis.bar() uses isHorizontal(). Old commented code removed.
 
+#' @include visgen.R
 
 googleVis.line.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -63,20 +66,20 @@ googleVis.sankey.defset = defset %<==>% list(
   essentials = c('key', 'source', 'target')
 )
 
+# Builds googleVis chart options specifying the axis of each series (Ly: series on the left axis, Ly2: series on the right axis)
 googleVis.options = function(config, Ly, Ly2){
   opt = list()
 
   # Specify y axis sides and labels:
-  yy = c(L$y,L$y2)
-  N = length(yy)
+  yy = c(Ly, Ly2)
   srs = '['
   vax = '['
-  for(i in sequence(N)){
-    srs %<>% paste0(chif(srs == '[', "", ","), "{targetAxisIndex:", (yy[i] %in% L$y2) %>% as.integer, "}")
-    if((yy[i] %in% L$y) & (!is.null(config$yAxis.label))){
+  for(i in seq_along(yy)){
+    srs %<>% paste0(chif(srs == '[', "", ","), "{targetAxisIndex:", (yy[i] %in% Ly2) %>% as.integer, "}")
+    if((yy[i] %in% Ly) & (!is.null(config$yAxis.label))){
       vax %<>% paste0(chif(vax == '[', "", ","), "{title:'", config$yAxis.label, "'}")
     }
-    if((yy[i] %in% L$y2) & (!is.null(config$y2Axis.label))){
+    if((yy[i] %in% Ly2) & (!is.null(config$y2Axis.label))){
       vax %<>% paste0(chif(vax == '[', "", ","), "{title:'", config$y2Axis.label, "'}")
     }
   }
@@ -98,7 +101,7 @@ googleVis.line = function(obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...
 
   obj %<>% prepare4Plot(A, config = config)
 
-  gvisLineChart(obj, xvar = L$x, yvar = yy, options = googleVis.options(config, L$y, L$y2), ...)
+  gvisLineChart(obj, xvar = L$x, yvar = c(L$y, L$y2), options = googleVis.options(config, L$y, L$y2), ...)
 }
 
 googleVis.area = function(obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...){
@@ -130,16 +133,10 @@ googleVis.bar = function(obj, x = NULL, y = NULL, config = NULL, ...){
 
   obj %<>% prepare4Plot(A, config = config)
 
-  hor = T
-  for (i in L$x){hor = hor & inherits(obj[,i], c('numeric', 'integer'))}
-  for (i in L$y){hor = hor & inherits(obj[,i], c('character', 'factor'))}
-
-  options = list()
-
-  if(hor){
-    g = gvisBarChart(obj, yvar = L$x, xvar = L$y, options = options, ...)}
+  if(isHorizontal(obj, L$x, L$y)){
+    g = gvisBarChart(obj, yvar = L$x, xvar = L$y, options = list(), ...)}
   else {
-    g = gvisColumnChart(obj, xvar = L$x, yvar = L$y, options = options, ...)
+    g = gvisColumnChart(obj, xvar = L$x, yvar = L$y, options = list(), ...)
   }
   return(g)
 }
@@ -159,6 +156,7 @@ googleVis.gauge = function(obj = data.frame(), theta = NULL, label = NULL, confi
 
   if(is.empty(obj)){return(NULL)}
 
+  # config$thetaAxis.zone: list of three zones (green, yellow, red), each a list with elements min and max
   obj[, c(L$label, L$theta)] %>%
     gvisGauge(
       options = list(
@@ -175,7 +173,7 @@ googleVis.gauge = function(obj = data.frame(), theta = NULL, label = NULL, confi
 
 # It is a sankeytree not a sankey!!!!
 googleVis.sankey = function(obj, key = NULL, source = NULL, target = NULL, linkWidth = NULL, config = NULL){
-  obj %>% verify('list', lengths = 2, names_identical = c('nodes', 'links'), varname = 'obj', null_allowed = F, err_src = 'visNetwork.graph')
+  obj %>% verify('list', lengths = 2, names_identical = c('nodes', 'links'), varname = 'obj', null_allowed = F, err_src = 'googleVis.sankey')
   obj$nodes %>% verify('data.frame', varname = 'obj$nodes', null_allowed = F, err_src = 'googleVis.sankey')
   obj$links %>% verify('data.frame', varname = 'obj$links', null_allowed = F, err_src = 'googleVis.sankey')
 
@@ -193,183 +191,8 @@ googleVis.sankey = function(obj, key = NULL, source = NULL, target = NULL, linkW
   obj$nodes = obj$nodes[!duplicated(obj$nodes[[L$key]]), , drop = FALSE]
   obj$links %<>% prepare4Plot(A %>% list.extract('source', 'target', 'linkWidth'), config)
 
-  assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'googleVis.sankey')
-  assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'googleVis.sankey')
+  assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a subset of node IDs'", err_src = 'googleVis.sankey')
+  assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a subset of node IDs'", err_src = 'googleVis.sankey')
 
   obj$links %>% gvisSankey(from = L$source, to = L$target, weight = L$linkWidth)
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# OLD FUNCTIONS
-# gglvis.click.jscript = function(input_id){
-#   "var row = chart.getSelection()[0].row + 1;" %++%
-#     "Shiny.onInputChange('" %++% input_id %++% "', row)"
-# }
-#
-#
-# # Default Settings:
-#
-# # default.gglvis.tsline.settings = list(width="800px", height="600px", displayExactValues=TRUE, scaleType='maximized') # todo transfer to settings
-# gglvis.tsline.settings = list(displayExactValues = TRUE, scaleType = 'maximized')
-#
-# gglvis.column.settings <- list(width = "600px", height = "600px", vAxis.minValue = 0)
-#
-# gglvis.sankey.settings <- list(width = 800, height = 600)
-#
-# gglvis.calendar.settings <- list(
-#   height    = 'auto',
-#   yearLabel = list(fontName = 'Times-Roman', fontSize = 32, color = '#1A8763', bold = TRUE),
-#   cellSize  =  10,
-#   cellColor = list(stroke ='red', strokeOpacity = 0.2),
-#   focusedCellColor = list(stroke = 'red'))
-#
-# gglVis.gauge.settings = list(width = 400, height = 300)
-#
-# gglvis.motionChart.settings <- list(width="800px", height="600px", displayExactValues=TRUE, scaleType='maximized')
-#
-#
-# # All Java function scripts:
-# getMonth <- 'function(d){
-# var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-# return monthNames[d.getMonth()];
-# }'
-#
-# getMonthLabel <- 'function(d){
-# var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-# var S    = monthNames[d - 1];
-# if (S == null){return "";} else {return S;}
-# }'
-#
-# #the x values are passed as milliseconds, turn them into a date and extract month and day
-# getMonthDay <- 'function(d) {
-# var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-# date = new Date(d);
-# return monthNames[date.getMonth()] + " " +date.getUTCDate(); }'
-#
-# # googleVis Plots:
-#
-# # Argument 'x' can only refer to a categorical
-# # Argument 'y' must refer to one or more than one numeric columns of obj
-# googleVis.line.old = function(obj, x = NULL, y = NULL, func = mean, options = list(), ...){
-#   assert(require(googleVis), "Package googleVis is not installed!", err_src = match.call()[[1]])
-#   obj = verifyPlotInputs(obj, x, y, package = 'googleVis', type = 'line')
-#
-#   if (!is.null(func)){
-#     if (length(y) == 1){frm = as.formula(paste0(y,' ~ ', x))} else {frm = as.formula(paste0('cbind(', paste(y,collapse = ','), ') ~ ', x))}
-#     obj = aggregate(frm, data = obj, FUN = func)
-#   }
-#
-#   g = gvisLineChart(obj, xvar = x, yvar = y, options = options, ...)
-#
-#   return(g)
-# }
-#
-# googleVis.bar.old = function(obj, x = NULL, y = NULL, func = mean, options = list(), horizontal = F, ...){
-#   assert(require(googleVis), "Package googleVis is not installed!", err_src = match.call()[[1]])
-#   obj = verifyPlotInputs(obj, x, y, package = 'googleVis', type = 'line')
-#
-#   if (!is.null(func)){
-#     if (length(y) == 1){frm = as.formula(paste0(y,' ~ ', x))} else {frm = as.formula(paste0('cbind(', paste(y,collapse = ','), ') ~ ', x))}
-#     obj = aggregate(frm, data = obj, FUN = func)
-#   }
-#   if(horizontal){
-#     g = gvisBarChart(obj, xvar = x, yvar = y, options = options, ...)}
-#   else {
-#     g = gvisColumnChart(obj, xvar = x, yvar = y, options = options, ...)
-#   }
-#   return(g)
-# }
-#
-# # package.plotType.objectClass.whatToPlot
-#
-# # molten table required!
-# googleVis.gauge.old = function(obj, theta = NULL, label = NULL, func = mean, thetaLegend = NULL, config = NULL, ...){
-#   assert(require(googleVis), "Package googleVis is not installed!", err_src = match.call()[[1]])
-#   obj = verifyPlotInputs(obj, theta = theta, label = label, package = 'googleVis', type = 'gauge')
-#
-#   if (is.null(theta)){theta = numerics(obj)[1]}
-#
-#   thetaLegend = verifyThetaLegend(thetaLegend, obj, theta)
-#
-#
-#   if(length(theta) > 1){
-#     assert(is.null(label), "In gauge charts, dimension 'label' cannot be defined when multiple columns are chosen! In this case, column names, will be the labels.", match.call()[[1]])
-#     obj = melt(obj[,theta])
-#     label = 'variable'
-#     theta = 'value'
-#   }
-#
-#   if (!is.null(func)){
-#     if (length(theta) == 1){frm = as.formula(paste0(theta,' ~ ', label))} else {frm = as.formula(paste0('cbind(', paste(theta,collapse = ','), ') ~ ', label))}
-#     obj = aggregate(frm, data = obj, FUN = func)
-#   }
-#
-#   if (thetaLegend$percentage){
-#     thetaLegend$levels  = verify(thetaLegend$levels , 'numeric', varname = 'thetaLegend$levels' , lengths = 4, domain = c(0.0, 100.0), default = c(0.0, 30.0, 70.0, 100.0))
-#     obj[,theta]    = 100*(obj[,theta] - thetaLegend$min)/(thetaLegend$max - thetaLegend$min)
-#     thetaLegend$max     = 100.0
-#     thetaLegend$min     = 0.0
-#   } else {
-#     thetaLegend$levels  = verify(thetaLegend$levels , 'numeric', varname = 'thetaLegend$levels' , lengths = 4, default = c(thetaLegend$min, thetaLegend$min + 0.3*(thetaLegend$max - thetaLegend$min), thetaLegend$min + 0.7*(thetaLegend$max - thetaLegend$min), thetaLegend$max))
-#   }
-#
-#   thetaLegend$levels = sort(thetaLegend$levels)
-#
-#   if (is.null(config)){config = gglVis.gauge.settings}
-#
-#   config$min        = thetaLegend$min
-#   config$max        = thetaLegend$max
-#   config$redFrom    = thetaLegend$levels[1]
-#   config$redTo      = thetaLegend$levels[2]
-#   config$yellowFrom = thetaLegend$levels[2]
-#   config$yellowTo   = thetaLegend$levels[3]
-#   config$greenFrom  = thetaLegend$levels[3]
-#   config$greenTo    = thetaLegend$levels[4]
-#
-#   g = gvisGauge(obj, options = config)
-#   return(g)
-# }
-#
-# googleVis.sankey.old = function(obj, linkSource = NULL, linkTarget = NULL, linkWidth = NULL, config = NULL, ...){
-#   assert(require(googleVis), "Package googleVis is not installed!", err_src = match.call()[[1]])
-#   argEdges = list(table = obj,
-#                   linkSource = list(colName = linkSource, type = 'nominal'),
-#                   linkTarget = list(colName = linkTarget, type = 'nominal'),
-#                   linkWidth  = list(colName = linkWidth,  type = 'numeric'))
-#   links    = visPrepare(argEdges)
-#
-#   if(is.null(config)){config = gglvis.sankey.settings}
-#
-#   gvisSankey(links, from = linkSource,
-#              to = linkTarget, weight = linkWidth,
-#              options = config, ...)
-# }
-#
-
-

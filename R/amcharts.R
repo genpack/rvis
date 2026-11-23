@@ -5,8 +5,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     28 November 2016
-# Last Revision:  24 July 2018
-# Version:        1.1.9
+# Last Revision:  23 November 2026
+# Version:        1.2.0
 #
 
 # Version History:
@@ -24,25 +24,19 @@
 # 1.1.7     30 June 2018       amCharts.box() added.
 # 1.1.8     30 June 2018       amCharts.bullet() added.
 # 1.1.9     24 July 2018       amCharts.tsline() added.
+# 1.2.0     23 November 2026   Bug fix: shape lookup vector renamed from amCharts.bullet to amCharts.bullet.shape. It was overwritten
+#                              by function amCharts.bullet(), so amCharts.tsline() failed whenever 'shape' was given.
+#                              Duplicate definition of 'defset' removed (single definition in visgen.R). Old commented code removed.
 
-# General settings for all the plots
-defset = list(
-  palette= list(
-    # color = c("#FB1108", "#FA7806","#FBE426","#FCFB8F", "#F3F5E7", "#C7E4EA","#ABD6E6","#9AD2E1"),
-    color = c("purple", "blue","cyan","green", "yellow", "orange","red","black" , 'white'),
-    shape = c('circle', 'x', 'o', 'plus', 'square.hollow', 'rhombus.hollow')
-  ),
-
-  withRowNames = F,
-  colorize     = T
-)
+#' @include visgen.R
 
 symbols = c('point', 'circle', 'bubble', 'square', 'rhombus', 'diamond', 'delta', 'right', 'left')
 ltypes  = c('line', 'dashLine')
 valid.amCharts.shapes = c('line', paste(ltypes[1], symbols, sep = '.'), 'dashLine', paste(ltypes[2], symbols, sep = '.'))
 
-amCharts.bullet = character()
-amCharts.bullet[valid.amCharts.shapes] = c(NA, rep('bubble', 3), 'square', rep('diamond',2), 'triangleUp', 'triangleRight', 'triangleLeft') %>% rep(2)
+# amCharts bullet type and line type associated with each rvis shape:
+amCharts.bullet.shape = character()
+amCharts.bullet.shape[valid.amCharts.shapes] = c(NA, rep('bubble', 3), 'square', rep('diamond',2), 'triangleUp', 'triangleRight', 'triangleLeft') %>% rep(2)
 
 amCharts.linetype = numeric()
 amCharts.linetype[valid.amCharts.shapes] = c(rep(0, 10), rep(1, 10))
@@ -88,7 +82,6 @@ amCharts.gauge.defset = defset %<==>% list(
   theta.min = 0,
   theta.max = 100,
   thetaAxis.tick.step = 20
-  # todo: set in settings table
 )
 
 amCharts.bullet.defset = defset %<==>% list(
@@ -103,7 +96,6 @@ amCharts.bullet.defset = defset %<==>% list(
   x.min = 0,
   x.max = 100,
   xAxis.tick.step = 20
-  # todo: set in settings table
 )
 
 amCharts.funnel.defset = defset %<==>% list(
@@ -114,7 +106,6 @@ amCharts.funnel.defset = defset %<==>% list(
   multiples  = c(),
   essentials = c('y', 'label'),
   direction = 'up.down'
-  # todo: add to settings
 )
 
 amCharts.box.defset = defset %<==>% list(
@@ -165,7 +156,6 @@ amCharts.pie = function(obj, label = NULL, theta = NULL, config = NULL, ...){
   config = amCharts.pie.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
     verifyConfig(plotter = 'amCharts')
 
-
   # Preparing Aesthetics:
   a = prepareAesthetics(label = label, theta = theta)
   L = a$labels
@@ -198,12 +188,13 @@ amCharts.tsline = function(obj, x = NULL, y = NULL, shape = NULL, size = NULL, c
     bul = NULL
     ltp = NULL
   } else {
-    bul = amCharts.bullet[L$shape]
+    bul = amCharts.bullet.shape[L$shape]
     ltp = amCharts.linetype[L$shape]
     bul[is.na(bul)] <- 'round'
     ltp[is.na(ltp)] <- 0
   }
 
+  # A series with both 'low' and 'high' is passed as c(low, y, high) to show the range:
   if(is.null(L$high) | is.null(L$low)){dat = L$y} else {
     dat = list()
     for (i in seq(L$y)){
@@ -237,6 +228,7 @@ amCharts.gauge = function(obj = data.frame(), theta = NULL, config = NULL, ...){
 
   if(is.empty(obj)){return(NULL)}
 
+  # Gauge bands come from config$thetaAxis.zone: a list of lists with elements min, max and color
   zones <- config$thetaAxis.zone
   if (length(zones)) {
     bands <- lapply(zones, function(zone) {
@@ -331,70 +323,3 @@ amCharts.bullet = function(obj = data.frame(), x = NULL, y = NULL, config = NULL
              steps = chif(hor, config$xAxis.step.enabled, config$yAxis.step.enabled),
              horiz = hor)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# old functions:
-
-#' amCharts.gauge.settings <- list(colorder = c('red', 'yellow', "#00CC00", 'purple', 'aqua', 'blue', 'yellow', 'magenta', 'cyan', 'black', 'grey', 'orange'))
-#'
-#'
-#' amCharts.gauge.old = function(theta, legend = list(), config = NULL, ...){
-#'   assert(require(rAmCharts), "Package rAmCharts is not installed!", err_src = match.call()[[1]])
-#'
-#'   legend$min  = verify(legend$min , 'numeric', varname = 'legend$min', default = 0.00)
-#'   legend$max  = verify(legend$max , 'numeric', varname = 'legend$max', domain = c(legend$min, Inf), default = 180.00)
-#'   legend$percentage  = verify(legend$percentage , 'logical', varname = 'legend$percentage', domain = c(T, F), default = F)
-#'
-#'   if (legend$percentage){
-#'     legend$levels  = verify(legend$levels , 'numeric', varname = 'legend$levels', domain = c(0.0, 100.0), default = c(0.0, 30.0, 70.0, 100.0))
-#'   } else {
-#'     legend$levels  = verify(legend$levels , 'numeric', varname = 'legend$levels', default = c(legend$min, legend$min + 0.3*(legend$max - legend$min), legend$min + 0.7*(legend$max - legend$min), legend$max))
-#'   }
-#'
-#'   legend$levels = sort(legend$levels)
-#'   nn     = length(legend$levels)
-#'   assert(nn > 1, "Argument 'legend$levels' needs at least two elements!", err_src = match.call()[[1]])
-#'
-#'   L  = legend$levels[nn] - legend$levels[1]
-#'
-#'   if (is.null(config)){config = amCharts.gauge.settings}
-#'
-#'   if (legend$percentage){
-#'     bands = data.frame(start = legend$levels[- nn], end = legend$levels[- 1], color = config$colorder[sequence(nn-1)], stringsAsFactors = FALSE)
-#'     ag    = amAngularGauge(x = round(100*(theta - legend$min)/(legend$max - legend$min), 2), start = 0, end = 100, step = 20, bands = bands, text = "%", ...)
-#'     ag    = amCharts.gauge.apply.settings(ag, config)
-#'   } else {
-#'     bands = data.frame(start = legend$levels[- nn], end = legend$levels[-1], color = config$colorder[sequence(nn-1)], stringsAsFactors = FALSE)
-#'     ag    = amAngularGauge(x = round(theta, 2), start = legend$levels[1], end = legend$levels[nn], step = L/5, bands = bands, ...)
-#'     ag    = amCharts.gauge.apply.settings(ag, config)
-#'     # %>% setProperties(fontSize = 10, adjustSize = T) #%>% amOptions(theme = 'dark', mainSize = 2, scrollbarHeight = 2)
-#'   }
-#'   return(ag)
-#'
-#' }
-#'
-#' amCharts.gauge.apply.settings = function(plt, config){
-#'   props2bSet = c('fontSize', 'adjustSize')
-#'   eval(parse(text = paste0('plt %>% setProperties(', list2Script(config, fields = props2bSet, fields_remove = 'colorder'), ')')))
-#'   eval(parse(text = paste0('plt %>% amOptions(', list2Script(config, fields_remove = c('colorder', props2bSet)), ')')))
-#'   return(plt)
-#' }
-
-
-
-

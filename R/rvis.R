@@ -28,8 +28,16 @@
 #' @include d3plus.R
 #' @include tfd3.R
 #' @include dimple.R
-#' @include dialogs.R
 #' @include dt.R
+#' @include d3tablefilter.R
+#' @include dc.R
+#' @include dfvis.R
+#' @include grviz.R
+#' @include pivot.R
+#' @include csscripts.R
+#' @include calheatmap.R
+#' @include sankeytree.R
+#' @include streamgraph.R
 #' @include dygraphs.R
 #' @include echarts.R
 #' @include ggvis.R
@@ -204,6 +212,27 @@
 # 5.8.9 (05 January 2023)   - dashboard.R updated to version 2.5.9
 # 5.9.2 (02 February 2023)  - d3tablefilter.R added. (We had an embedded htmlwidget for  the javascript package but we found a similar existing htmlwidget in the github and decided to embed that as well)
 # 5.9.3 (03 January 2025)   - visgen.R updated to version 1.3.9
+# 5.9.10 (23 November 2026) - Documentation: roxygen documentation of rvisPlot(), README, pkgdown site and vignettes
+#                             (getting started, chart types, configuration, amCharts) added. grviz.R fixed to render again.
+# 5.10.0 (23 November 2026) - Code review release (bug fixes, clean-up and speed-ups; working charts produce identical output):
+#                             * Package: Imports and Remotes added to DESCRIPTION (rutils, magrittr, htmlwidgets, crosstalk, dplyr, stringr);
+#                               visgen.R is collated first and is the single definition of 'defset' (was duplicated in amcharts.R);
+#                               rvisPlot() dispatches without eval(parse()) and reports unknown wrappers clearly.
+#                             * Speed: verifyConfig() parses and caches the properties table once per plotter instead of loading
+#                               data('properties') on every plot; gndcd() vectorised.
+#                             * Bug fixes in wrappers that failed on every call: amCharts.tsline (shape lookup overwritten by
+#                               amCharts.bullet()), c3.bar, nvd3.scatter, googleVis.line/area options, candela.bar/scatter,
+#                               bpexploder.box, rCharts.scatter, highcharts.scatter.molten, highcharter.tsline.stock,
+#                               echarts (non-exported echarts4r helpers, list data), D3plusR wrappers (d3plus() masked by
+#                               package d3plus), d3plus.bubble/scatter, networkD3.sankey without labels, streamgraph without
+#                               config or with a single series, df2Network and other functions calling dplyr verbs unqualified.
+#                             * Other bug fixes: highcharter drilldown with numeric x, visNetwork node size scaling, ggvis point
+#                               shape, billboarder 'bottom' legend, TFD3/D3TableFilter radio buttons, dashboard box footer,
+#                               navbarPage fluid/icon, pivotOutput rendering, header title CSS for non-blue skins, skin hover font,
+#                               verifyConfigDimProperties() processing only the first dimension, bubbleforce widget name.
+#                             * Clean-up: duplicated code merged (TFD3.prepare() shared by TFD3 and D3TableFilter tables,
+#                               DT.addLinks(), dygraphs series helper, grviz helpers), dead commented code and an unused debug
+#                               object removed, comments and error messages made clearer. Unused man/hello.Rd removed.
+#                               See the version history of each file for details.
 NULL
 #> NULL
-

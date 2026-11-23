@@ -40,5 +40,3 @@ leaflet.map.Zoom = function(x, lat, long, dist = 0.01){
   # Check out x is of class leaflet map
   x %>% clearPopups() %>% fitBounds(min(long) - dist, min(lat) - dist, max(long) + dist, max(lat) + dist)
 }
-
-

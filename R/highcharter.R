@@ -6,8 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 October 2016
-# Last Revision:  24 July 2018
-# Version:        1.3.9
+# Last Revision:  23 November 2026
+# Version:        1.4.0
 #
 
 # Version History:
@@ -30,6 +30,12 @@
 # 1.2.9     20 July 2018       Function highcharter.addSeries() modified: key column in the data is calculated correctly
 # 1.3.0     20 July 2018       Function highcharter.combo() rewritten. addSeries removed
 # 1.3.9     24 July 2018       Functions highcharter.line, area, bar, area.range, treemap, pie, pyramid, funnel, bubble, added.
+# 1.4.0     23 November 2026   Bug fixes: highcharter.combo() failed for drilldown charts with numeric x (list 'dd' was not initialised),
+#                              highcharter.tsline.stock() used undefined highcharter.tsline.defset, highcharter.applyConfig() passed the
+#                              barMode value as variable name. Clear error messages for unsupported axis classes and missing series.
+#                              Package functions namespaced (datetime_to_timestamp, hc_drilldown).
+
+#' @include visgen.R
 
 
 # todo: add sunburst asap! take the example in tutorial
@@ -103,6 +109,14 @@ highcharter.scatter.defset = defset %<==>% list(
   colorize   = F,
   yAxis.gridLine.width = 1
 
+)
+
+highcharter.tsline.defset = defset %<==>% list(
+  dimclass   = list(
+    x       = c('Date', 'POSIXct'),
+    y       = c('numeric', 'integer')),
+  multiples  = 'y',
+  essentials = c('x', 'y')
 )
 
 highcharter.scatter.molten.defset = defset %<==>% list(
@@ -210,7 +224,7 @@ highcharter.applyConfig = function(h, config = list()){
 
   if(!is.null(config$border.radius)){h %<>% highcharter::hc_xAxis(borderRadius = config$border.radius)}
 
-  config$barMode %<>% verify('character', lengths = 1, domain = c('group', 'stack', 'relative'), varname = config$barMode, default = 'group')
+  config$barMode %<>% verify('character', lengths = 1, domain = c('group', 'stack', 'relative'), varname = 'config$barMode', default = 'group')
   if(config$barMode == 'stack'){h %<>% highcharter::hc_plotOptions(column = list(stacking = "normal"), bar = list(stacking = "normal"))}
   return(h)
 }
@@ -259,8 +273,8 @@ highcharter.combo = function(obj, x = NULL, y = NULL, size = NULL, low = NULL, h
       if(inherits(obj[, L$x[1]], c('Date', 'POSIXct'))){
         assert(length(L$x) == 1)
         h %<>% highcharter::hc_xAxis(type = "datetime")
-        obj[, L$x] <- datetime_to_timestamp(obj[, L$x])
-      } else {stop('Ino dige man nemishnasam!!!!!')}
+        obj[, L$x] <- highcharter::datetime_to_timestamp(obj[, L$x])
+      } else {stop('Unsupported class for x axis: ', class(obj[, L$x[1]])[1])}
   } else {
     h %<>% highcharter::hc_xAxis(type = 'linear')
   }
@@ -283,15 +297,16 @@ highcharter.combo = function(obj, x = NULL, y = NULL, size = NULL, low = NULL, h
       if(inherits(obj[, L$y[1]], 'Date')){
         assert(length(L$y) == 1)
         h %<>% highcharter::hc_yAxis(type = "datetime")
-        obj[, L$y] <- datetime_to_timestamp(obj[, L$y])
-      } else {stop('Ino dige man nemishnasam!!!!!')}
+        obj[, L$y] <- highcharter::datetime_to_timestamp(obj[, L$y])
+      } else {stop('Unsupported class for y axis: ', class(obj[, L$y[1]])[1])}
   } else {
     h %<>% highcharter::hc_yAxis(type = 'linear')
   }
 
   # todo: care for timedate class for x and y axis
+  dd = list() # drilldown series
   if(ynum & !xnum){
-    dd   = list()
+    # series are determined by y, otherwise by size, otherwise by low:
     if(!is.null(L$y)){
       sercount  = sequence(length(L$y))
       sernames  = L$y
@@ -301,7 +316,7 @@ highcharter.combo = function(obj, x = NULL, y = NULL, size = NULL, low = NULL, h
     } else if (!is.null(L$low)){
       sercount = sequence(length(L$low))
       sernames  = L$low
-    }
+    } else {stop("At least one of dimensions 'y', 'size' or 'low' must be specified!")}
     seriescolor = NULL
     for (i in sercount){
       # Find series color:
@@ -364,7 +379,7 @@ highcharter.combo = function(obj, x = NULL, y = NULL, size = NULL, low = NULL, h
   } else {
     stop('either x or y must be categorical!')
   }
-  if(drll){h %<>% hc_drilldown(allowPointDrilldown = TRUE, series = dd)}
+  if(drll){h %<>% highcharter::hc_drilldown(allowPointDrilldown = TRUE, series = dd)}
 
   return(h %>% highcharter.applyConfig(config))
 }
@@ -470,8 +485,7 @@ highcharter.scatter = function(obj, x = NULL, y = NULL, size = NULL, color = NUL
 
 }
 
-# http://rstudio-pubs-static.s3.amazonaws.com/230276_25781805506b41478e93da2a641ad108.html
-# hcaes
+# Reference: http://rstudio-pubs-static.s3.amazonaws.com/230276_25781805506b41478e93da2a641ad108.html
 
 highcharter.scatter.molten = function(obj, x = NULL, y = NULL, size = NULL, group = NULL, color = NULL, config = NULL, ...){
   # Verifications:
@@ -521,7 +535,3 @@ highcharter.tsline.stock = function(obj, x = NULL, y = NULL, config = NULL, ...)
   }
   return(hc)
 }
-
-
-
-

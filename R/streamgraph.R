@@ -8,8 +8,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     25 September 2018
-# Last Revision:  25 September 2018
-# Version:        0.0.1
+# Last Revision:  23 November 2026
+# Version:        0.0.2
 #
 
 # Version History:
@@ -17,6 +17,11 @@
 # Version   Date                 Action
 # ----------------------------------
 # 0.0.1     25 September 2018    Initial issue
+# 0.0.2     23 November 2026     Bug fixes: stream() had a self-referencing default 'config = config' (failed when config was not
+#                                passed, i.e. for grouped tables); a single series without group failed (no key column);
+#                                dplyr verbs namespaced. Old commented code removed.
+
+#' @include visgen.R
 
 
 # Does not work with POSIXct, don't try!
@@ -85,7 +90,7 @@ stream <- function(data, key, value, date, width=NULL, height=NULL,
                    offset = c("silhouette", "wiggle", "expand", "zero"),
                    interpolate=c("cardinal", "linear", "step", "step-before", "step-after", "basis", "basis-open", "cardinal-open", "monotone"),
                    interactive=TRUE, scale = c("date", "continuous"),
-                   top=20, right=40, bottom=30, left=50, config = config) {
+                   top=20, right=40, bottom=30, left=50, config = list()) {
 
   offset      = match.arg(offset)
   interpolate = match.arg(interpolate)
@@ -101,23 +106,14 @@ stream <- function(data, key, value, date, width=NULL, height=NULL,
 
     xtu <- config$xAxis.tick.unit %>% verify('character', lengths = 1, default = "day")
     xtf <- config$xAxis.tick.format %>% verify('character', lengths = 1, default = "%Y-%m-%d")
-    # date format
-    # if (all(class(data$date) %in% c("numeric", "character", "integer"))) {
-    #   if (all(nchar(as.character(data$date)) == 4)) {
-    #     data %>%
-    #       mutate(date=sprintf("%04d-01-01", as.numeric(date))) -> data
-    #     xtu <- 'Year'
-    #     xtf <- "%Y"
-    #   }
-    # }
   } else {
     xtu <- NULL
     xtf <- ",.0f"
   }
 
+  # Values of duplicated (key, date) pairs are aggregated by config$aggregator (default: sum)
   config$aggregator %<>% verify('function', default = sum)
-  if(!inherits(data$date, 'numeric')){data %<>% group_by(key, date) %>% summarise(value = do.call(config$aggregator, list(value, na.rm = T)))}
-  # call config aggregator function
+  if(!inherits(data$date, 'numeric')){data %<>% dplyr::group_by(key, date) %>% dplyr::summarise(value = do.call(config$aggregator, list(value, na.rm = T)))}
 
   params = list(
     data=data,
@@ -193,75 +189,13 @@ streamgraph.tsarea = function(obj, x = NULL, y = NULL, group = NULL, config = NU
   configscale = chif(inherits(obj[, L$x], 'Date'), 'date', 'continuous')
 
   if(is.null(L$group)){
-    if(length(L$y) > 1){
-      sg = obj %>% reshape2::melt(id.vars = L$x, measure.vars = L$y) %>%
-        stream(date = L$x, value = 'value', key = 'variable', scale = configscale, config = config)
-    } else {
-      sg = obj %>% stream(value = L$y, date = L$x, scale = configscale, config = config)
-    }
+    # Each y column is a series (also for a single series: stream() always needs a key column)
+    sg = obj %>% reshape2::melt(id.vars = L$x, measure.vars = L$y) %>%
+      stream(date = L$x, value = 'value', key = 'variable', scale = configscale, config = config)
   } else {
     assert(length(L$x) == 1 & length(L$y) == 1, 'You can define series by either grouping the values or selecting multiple columns!')
-    sg = stream(data = obj, date = L$x, value = L$y, key = L$group, scale = configscale)
+    sg = stream(data = obj, date = L$x, value = L$y, key = L$group, scale = configscale, config = config)
   }
 
   return(sg)
-
-  # if(obj[, L$x] %>% duplicated %>% sum > 0 & !is.null(config$aggregator)){
-  #   # if(inherits(config$aggregator, 'function')){config$aggregator = as.character(substitute(config$aggregator))}
-  #   config$aggregator %>% verify('character')
-  #   obj %<>% dplyr::group_by_(L$x)
-  #   scr = "obj %>% dplyr::summarise("
-  #   N   = length(L$y)
-  #   for (i in sequence(N)){
-  #     scr %<>% paste0("`", L$y[i], "` = ", config$aggregator, "(`", L$y[i], "`)", chif(i < N, ", ", ")"))
-  #   }
-  #   obj = parse(text = scr) %>% eval %>% as.data.frame
-  # }
-  #
-  # if (!is.null(L$x)){
-  #   if (inherits(obj[,L$x], 'Date')){ct = obj %>% streamgraph(x = L$x)} else {
-  #     ct = obj %>% streamgraph %>% xAxis(type = 'category', categories = obj[, L$x] %>% as.character)
-  #   }
-  # } else {ct = obj %>% streamgraph}
-  # if(!is.null(L$shape)){names(L$shape) <- L$y}
-  # if(is.null(L$shape)){
-  #   if(!is.null(config$shape)){
-  #     L$shape = config$shape
-  #   } else {L$shape = 'line'}
-  # }
-  #
-  # L$shape %<>% vect.extend(length(L$y))
-  # if(is.empty(config$stack.groups)){config$stack.groups = L$y}
-  # options(warn = -1)
-  # ct %<>% streamgraph_mixedGeom(type = most.common(L$shape), types = L$shape %>% as.list, stacked = chif(config$stack.enabled, config$stack.groups, NULL))
-  # options(warn = 1)
-  #
-  # return(ct %>% streamgraph.applyConfig(config))
 }
-
-# streamgraph.tsline = function(obj, x = NULL, y = NULL, config = NULL, ...){
-#   config = streamgraph.tsline.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
-#   obj %>% streamgraph.combo(x = x, y = y, shape = 'line', config = config, ...)
-# }
-#
-# streamgraph.tsarea = function(obj, x = NULL, y = NULL, config = NULL, ...){
-#   config = streamgraph.tsline.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
-#     verifyConfig(plotter = 'streamgraph')
-#
-#   obj %>% streamgraph.combo(x = x, y = y, shape = 'area', config = config, ...)
-# }
-#
-# streamgraph.area = function(obj, x = NULL, y = NULL, config = NULL, ...){
-#   config = streamgraph.bar.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
-#     verifyConfig(plotter = 'streamgraph')
-#
-#   obj %>% streamgraph.combo(x = x, y = y, shape = 'area', config = config, ...)
-# }
-
-# streamgraph.line = function(obj, x = NULL, y = NULL, config = NULL, ...){
-#   config = streamgraph.bar.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
-#     verifyConfig(plotter = 'streamgraph')
-#
-#   obj %>% streamgraph.combo(x = x, y = y, shape = 'line', config = config, ...)
-# }
-

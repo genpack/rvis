@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     29 December 2016
-# Last Revision:  27 June 2019
-# Version:        1.3.7
+# Last Revision:  23 November 2026
+# Version:        1.3.8
 #
 
 # Version History:
@@ -39,6 +39,9 @@
 # 1.3.5     16 October 2018    plotly.box() modified: factors converted to character for computing nchar in order to adjust margin
 # 1.3.6     18 October 2018    plotly.combo() modified: tooltip added
 # 1.3.7     27 June 2019       plotly.pie() and plotly.box() modified: additional arguments passed to original function.
+# 1.3.8     23 November 2026   Orientation check moved to function plotly.isHorizontal(), @include visgen.R added for correct collation
+
+#' @include visgen.R
 
 
 
@@ -166,6 +169,12 @@ plotly.addSeries = function(p, z = NULL, size = NULL, shape = NULL, name = NULL,
 }
 
 
+# Horizontal if all x columns are numeric and all y columns are categorical or time (for plotly, time on y is also horizontal)
+plotly.isHorizontal = function(obj, Lx, Ly){
+  all(vapply(Lx, function(i) inherits(obj[,i], c('numeric', 'integer')), logical(1))) &
+    all(vapply(Ly, function(i) inherits(obj[,i], c('character', 'factor', 'Date', 'POSIXct')), logical(1)))
+}
+
 plotly.makeMarker = function(config, name = NULL){
   mkr = list(line = list())
   mkr$size       = config$point.size
@@ -175,19 +184,6 @@ plotly.makeMarker = function(config, name = NULL){
   return(mkr)
 }
 
-# plotly.prepareConfig = function(config){
-#   config$xAxis.enabled %<>% verify('logical', domain = c(T,F), default = T)
-#   config$yAxis.enabled %<>% verify('logical', domain = c(T,F), default = T)
-#   config$xAxis.label %<>% verify('character', lengths = 1, varname = "config$xAxis.label")
-#   config$yAxis.label %<>% verify('character', lengths = 1, varname = "config$yAxis.label")
-#   config$barMode %<>% verify('character', domain = c('group', 'stack', 'relative'), lengths = 1, default = 'group', varname = "config$barMode")
-#   config$xAxis.grid.enabled %<>% verify('logical', domain = c(T,F), default = config$xAxis.enabled)
-#   config$yAxis.grid.enabled %<>% verify('logical', domain = c(T,F), default = config$yAxis.enabled)
-#   config$xAxis.tick.label.enabled %<>% verify('logical', domain = c(T,F), default = config$xAxis.enabled)
-#   config$yAxis.tick.label.enabled %<>% verify('logical', domain = c(T,F), default = config$yAxis.enabled)
-#
-#   return(config)
-# }
 
 plotly.applyConfig = function(p, config){
   plotly::layout(p, title = config$title,
@@ -232,7 +228,6 @@ plotly.scatter = function(obj, x, y, z = NULL, size = NULL, shape = NULL, color 
 
   if(is.null(config$xAxis.label)){config$xAxis.label = L$x}
   if(is.null(config$yAxis.label)){config$yAxis.label = L$y}
-  # config %<>% plotly.prepareConfig
 
   p %>% plotly.applyConfig(config)
 }
@@ -249,9 +244,7 @@ plotly.combo = function(obj, x = NULL, y = NULL, shape = NULL, color = NULL, con
 
   obj %<>% prepare4Plot(A, config)
 
-  hor = T
-  for (i in L$x){hor = hor & inherits(obj[,i], c('numeric', 'integer'))}
-  for (i in L$y){hor = hor & inherits(obj[,i], c('character', 'factor', 'Date', 'POSIXct'))}
+  hor = plotly.isHorizontal(obj, L$x, L$y)
 
   if (hor){
     if(inherits(obj[,L$y[1]], 'character')){obj[,L$y[1]] <- factor(obj[,L$y[1]], levels = obj[,L$y[1]])}
@@ -304,9 +297,7 @@ plotly.box = function(obj, x = NULL, y = NULL, group = NULL, config = NULL, ...)
 
   obj %<>% prepare4Plot(A, config)
 
-  hor = T
-  for (i in L$x){hor = hor & inherits(obj[,i], c('numeric', 'integer'))}
-  for (i in L$y){hor = hor & inherits(obj[,i], c('character', 'factor', 'Date', 'POSIXct'))}
+  hor = plotly.isHorizontal(obj, L$x, L$y)
 
   if(!hor & is.null(config$xAxis.margin.bottom)){config$xAxis.margin.bottom = 5*(obj[, L$x] %>% as.character %>% nchar %>% max)}
   if( hor & is.null(config$yAxis.margin.left))  {config$yAxis.margin.left   = 10*(obj[, L$y] %>% as.character %>% nchar %>% max)}

@@ -6,12 +6,16 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     21 June 2018
-# Last Revision:  21 June 2018
-# Version:        0.1.0
+# Last Revision:  23 November 2026
+# Version:        0.1.1
 #
 # Version   Date               Action
 # -----------------------------------
 # 0.1.0     21 June 2018       Initial issue with function bubbleCloud.bubble.molten()
+# 0.1.1     23 November 2026   Bug fixes: undefined 'width' and 'height' added as arguments; plyr::ddply() (package was never
+#                              imported) replaced by base R.
+
+#' @include visgen.R
 
 # Default settings for package bubbleCloud:
 bubbleCloud.bubble.molten.defset = defset %<==>% list(
@@ -24,7 +28,7 @@ bubbleCloud.bubble.molten.defset = defset %<==>% list(
   essentials = c('size')
 )
 
-bubbleCloud.bubble.molten <- function(obj, size = NULL, group = NULL, tooltip = NULL, config = bubbleCloud.bubble.molten.defset, ...){
+bubbleCloud.bubble.molten <- function(obj, size = NULL, group = NULL, tooltip = NULL, config = bubbleCloud.bubble.molten.defset, width = NULL, height = NULL, ...){
   if (is.empty(obj)){return(NULL)}
 
   # Verifications:
@@ -40,6 +44,7 @@ bubbleCloud.bubble.molten <- function(obj, size = NULL, group = NULL, tooltip = 
 
   if (is.null(obj$hover)){obj$hover <- ''}
 
+  # random initial positions of the bubbles:
   obj$x <- runif(nrow(obj),1,400)
   obj$y <- runif(nrow(obj),1,400)
 
@@ -55,17 +60,16 @@ bubbleCloud.bubble.molten <- function(obj, size = NULL, group = NULL, tooltip = 
     obj$clusterName <- obj$group
   }
 
-  clusters <- ddply(obj, .(cluster), function(r){
-    r <- r[with(r, order(radius)),]
-    head(r,1)
-  })
-
-  n <- nrow(obj)
-  m <- nrow(clusters)
+  # The smallest bubble of each cluster represents the cluster centre:
+  clusters <- do.call(rbind, lapply(split(obj, obj$cluster), function(r){
+    r <- r[order(r$radius), , drop = FALSE]
+    head(r, 1)
+  }))
+  rownames(clusters) <- NULL
 
   x = list(
-    n = n,
-    m = m,
+    n = nrow(obj),
+    m = nrow(clusters),
     data = obj,
     clusters = clusters,
     settings = config

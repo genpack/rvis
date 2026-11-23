@@ -6,15 +6,18 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     12 May 2017
-# Last Revision:  12 May 2017
-# Version:        1.0.0
+# Last Revision:  23 November 2026
+# Version:        1.0.1
 #
 
 # Version History:
 
 # Version   Date                Action
 # ----------------------------------
-# 1.0.0     12 Mary 2017       Initial issue separated from rCharts.R
+# 1.0.0     12 May 2017        Initial issue separated from rCharts.R
+# 1.0.1     23 November 2026   Header tidied, @include visgen.R added for correct collation
+
+#' @include visgen.R
 
 xCharts.area.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -41,7 +44,3 @@ xCharts.area.molten = function(obj, x = NULL, y = NULL, group = NULL, config = N
 
   xPlot(as.formula(paste(L$y, '~', L$x)), group = L$group, data = obj, type = "line-dotted")
 }
-
-
-
-

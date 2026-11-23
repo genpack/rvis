@@ -8,8 +8,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     23 April 2017
-# Last Revision:  26 May 2017
-# Version:        0.0.4
+# Last Revision:  23 November 2026
+# Version:        0.0.5
 #
 
 # Version History:
@@ -20,6 +20,9 @@
 # 0.0.2     26 May 2017        package is imported silently
 # 0.0.3     26 May 2017        argument 'obj' can be ignored or given an empty data.frame()
 # 0.0.4     26 May 2017        Function morrisjs.options() modified: corrects package bug for single color
+# 0.0.5     23 November 2026   Comments tidied, @include visgen.R added for correct collation
+
+#' @include visgen.R
 
 
 
@@ -49,7 +52,8 @@ morrisjs.options = function(config, color = NULL){
   # Should add more arguments
   opt = list(resize = config$resize)
   # if(is.null(color)){color = config$color}
-  if(!is.null(color)){if(length(color) == 2){color = c(color, 'black')}}  # STUPID PACKAGE !!!!!!!!!!!!!!! When length of color is 1, it draws everything in black !!!!
+  # Workaround for a morrisjs bug: with two colours everything is drawn in black, so a third colour is added
+  if(!is.null(color)){if(length(color) == 2){color = c(color, "black")}}
   if (!color %>% is.empty){
     opt$colors = color
     opt$lineColors = color
@@ -127,4 +131,3 @@ morrisjs.pie = function(obj = data.frame(), theta = NULL, label = NULL, color = 
   list(obj[,L$label], obj[,L$theta]) %>%  morrisjs(...) %>% mjsDonut(options = morrisjs.options(config, obj[, L$color]))
 
 }
-

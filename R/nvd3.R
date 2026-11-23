@@ -6,8 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     12 May 2017
-# Last Revision:  23 July 2018
-# Version:        1.0.5
+# Last Revision:  23 November 2026
+# Version:        1.0.6
 #
 
 # Version History:
@@ -19,6 +19,9 @@
 # 1.0.3     12 May 2017         Added nvd3.pie.molten()
 # 1.0.4     23 July 2018        nvd3.scatter.molten() embedded in new added function added nvd3.scatter()
 # 1.0.5     23 July 2018        nvd3.bar.molten() embedded in new added function added nvd3.bar()
+# 1.0.6     23 November 2026    Bug fix: nvd3.scatter() used undefined series colours 'clrvect' (always failed). Error sources corrected.
+
+#' @include visgen.R
 
 nvd3.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -62,8 +65,8 @@ nvd3.scatter.defset = defset %<==>% list(
 )
 
 nvd3.type = function(shape, config){
-  shape %<>% verify('character', lengths = 1, domain = c('line', 'point', 'bubble', 'circle', 'bar'), default = 'point', varname = 'shape', err_src = 'nvd2.type')
-  config$zoomWindow %<>% verify('logical', lengths = 1, domain = c(T, F), default = F, varname = 'config$zoomWindow', err_src = 'nvd2.type')
+  shape %<>% verify('character', lengths = 1, domain = c('line', 'point', 'bubble', 'circle', 'bar'), default = 'point', varname = 'shape', err_src = 'nvd3.type')
+  config$zoomWindow %<>% verify('logical', lengths = 1, domain = c(T, F), default = F, varname = 'config$zoomWindow', err_src = 'nvd3.type')
   if(shape == 'line'){
     if(config$zoomWindow){return('lineWithFocusChart')} else {return('lineChart')}
   } else if (shape == 'bar'){
@@ -155,6 +158,7 @@ nvd3.scatter = function(obj, x = NULL, y = NULL, shape = NULL, group = NULL, con
   if(!is.null(L$group)){
     assert(length(L$x) == 1 & length(L$y) == 1, 'You can define series by either grouping the values or selecting multiple columns!')
     nv = nPlot(data = obj, x = L$x, y = L$y, group = L$group, type = nvd3.type(shape, config))
+    clrvect = getColorVect(obj[, L$group] %>% as.character %>% unique, NULL, config)
   } else {
     if(length(L$y) > 1){
       nv = nPlot(data = obj %>% reshape2::melt(id.vars = L$x, measure.vars = L$y),
@@ -162,6 +166,7 @@ nvd3.scatter = function(obj, x = NULL, y = NULL, shape = NULL, group = NULL, con
     } else {
       nv = nPlot(data = obj, x = L$x, y = L$y, type = nvd3.type(shape, config))
     }
+    clrvect = getColorVect(L$y, NULL, config)
   }
   nv %>% nvd3.applyConfig(config) %>% nvd3.applyColors(clrvect)
 }
@@ -185,4 +190,3 @@ nvd3.pie = function(obj, theta = NULL, label = NULL, config = NULL, ...){
   return(np %>% nvd3.applyConfig(config))
 
 }
-

@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     31 March 2017
-# Last Revision:  12 May 2017
-# Version:        1.1.3
+# Last Revision:  23 November 2026
+# Version:        1.1.4
 #
 
 # Version History:
@@ -22,9 +22,27 @@
 # 1.1.1     12 May 2017         nvd3 charts separated and transferred to nvd3.R
 # 1.1.2     12 May 2017         xCharts charts separated and transferred to xCharts.R
 # 1.1.3     12 May 2017         highcharts charts separated and transferred to highcharts.R
+# 1.1.4     23 November 2026    Bug fix: rCharts.scatter() used undefined rCharts.scatter.defset and translateShape (always failed).
+#                               Defset added; shapes translated by rCharts.hPlotType() (highcharts.R); colour mapped to hPlot groups.
 
+#' @include visgen.R
+#' @include highcharts.R
 
-# Incomplete:
+rCharts.scatter.defset = defset %<==>% list(
+  # Valid classes for all dimensions
+  dimclass   = list(
+    x     = c('numeric', 'character'),
+    y     = c('numeric', 'character'),
+    size  = 'numeric',
+    color = valid.classes,
+    shape = 'character'),
+  multiples  = c(),
+  essentials = c('x', 'y'),
+  colorize   = F,
+  horizontal = F
+)
+
+# Scatter chart using rCharts hPlot. Points are grouped (coloured) by column 'color'.
 rCharts.scatter = function(obj, x = NULL, y = NULL, size = NULL, shape = NULL, color = NULL, config = NULL, ...){
   # Verifications:
   if (is.empty(obj)){return(NULL)}
@@ -38,15 +56,6 @@ rCharts.scatter = function(obj, x = NULL, y = NULL, size = NULL, shape = NULL, c
 
   obj %<>% prepare4Plot(A, config = config)
 
-  rcharts.type = c(square = 'scatter', bubble = 'bubble', point = 'scatter', circle = 'bubble', bar   = ifelse(config$horizontal, 'bar', 'column'), line  = 'line')
-  # warn if bar is not among shapes, horizontal does not work!
-
-  L$shape = translateShape[L$shape]
-  if(is.empty(L$shape)){L$shape = 'scatter'}
-  L$shape[is.na(L$shape)] == 'bubble'
-
   hPlot(x = L$x, y = L$y, data = obj,
-        type = L$shape, group = L$group, size = L$size)
-
+        type = rCharts.hPlotType(L$shape, config$horizontal), group = L$color, size = L$size)
 }
-

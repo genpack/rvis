@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     28 November 2016
-# Last Revision:  25 February 2019
-# Version:        1.1.3
+# Last Revision:  23 November 2026
+# Version:        1.1.4
 #
 
 # Version History:
@@ -20,6 +20,10 @@
 # 1.1.1     27 June 2018       Dimension 'key' added
 # 1.1.2     27 June 2018       More config properties added
 # 1.1.3     25 February 2019   tooltip and linkTooltip dimensions added to sankey chart
+# 1.1.4     23 November 2026   Node labels default to node keys when 'label' is not given (sankeyNetwork() failed without NodeID).
+#                              Error sources and messages corrected.
+
+#' @include visgen.R
 
 networkD3.sankey.defset = defset %<==>% list(
   dimclass = list(
@@ -48,7 +52,7 @@ networkD3.sankey.defset = defset %<==>% list(
 
 networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, source = NULL, target = NULL, linkWidth = NULL, linkTooltip = NULL, config = NULL){
 
-  obj %>% verify('list', lengths = 2, names_identical = c('nodes', 'links'), varname = 'obj', null_allowed = F, err_src = 'visNetwork.graph')
+  obj %>% verify('list', lengths = 2, names_identical = c('nodes', 'links'), varname = 'obj', null_allowed = F, err_src = 'networkD3.sankey')
   obj$nodes %>% verify('data.frame', varname = 'obj$nodes', null_allowed = F, err_src = 'networkD3.sankey')
   obj$links %>% verify('data.frame', varname = 'obj$links', null_allowed = F, err_src = 'networkD3.sankey')
 
@@ -56,6 +60,9 @@ networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, sourc
 
   config = networkD3.sankey.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
     verifyConfig(plotter = 'networkD3')
+
+  # Without labels, nodes are labelled by their keys (a copy of the key column is used since keys are converted to indices):
+  if(is.null(label)){label = renameSeries(key, 'nodeLabel')}
 
   # Preparing Aesthetics:
   a = prepareAesthetics(key = key, label  = label, source = source, target = target, tooltip = tooltip, linkWidth = linkWidth, linkTooltip = linkTooltip)
@@ -66,8 +73,8 @@ networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, sourc
   obj$nodes = obj$nodes[!duplicated(obj$nodes[[L$key]]), , drop = FALSE]
   obj$links %<>% prepare4Plot(A %>% list.extract('source', 'target', 'linkWidth', 'linkTooltip'), config)
 
-  assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'network.sankey')
-  assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'network.sankey')
+  assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a subset of node IDs'", err_src = 'networkD3.sankey')
+  assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a subset of node IDs'", err_src = 'networkD3.sankey')
 
   if(!inherits(obj$nodes[, L$key], 'integer')){
     nodemap = sequence(nrow(obj$nodes)) - 1
@@ -100,5 +107,3 @@ networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, sourc
 
   return(sn)
 }
-
-

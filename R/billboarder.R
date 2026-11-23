@@ -6,9 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     05 March 2018
-# Last Revision:  17 September 2018
-# Version:        0.1.1
-#
+# Last Revision:  23 November 2026
+# Version:        0.1.2
 
 # Version History:
 
@@ -25,6 +24,11 @@
 # 0.0.9     24 July 2018        billboarder.bar.molten() embedded in added function billboarder.bar()
 # 0.1.0     24 July 2018        billboarder.bb_opt() removed: applyConfig() and applyColor() now directly modifies object property and data lists
 # 0.1.1     17 Spetember 2018   billboarder.tsarea() added
+# 0.1.2     23 November 2026    Bug fix: legend position 'bottom' was misspelled ('buttom') so it was treated as an inset anchor.
+#                               billboarder.bar() uses isHorizontal(). Commented code removed.
+
+#' @include visgen.R
+#' @include jscripts.R
 
 billboarder.bar.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -35,19 +39,6 @@ billboarder.bar.defset = defset %<==>% list(
   multiples  = c('x', 'y'),
   essentials = c('x', 'y')
 )
-
-# valid.yAxis.label.positions = c('top', 'middle', 'bottom')
-# valid.yAxis.label.positions %<>% c(
-#   paste('inner', valid.yAxis.label.positions, sep = '-'),
-#   paste('outer', valid.yAxis.label.positions, sep = '-'), 'inner', 'outer')
-#
-# valid.xAxis.label.positions = c('left', 'right')
-# valid.xAxis.label.positions %<>% c(
-#   paste('inner', valid.xAxis.label.positions, sep = '-'),
-#   paste('outer', valid.xAxis.label.positions, sep = '-'), 'inner', 'outer')
-# valid.legend.positions = c('right', 'bottom', 'top-right', 'top-left', 'bottom-right', 'bottom-left')
-
-
 
 billboarder.scatter.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -78,16 +69,16 @@ billboarder.tsline.defset = defset %<==>% list(
   subchart.enabled = TRUE
 )
 
-
-
+# Applies a named list of series colours to the chart
 billboarder.applyColors <- function(bb, colorlist, opacity = 1) {
   bb$x$bb_opts[["billboarderspecials"]][["opacity"]] <- opacity
   bb$x$bb_opts[["data"]] <- bb$x$bb_opts[["data"]] %<==>% list(colors = colorlist)
   return(bb)
 }
 
+# Applies config properties (labels, axes, grid, legend, title, stacking, subchart) to the chart
 billboarder.applyConfig = function(bb, config){
-  nin = config$legend.position %in% c('buttom', 'right')
+  nin = config$legend.position %in% c('bottom', 'right')
   if(!is.null(config$point.label.enabled)){
     bb %<>% bb_data(labels = config$point.label.enabled)
   }
@@ -149,7 +140,7 @@ billboarder.bar = function(obj, x = NULL, y = NULL, group = NULL, color = NULL, 
   if (is.empty(obj)){return(NULL)}
 
   assert(require('billboarder'), "Package 'billboarder' is not installed!", err_src = match.call()[[1]])
-  (billboarder.bar.defset %<==>% config) %>%
+  (billboarder.bar.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))) %>%
     verifyConfig(plotter = 'billboarder') %>%
     verifyConfigDimProperties(dims = 'color') -> config
 
@@ -160,9 +151,7 @@ billboarder.bar = function(obj, x = NULL, y = NULL, group = NULL, color = NULL, 
 
   obj %<>% prepare4Plot(A, config = config)
 
-  hor = T
-  for (i in L$x){hor = hor & inherits(obj[,i], c('numeric', 'integer'))}
-  for (i in L$y){hor = hor & inherits(obj[,i], c('character', 'factor'))}
+  hor = isHorizontal(obj, L$x, L$y)
 
   # apply series colors:
   Ly      = chif(hor, L$x, L$y); Lx = chif(hor, L$y, L$x)
@@ -262,4 +251,3 @@ billboarder.tsline = function(obj, x = NULL, y = NULL, color = NULL, config = NU
 billboarder.tsarea = function(obj, x = NULL, y = NULL, color = NULL, config = NULL, ...){
   obj %>% billboarder.tsLineChart(x = x, y = y, color = color, shape = 'area', config = config, ...)
 }
-

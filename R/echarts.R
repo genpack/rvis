@@ -8,8 +8,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     19 June 2018
-# Last Revision:  19 June 2018
-# Version:        0.1.0
+# Last Revision:  23 November 2026
+# Version:        0.1.1
 #
 
 # Version History:
@@ -17,6 +17,14 @@
 # Version   Date               Action
 # ----------------------------------
 # 0.1.0     19 June 2018       Initial issue with bar, funnel, wordCloud and gauge
+# 0.1.1     23 November 2026   Bug fix: internal echarts4r helpers (.rm_axis, .set_y_axis, .set_x_axis) are not exported;
+#                              they are now fetched from the echarts4r namespace (funnel and wordCloud always failed).
+#                              Data access works with recent echarts4r versions which keep data as a list (all charts failed).
+
+#' @include visgen.R
+
+# Internal (non-exported) helper of package echarts4r
+echarts.internal = function(name){utils::getFromNamespace(name, 'echarts4r')}
 
 echarts.bar.defset = defset %<==>% list(
   dimclass   = list(
@@ -43,8 +51,15 @@ echarts.wordCloud.defset = defset %<==>% list(
   essentials = c('label', 'size')
 )
 
+# Data of an echarts object (recent versions of echarts4r keep a list of data frames, one per group)
+echarts.data = function(e){
+  d = e$x$data
+  if (!is.data.frame(d)){d = d[[1]]}
+  return(d)
+}
+
 echarts.build_data <- function(e, ...){
-  e$x$data %>%
+  echarts.data(e) %>%
     dplyr::select(...) %>%
     unname(.) -> data
 
@@ -54,7 +69,7 @@ echarts.build_data <- function(e, ...){
 
 }
 echarts.add_bind <- function(e, l, bind, col = "name"){
-  e$x$data %>%
+  echarts.data(e) %>%
     dplyr::select(bind) %>% unname() %>% unlist() -> bind
 
   for(i in 1:length(l)){
@@ -64,7 +79,7 @@ echarts.add_bind <- function(e, l, bind, col = "name"){
 }
 
 echarts.get_data <- function(e, serie){
-  e$x$data %>%
+  echarts.data(e) %>%
     dplyr::select(serie) %>%
     unname() %>%
     .[[1]]
@@ -82,10 +97,10 @@ ebar <- function(e, serie, bind = NULL, name = NULL, legend = TRUE, y.index = 0,
     name <- serie
 
   if(y.index != 0)
-    e <- .set_y_axis(e, serie, y.index)
+    e <- echarts.internal(".set_y_axis")(e, serie, y.index)
 
   if(x.index != 0)
-    e <- .set_x_axis(e, x.index)
+    e <- echarts.internal(".set_x_axis")(e, x.index)
 
   # build JSON data
   echarts.build_data(e, e$x$mapping$x, serie) -> vector
@@ -115,8 +130,8 @@ efunnel <- function(e, values, labels, name = NULL, legend = TRUE, rm.x = TRUE, 
     stop("missing values or labels", call. = FALSE)
 
   # remove axis
-  e <- .rm_axis(e, rm.x, "x")
-  e <- .rm_axis(e, rm.y, "y")
+  e <- echarts.internal(".rm_axis")(e, rm.x, "x")
+  e <- echarts.internal(".rm_axis")(e, rm.y, "y")
 
   # build JSON data
   funnel <- echarts.build_data(e, values)
@@ -147,8 +162,8 @@ ecloud <- function(e, word, freq, color = NULL, rm.x = TRUE, rm.y = TRUE, ...){
   if(missing(e))
     stop("missing e", call. = FALSE)
 
-  e <- .rm_axis(e, rm.x, "x")
-  e <- .rm_axis(e, rm.y, "y")
+  e <- echarts.internal(".rm_axis")(e, rm.x, "x")
+  e <- echarts.internal(".rm_axis")(e, rm.y, "y")
 
   data <- echarts.build_data(e, freq)
   data <- echarts.add_bind(e, data, word)
@@ -185,7 +200,8 @@ egauge <- function(e, theta, label, config = NULL, ...){
     stop("must pass numeric or interger", call. = FALSE)
 
   # remove axis
-  e %<>% .rm_axis(T, "x") %>% .rm_axis(T, "y")
+  rm_axis = echarts.internal(".rm_axis")
+  e = rm_axis(rm_axis(e, T, "x"), T, "y")
 
   e$x$opts$series <- list(
     list(
@@ -253,5 +269,3 @@ echarts.wordCloud = function(obj, label = NULL, size = NULL, color = NULL, confi
 
   obj %>% e_charts() %>% ecloud(L$label, L$size, L$color, shape = config$cloud.shape, sizeRange = c(config$point.size.min, config$point.size.max))
 }
-
-

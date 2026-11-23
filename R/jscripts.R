@@ -406,4 +406,3 @@ dygraphs.click.js = function(input_id){
 billboarder.format.suffix.js = function(suffix){
   if(is.null(suffix)){return(NULL)}
   JS(paste0("function(x) {return x + '", suffix, "';}"))}
-

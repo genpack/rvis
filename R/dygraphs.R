@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     29 December 2016
-# Last Revision:  19 July 2017
-# Version:        1.2.4
+# Last Revision:  23 November 2026
+# Version:        1.2.5
 #
 
 # Version History:
@@ -25,7 +25,10 @@
 # 1.2.3     19 July 2018        shape and color removed from A$aesthetics list
 # 1.2.4     19 July 2018        subchart feature added configured by a set of properties in config
 # 1.2.4     28 September 2018   Function() asISO8601Time() modified: Forces time to GMT
+# 1.2.5     23 November 2026    Bug fixes: dplyr::distinct() and dygraphs internal defaultPeriodicity() namespaced (both failed when called).
+#                               Series options built by one helper for both y and y2 axes. Old commented code removed.
 
+#' @include visgen.R
 #' @include jscripts.R
 
 dygraphs.combo.defset = defset %<==>% list(
@@ -58,6 +61,7 @@ asISO8601Time <- function(x) {
 dychart = function (data, main = NULL, xlab = NULL, ylab = NULL, periodicity = NULL,
                     group = NULL, elementId = NULL, width = NULL, height = NULL)
 {
+  # Copy of dygraphs::dygraph() with the time column forced to GMT (see asISO8601Time())
   if (xts::xtsible(data)) {
     if (!xts::is.xts(data))
       data <- xts::as.xts(data)
@@ -74,7 +78,7 @@ dychart = function (data, main = NULL, xlab = NULL, ylab = NULL, periodicity = N
   if (format == "date") {
     if (is.null(periodicity)) {
       if (nrow(data) < 2) {
-        periodicity <- defaultPeriodicity(data)
+        periodicity <- utils::getFromNamespace("defaultPeriodicity", "dygraphs")(data)
       }
       else {
         periodicity <- xts::periodicity(data)
@@ -150,7 +154,7 @@ dygraphs.combo = function(obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...
   if (!inherits(obj[, L$x], c('numeric', 'integer'))){
     dates = try(as.Date(obj[, L$x]), silent = T)
     if(inherits(dates,'Date')){
-      obj %<>% distinct(.keep_all = T)
+      obj %<>% dplyr::distinct(.keep_all = T)
       rownames(obj) <- obj[, L$x]
     } else {
       getLabel <- 'function(d){
@@ -159,45 +163,35 @@ dygraphs.combo = function(obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...
     }'
       obj[, L$x] <- sequence(nrow(obj))
       scatterMode = F
+    }
   }
-}
 
   d = dychart(obj, main = config$title, ...)
 
   dygraphs.strokePattern = c(line.dot = 'dotted', line.dash = 'dashed', line.dash.dot = 'dotdash')
 
-  for(i in L$y){
-    d %<>% dySeries(i,
-                    label         = i,
-                    color         = config$color[[i]],
-                    axis          = 'y',
-                    stepPlot      = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == 'line.step'),
-                    stemPlot      = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == 'bar.point'),
-                    fillGraph     = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == gndcd(2,1,162,170)),
-                    drawPoints    = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == 'line.point'),
-                    pointSize     = config$size[[i]],
-                    strokePattern = chif(config$shape[[i]] %in% names(dygraphs.strokePattern), dygraphs.strokePattern[config$shape[[i]]], NULL),
-                    plotter       = chif(config$shape[[i]] == 'bar', dyPlotter[['bar']], NULL)
-    )
+  # Adds series 'i' to axis 'axis'. The series shape (config$shape[[i]]) determines the plot style:
+  addSeries = function(d, i, axis){
+    shp = config$shape[[i]]
+    dySeries(d, i,
+             label         = i,
+             color         = config$color[[i]],
+             axis          = axis,
+             stepPlot      = chif(is.null(shp), NULL, shp == 'line.step'),
+             stemPlot      = chif(is.null(shp), NULL, shp == 'bar.point'),
+             fillGraph     = chif(is.null(shp), NULL, shp == gndcd(2,1,162,170)),
+             drawPoints    = chif(is.null(shp), NULL, shp == 'line.point'),
+             pointSize     = config$size[[i]],
+             strokePattern = chif(shp %in% names(dygraphs.strokePattern), dygraphs.strokePattern[shp], NULL),
+             plotter       = chif(shp == 'bar', dyPlotter[['bar']], NULL))
   }
+
+  for(i in L$y){d %<>% addSeries(i, 'y')}
   # package has a bug! colors are not assigned to series names correctly!!
-  for(i in L$y2){
-    d %<>% dySeries(i,
-                    label         = i,
-                    color         = config$color[[i]],
-                    axis          = 'y2',
-                    stepPlot      = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == 'line.step'),
-                    stemPlot      = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == 'bar.point'),
-                    fillGraph     = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == gndcd(2,1,162,170)),
-                    drawPoints    = chif(is.null(config$shape[[i]]), NULL, config$shape[[i]] == 'line.point'),
-                    pointSize     = config$size[[i]],
-                    strokePattern = chif(config$shape[[i]] %in% names(dygraphs.strokePattern), dygraphs.strokePattern[config$shape[[i]]], NULL),
-                    plotter       = chif(config$shape[[i]] == 'bar', dyPlotter[['bar']], NULL)
-    )
-  }
+  for(i in L$y2){d %<>% addSeries(i, 'y2')}
   if(!scatterMode){d %<>% dyAxis("x", valueFormatter=JS(getLabel), axisLabelFormatter = JS(getLabel))}
   return(d %>% dygraphs.applyConfig(config))
-  }
+}
 
 dygraphs.tsline = function(obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...){
   config = dygraphs.tsline.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
@@ -205,70 +199,6 @@ dygraphs.tsline = function(obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ..
   dygraphs.combo(obj, x = x, y = y, y2 = y2, config = config, ...)
 }
 
-# OLD FUNCTIONS:
 
-# dygraphs.line = function(obj, x = NULL, y = NULL, rownamesAsX = T, ...){
-#   y = verify(y, 'character', domain = numerics(obj), default = numerics(obj), varname = 'y')
-#   if (rownamesAsX){
-#     lbl = rownames(obj)
-#     obj = cbind(seq(lbl), obj[, y, drop = F])
-#     names(obj)[1] <- x
-#   } else {
-#     lbl = obj[, x]
-#     obj = obj[, y]
-#     obj[, x] <- seq(lbl)
-#   }
-#
-#   getLabel <- 'function(d){
-#   var labels = [' %++% paste(paste0('"', lbl, '"'), collapse = ',') %++% '];
-#   return labels[d - 1];
-# }'
-#
-#   dygraph(obj, ...) %>% dyAxis("x", valueFormatter=JS(getLabel), axisLabelFormatter = JS(getLabel))
-#   }
-#
-# dygraphs.tsline.settings = list(
-#   title = NULL, xlab = NULL, ylab = NULL, width = NULL, height = NULL,
-#   # legend = list(show  = "auto", width = 250, showZeroValues = TRUE, labelsDiv = NULL, labelsSeparateLines = FALSE, hideOnMouseOut = TRUE),
-#   RangeSelector = list(dateWindow = NULL, height = 40, fillColor = " #A7B1C4", strokeColor = "#808FAB", keepMouseZoom = TRUE, retainDateWindow = FALSE),
-#   Roller = list(showRoller = TRUE, rollPeriod = 1)
-# )
-#
-# #' This function gets a dygraph plot and dygraph configuration as input and
-# #' Returns the modified plot affected by given configuration
-# dygraphs.tsline.apply.settings = function(plt, config){
-#   if (!is.null(config$legend)){
-#     plt = plt %>% dyLegend(show = config$legend$show, width = config$legend$width, showZeroValues = config$legend$showZeroValues, labelsDiv = config$legend$labelsDiv, labelsSeparateLines = config$legend$labelsSeparateLines, hideOnMouseOut = config$legend$hideOnMouseOut)
-#   }
-#   if (!is.null(config$RangeSelector)){
-#     plt = plt %>% dyRangeSelector(dateWindow = config$RangeSelector$dateWindow, height = config$RangeSelector$height, fillColor = config$RangeSelector$fillColor, strokeColor = config$RangeSelector$strokeColor, keepMouseZoom = config$RangeSelector$keepMouseZoom, retainDateWindow = config$RangeSelector$retainDateWindow)
-#   }
-#   if (!is.null(config$Roller)){
-#     plt = plt %>% dyRoller(showRoller = config$Roller$showRoller, rollPeriod = config$Roller$rollPeriod)
-#   }
-#
-#   plt = plt %>% dyOptions(
-#     stackedGraph = verify(config$stackedGraph, 'logical', default = F, varname = 'config$stackedGraph'),
-#     fillGraph    = verify(config$fillGraph   , 'logical', default = F, varname = 'config$fillGraph'),
-#     colors       = verify(config$colors, 'character', varname = 'config$colors')
-#     # todo: write all the settings tuned by function dyOptions()
-#   )
-#   return(plt)
-# }
-#
-# # Customized modifications for dygraphs plots:
-# dygraph.Highlight.1 = function(x){
-#   verify(x, 'dygraphs')
-#   dyHighlight(x, highlightCircleSize = 5,
-#               highlightSeriesBackgroundAlpha = 0.2,
-#               hideOnMouseOut = TRUE)
-# }
-#
-
-
-
-##########################################################################
-# Java plotters:
-
+# Javascript plotters for dygraphs series (see jscripts.R):
 dyPlotter = list(bar = dygraphs.shape.bar.js, multiBar = dygraphs.shape.multibar.js, candle = dygraphs.shape.candle.js)
-

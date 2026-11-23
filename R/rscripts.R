@@ -369,5 +369,3 @@ if(inherits(res, 'character')){sync$message = messages['loginSuccess']; sync$use
 logout.srv = "if(settings$saveSession){lc = list(); for (i in names(session$userData)){lc[[i]] <- session$userData[[i]]}; ss = list(); for (i in names(sync)){ss[[i]] <- sync[[i]]}; sessiondata = list(local = lc, sync = ss); saveRDS(sessiondata, settings$savePath %++% session$user %++% '.rds')}; session$user = NULL; sync$user = NULL"
 
 loginUIExtraService = paste("observeEvent(input$login, {", login.srv, "})", "observeEvent(input$logout, {", logout.srv, "})", sep = '\n')
-
-

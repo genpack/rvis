@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     18 October 2016
-# Last Revision:  31 March 2017
-# Version:        1.1.2
+# Last Revision:  23 November 2026
+# Version:        1.1.3
 #
 # Version   Date               Action
 # -----------------------------------
@@ -19,6 +19,9 @@
 #                              Uses function prepare4Plot()
 #                              all non-aesthetic arguments comes from config now.
 # 1.1.2     31 March 2017      Calls prepareAusthetics() from visgen.R
+# 1.1.3     23 November 2026   Header tidied, @include visgen.R added for correct collation
+
+#' @include visgen.R
 
 # Shiny Inputs:
 # chartID_click
@@ -68,6 +71,3 @@ bubbles.bubble <- function(obj, size = NULL, color = NULL, label = NULL, labelCo
           tooltip   = chif(is.null(tooltip)   , "", obj[, L$tooltip]),
           textColor = chif(is.null(labelColor), "#333333", obj[, L$labelColor]), ...)
 }
-
-
-

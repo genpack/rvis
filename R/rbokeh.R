@@ -8,8 +8,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     24 April 2017
-# Last Revision:  24 April 2017
-# Version:        0.0.1
+# Last Revision:  23 November 2026
+# Version:        0.0.2
 #
 
 # Version History:
@@ -17,6 +17,9 @@
 # Version   Date               Action
 # -----------------------------------
 # 0.0.1     24 April 2017      Initial issue
+# 0.0.2     23 November 2026   @include visgen.R added for correct collation
+
+#' @include visgen.R
 
 
 rbokeh.scatter.defset = defset %<==>% list(

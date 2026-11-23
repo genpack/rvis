@@ -6,8 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     28 April 2018
-# Last Revision:  05 November 2018
-# Version:        0.1.7
+# Last Revision:  23 November 2026
+# Version:        0.1.9
 #
 
 # Version History:
@@ -21,6 +21,14 @@
 # 0.1.6     05 November 2018   functions grviz.createGraph() & .generateDot() added.
 # 0.1.7     05 November 2018   functions replaceInSpec() added.
 # 0.1.8     20 June 2019       grviz.graph() modified: ... Arguments passed to grviz.renderGraph()
+# 0.1.9     23 November 2026   DiagrammeR functions namespaced (to_igraph, and internals x11_hex, save_graph_as_rds were not found).
+#                              Duplicated functions grviz.addActions()/addAction2Log() and is.grviz.graph()/is.graph.valid() merged.
+#                              Unused debugging object grviz.task.js and commented code removed.
+
+#' @include visgen.R
+
+# Internal (non-exported) function of package DiagrammeR
+grviz.diagrammer = function(name){utils::getFromNamespace(name, 'DiagrammeR')}
 
 
 grviz.graph.defset = defset %<==>% list(
@@ -134,19 +142,8 @@ grviz.applyConfig = function(net, config){
   # todo: fixed, physics, node.label.font, node image, node broken image, icon, shape properties
 }
 
-grviz.addActions = function(graph_log, version_id, function_used, time_modified, duration, nodes, edges, d_n = 0, d_e = 0)
-{
-  if (inherits(time_modified, "POSIXct") == FALSE) {
-    stop("The `time_modified` value must inherit from POSIXct.",
-         call. = FALSE)
-  }
-  graph_log_line <- data.frame(version_id = as.integer(version_id),
-                               function_used = as.character(function_used), time_modified = time_modified,
-                               duration = as.numeric(duration), nodes = as.integer(nodes),
-                               edges = as.integer(edges), d_n = as.integer(d_n), d_e = as.integer(d_e),
-                               stringsAsFactors = FALSE)
-  dplyr::bind_rows(graph_log, graph_log_line)
-}
+# Appends a line to the graph log (same as addAction2Log())
+grviz.addActions = function(...){addAction2Log(...)}
 
 grviz.addAttributes = function(graph, attr, value, attr_type){
   time_function_start <- Sys.time()
@@ -355,8 +352,8 @@ grviz.graph = function(obj,
 
   # if (is.empty(obj$nodes)){obj$nodes <- data.frame(id = nodeIDs)} else {obj$nodes$id = nodeIDs}
 
-  rutils::assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
-  rutils::assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'grviz.graph')
+  rutils::assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a subset of node IDs'", err_src = 'grviz.graph')
+  rutils::assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a subset of node IDs'", err_src = 'grviz.graph')
 
   if(!inherits(obj$nodes[, L$key], 'integer')){
     nodemap = sequence(nrow(obj$nodes))
@@ -514,27 +511,8 @@ is.graph.valid <- function(graph) {
   return(TRUE)
 }
 
-is.grviz.graph = function(graph){
-  if (!all(c("graph_info", "nodes_df", "edges_df", "global_attrs",
-             "directed", "last_node", "last_edge", "node_selection",
-             "edge_selection", "cache", "graph_log") %in% names(graph))) {
-    return(FALSE)
-  }
-  if (any(inherits(graph$graph_info, "data.frame") == FALSE,
-          inherits(graph$nodes_df, "data.frame") == FALSE, inherits(graph$edges_df,
-                                                                    "data.frame") == FALSE, inherits(graph$global_attrs,
-                                                                                                     "data.frame") == FALSE, inherits(graph$global_attrs$attr,
-                                                                                                                                      "character") == FALSE, inherits(graph$global_attrs$value,
-                                                                                                                                                                      "character") == FALSE, inherits(graph$global_attrs$attr_type,
-                                                                                                                                                                                                      "character") == FALSE, inherits(graph$directed, "logical") ==
-          FALSE, inherits(graph$node_selection, "data.frame") ==
-          FALSE, inherits(graph$edge_selection, "data.frame") ==
-          FALSE, inherits(graph$cache, "list") == FALSE, inherits(graph$graph_log,
-                                                                  "data.frame") == FALSE)) {
-    return(FALSE)
-  }
-  return(TRUE)
-}
+# Checks whether a graph object is valid (same as is.graph.valid())
+is.grviz.graph = function(graph){is.graph.valid(graph)}
 
 grviz.createGraph <- function(nodes_df = NULL, edges_df = NULL, directed = TRUE, graph_name = NULL, attr_theme = "default", write_backups = FALSE) {
   fcn_name   <- getCallingFcn()
@@ -654,7 +632,7 @@ grviz.createGraph <- function(nodes_df = NULL, edges_df = NULL, directed = TRUE,
 
   # Write graph backup if the option is set
   if (graph$graph_info$write_backups) {
-    save_graph_as_rds(graph = graph)
+    grviz.diagrammer("save_graph_as_rds")(graph = graph)
   }
 
   # If neither an ndf nor both ndf & edf provided,
@@ -758,7 +736,7 @@ grviz.generateDot <- function(graph) {
   if ("display" %in% colnames(edges_df)) {
     display_col <- which(colnames(edges_df) == "display")
     if (!("label" %in% colnames(edges_df))) {
-      edges_df <- edges_df %>% mutate(label = as.character(NA))
+      edges_df <- edges_df %>% dplyr::mutate(label = as.character(NA))
     }
 
     label_col <- which(colnames(edges_df) == "label")
@@ -908,12 +886,12 @@ grviz.generateDot <- function(graph) {
           if (all(grepl("[a-z]*",
                         as.character(nodes_df[, color_attr_column_no]))) &
               all(as.character(nodes_df[, color_attr_column_no]) %in%
-                  x11_hex()[, 1])) {
+                  grviz.diagrammer("x11_hex")()[, 1])) {
 
             for (i in 1:nrow(nodes_df)) {
               nodes_df[i, color_attr_column_no] <-
-                paste0(x11_hex()[
-                  which(x11_hex()[, 1] %in%
+                paste0(grviz.diagrammer("x11_hex")()[
+                  which(grviz.diagrammer("x11_hex")()[, 1] %in%
                           as.character(nodes_df[i, color_attr_column_no])), 2],
                   formatC(round(as.numeric(nodes_df[i, alpha_column_no]), 0),
                           flag = "0", width = 2))
@@ -1275,24 +1253,24 @@ grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, 
           graph$nodes_df <- graph$nodes_df %>% dplyr::select(-y)
         }
         if (layout == "circle") {
-          coords <- graph %>% to_igraph() %>% igraph::layout_in_circle() %>%
+          coords <- graph %>% DiagrammeR::to_igraph() %>% igraph::layout_in_circle() %>%
             dplyr::as_tibble() %>%
             dplyr::rename(x = V1, y = V2) %>% dplyr::mutate(x = x * 1.25) %>% dplyr::mutate(y = y * 1.25)
         }
         if (layout == "tree") {
-          coords <- (graph %>% to_igraph() %>% igraph::layout_with_sugiyama())[[2]] %>%
+          coords <- (graph %>% DiagrammeR::to_igraph() %>% igraph::layout_with_sugiyama())[[2]] %>%
             dplyr::as_tibble() %>% dplyr::rename(x = V1, y = V2)
         }
         if (layout == "kk") {
-          coords <- graph %>% to_igraph() %>% igraph::layout_with_kk() %>%
+          coords <- graph %>% DiagrammeR::to_igraph() %>% igraph::layout_with_kk() %>%
             dplyr::as_tibble() %>% dplyr::rename(x = V1, y = V2)
         }
         if (layout == "fr") {
-          coords <- graph %>% to_igraph() %>% igraph::layout_with_fr() %>%
+          coords <- graph %>% DiagrammeR::to_igraph() %>% igraph::layout_with_fr() %>%
             dplyr::as_tibble() %>% dplyr::rename(x = V1, y = V2)
         }
         if (layout == "nicely") {
-          coords <- graph %>% to_igraph() %>% igraph::layout_nicely() %>%
+          coords <- graph %>% DiagrammeR::to_igraph() %>% igraph::layout_nicely() %>%
             dplyr::as_tibble() %>% dplyr::rename(x = V1, y = V2)
         }
         graph$nodes_df <- graph$nodes_df %>% dplyr::bind_cols(coords)
@@ -1303,39 +1281,17 @@ grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, 
   dotstr %>% grviz(width = width, height = height, shinyInput.click = shinyInput.click)
 }
 
-# task.js = JS('
-#   $(document).on("click", "a", function(e){ console.log($(this).text())} )
-# ')
-#
-#
-# task.js = JS('
-#   $(document).on("click", "a", function(e){ console.log($(this))} )
-# ')
-#
-# task.js2 = JS('
-#   $(document).on("click", function(e){e.preventDefault();
-#   Shiny.onInputChange("nicolas", Object.getOwnPropertyNames($(this).context.activeElement.childNodes[1].childNodes[1].))})
-# ')
-#
-# task.js2 = JS('
-#   $(document).on("click", "a", function(e){e.preventDefault();
-#   Shiny.onInputChange("nicolas", Math.random() + Object.getOwnPropertyNames($(this).context.childNodes[1].parentNode))})
-# ')
 
-grviz.task.js = JS('
-                   $(document).on("click", "a", function(e){e.preventDefault();
-                   Shiny.onInputChange("nicolas", Math.random() + " --> " + $(this)[0].childNodes[3].firstChild.data)})
-                   ')
 
 
 grviz = function(diagram = "", engine = "dot", allow_subst = TRUE,
                  options = NULL, width = NULL, height = NULL, shinyInput.click = NULL)
 {
+  # Clicking a node link sends its label to shiny input 'shinyInput.click':
   if(!is.null(shinyInput.click)){
-    # shinyInput.click %<>% verify('character', varname = 'shinyInput.click') Already verified!
     task.js = JS('$(document).on("click", "a", function(e){e.preventDefault();
                  Shiny.onInputChange("' %++% shinyInput.click %++% '", Math.random() + " --> " + $(this)[0].childNodes[3].firstChild.data)})')
-} else {task.js = NULL}
+  } else {task.js = NULL}
   if (inherits(diagram, "connection") || file.exists(diagram)) {
     diagram <- readLines(diagram, encoding = "UTF-8", warn = FALSE)
     diagram <- paste0(diagram, collapse = "\n")
@@ -1346,11 +1302,10 @@ grviz = function(diagram = "", engine = "dot", allow_subst = TRUE,
   if (allow_subst == TRUE) {diagram <- replaceInSpec(diagram)}
   diagram <- gsub(x = diagram, "'", "\"")
   x <- list(diagram = diagram, config = list(engine = engine, options = options, tasks = task.js))
-  # x <- list(diagram = diagram, config = list(engine = engine, options = options))
   viewer.suppress <- rstudioapi::isAvailable() && !rstudioapi::isAvailable("0.99.120")
   htmlwidgets::createWidget(name = "grviz", x = x, width = width,
                             height = height, package = "rvis", htmlwidgets::sizingPolicy(viewer.suppress = viewer.suppress))
-  }
+}
 
 grvizOutput <- function(outputId, width = '100%', height = '400px') {
   shinyWidgetOutput(outputId = outputId, 'grviz', width, height, package = 'rvis')
@@ -1360,5 +1315,3 @@ renderGrviz <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) expr <- substitute(expr)
   shinyRenderWidget(expr, grvizOutput, env, quoted = TRUE)
 }
-
-

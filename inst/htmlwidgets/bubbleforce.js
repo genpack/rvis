@@ -1,6 +1,6 @@
 HTMLWidgets.widget({
 
-  name: "bubbleForceInfobox",
+  name: "bubbleforce",
 
   type: "output",
 

@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     26 April 2017
-# Last Revision:  05 June 2018
-# Version:        0.0.9
+# Last Revision:  23 November 2026
+# Version:        0.1.0
 #
 
 # Version History:
@@ -24,10 +24,13 @@
 # 0.0.7     15 January 2017     Function TFD3.config.verify() modified: property 'sort' added to checks
 # 0.0.8     28 February 2018    config property paging_length renamed to paging.length same in DT
 # 0.0.9     05 June 2018        column labels unnamed before being passed to argument 'colNames'
+# 0.1.0     23 November 2026    Table preparation moved to TFD3.prepare(), shared with D3TableFilter.table().
+#                               Bug fixes: radio button columns were only passed when checkbox columns existed;
+#                               TFD3.addColumnTypes() looked up the literal 'type' instead of column classes.
 
 #' @include visgen.R
 
-# Default settings for package DT:
+# Default settings for TFD3 tables:
 TFD3.table.defset = defset %<==>% list(
   # Valid classes for all dimensions
   dimclass  = list(
@@ -54,7 +57,7 @@ TFD3.addColumnTypes = function(config, obj){
   TFD3.column_type = c(numeric = 'Number', character = 'String', Date = 'Date')
   types = apply(obj, 2, class)
   names(types) = NULL
-  types = TFD3.column_type['type']
+  types = TFD3.column_type[types]
   types[is.na(types)] <- 'None'
   config$sort_config %<>% add.list(sort_types = types)
   return(config)
@@ -140,7 +143,7 @@ TFD3.edit = function(colnames, config){
   out = character()
   for(i in enacols){
     w = which(nms == i) - 1
-    for (j in w){out %<>% c('col_' %++% w)}
+    for (j in w){out %<>% c('col_' %++% j)}
   }
   return(out)
 }
@@ -154,7 +157,7 @@ TFD3.initialFilters = function(colnames, config){
   out = list()
   for(i in names(config$column.filter) %>% verify('character', domain = nms, default = character(), varname = 'names(config$column.filter)')){
     w = which (nms == i)
-    for (j in w){out[['col_' %++% (w - 1)]] = config$column.filter[[i]]}
+    for (j in w){out[['col_' %++% (j - 1)]] = config$column.filter[[i]]}
   }
   return(out)
 }
@@ -693,18 +696,18 @@ resetInput <- function(session, input) {
                             message = input)
 }
 
-TFD3.table = function(obj, label = NULL, color = NULL, shape = NULL, config = NULL, ...){
+# Prepares the table and the widget arguments of a TFD3 or D3TableFilter table chart.
+# Returns NULL if there is nothing to plot, otherwise a list with elements:
+#   table: the table to plot, args: named list of arguments passed to the widget function TFD3() or D3TableFilter::d3tf()
+TFD3.prepare = function(obj, label = NULL, color = NULL, shape = NULL, config = NULL){
   if((nrow(obj) == 0) & (ncol(obj) == 0)){return(NULL)}
   if (is.null(label)){label = as.list(names(obj))}
   # Verifications:
-  # assert(require(TFD3), "Package TFD3 is not installed!", err_src = match.call()[[1]])
   config = TFD3.table.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
     TFD3.config.verify
 
   config$column.title %<>% verify('list', names_domain = c(chif(config$withRowNames,'rownames',NULL), colnames(obj)), varname = 'config$column.title')
-  # config$column.type  %<>% verify('list', names_domain = c(chif(config$withRowNames,'rownames',NULL), colnames(obj)), domain = c(config$dimclass$label, 'prettyDate', 'prettyTime', 'prettyTimeDate'), default = obj %>% apply(2,class) %>% as.list, varname = 'config$column.type')
 
-  # Preparing Aesthetics:
   # Preparing Aesthetics:
   a = prepareAesthetics(label = label, color = color, shape = shape, extend = c('label','color', 'shape'))
   L = a$labels
@@ -715,13 +718,6 @@ TFD3.table = function(obj, label = NULL, color = NULL, shape = NULL, config = NU
   if (ncol(obj) == 0){return(NULL)}
 
   names(obj) <- names(obj) %>% make.unique('.1')
-
-  # # todo: later support for prettyDate and prettyTime!
-  # for(cl in colnames(obj)){
-  #   if(config$column.type[[cl]] == 'PrettyTimeDate'){
-  #     obj[, cl] %<>% time2Char
-  #   }
-  # }
 
   # Specify background color from argument 'color':
   bgColScales = list()
@@ -763,13 +759,6 @@ TFD3.table = function(obj, label = NULL, color = NULL, shape = NULL, config = NU
     }
   }
 
-  # footCellFunctions <- list(
-  #   col_0 = TFD3.font.js(side = 'left', format = NULL, weight = 'bold'),
-  #   col_1 = TFD3.font.js(side = 'left', format = '.1f', weight = 'bold'),
-  #   col_2 = TFD3.font.js(side = 'center', format = '.1f', weight = 'bold'),
-  #   col_3 = TFD3.font.js(side = 'right', format = '.1f', weight = 'bold')
-  # )
-
   footCellFunctions = list()
   nms = c('rownames', colnames(obj))
   for (col in names(config$column.footer.font)){
@@ -786,28 +775,35 @@ TFD3.table = function(obj, label = NULL, color = NULL, shape = NULL, config = NU
   wcb = which(L$shape == 'checkBox')
   wrb = which(L$shape == 'radioButtons')
 
-  obj[, L$label] %>% TFD3(
-    colNames     = TFD3.colNames(config) %>% unname,
-    bgColScales  = bgColScales,
-    cellFunctions = cellFunctions,
-    footCellFunctions = footCellFunctions,
-    showRowNames = config$withRowNames,
-    enableTf     = config$column.filter.enabled,
-    filterInput  = config$column.filter.enabled,
-    edit         = L$label %>% TFD3.edit(config),
-    checkBoxes   = chif(is.empty(wcb), NULL, 'col_' %++% wcb),
-    radioButtons = chif(is.empty(wcb), NULL, 'col_' %++% wrb),
-    initialFilters = TFD3.initialFilters(L$label, config),
-    footData = TFD3.footData(obj[, L$label], config),
-    tableStyle = config$table.style,
-    selectableRows = config$selection.mode,
-    selectableRowsClass = config$selection.color,
-    rowStyles = TFD3.rowStyles(obj[, L$label], config),
-    tableProps = config %>% TFD3.tableprops,
-    extensions = config$extensions,
-    height = config$height,
-    width  = config$width,
-    ...)
+  list(
+    table = obj[, L$label],
+    args  = list(
+      colNames     = TFD3.colNames(config) %>% unname,
+      bgColScales  = bgColScales,
+      cellFunctions = cellFunctions,
+      footCellFunctions = footCellFunctions,
+      showRowNames = config$withRowNames,
+      enableTf     = config$column.filter.enabled,
+      filterInput  = config$column.filter.enabled,
+      edit         = L$label %>% TFD3.edit(config),
+      checkBoxes   = chif(is.empty(wcb), NULL, 'col_' %++% wcb),
+      radioButtons = chif(is.empty(wrb), NULL, 'col_' %++% wrb),
+      initialFilters = TFD3.initialFilters(L$label, config),
+      footData = TFD3.footData(obj[, L$label], config),
+      tableStyle = config$table.style,
+      selectableRows = config$selection.mode,
+      selectableRowsClass = config$selection.color,
+      rowStyles = TFD3.rowStyles(obj[, L$label], config),
+      tableProps = config %>% TFD3.tableprops,
+      extensions = config$extensions,
+      height = config$height,
+      width  = config$width))
+}
+
+TFD3.table = function(obj, label = NULL, color = NULL, shape = NULL, config = NULL, ...){
+  prep = TFD3.prepare(obj, label = label, color = color, shape = shape, config = config)
+  if (is.null(prep)){return(NULL)}
+  do.call(TFD3, c(list(prep$table), prep$args, list(...)))
 }
 
 

@@ -8,8 +8,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     25 December 2016
-# Last Revision:  28 February 2018
-# Version:        1.1.6
+# Last Revision:  23 November 2026
+# Version:        1.1.7
 #
 
 # Version History:
@@ -22,6 +22,7 @@
 # 1.1.4     23 February 2018    Functions DT.applyConfig2Obj() and DT.applyConfig() and DT.options() added. Currently only take care of property 'links'
 # 1.1.5     28 February 2018    config property 'paging.length' added.
 # 1.1.5     28 February 2018    config property 'autoWidth' added.
+# 1.1.7     23 November 2026    Duplicated code generating link columns moved to function DT.addLinks(), used by DT.applyConfig2Obj() and DT.Table()
 
 #' @include visgen.R
 
@@ -49,8 +50,6 @@ DT.defset = defset %<==>% list(
 
 # New function for plotting DT tables
 DT.table = function(obj, label = NULL, config = NULL, sessionobj = NULL, ...){
-  #if (is.empty(obj)){return(NULL)}
-
   if (is.null(label)){label = as.list(names(obj))}
   # Verifications:
   assert(require(DT), "Package DT is not installed!", err_src = match.call()[[1]])
@@ -59,46 +58,43 @@ DT.table = function(obj, label = NULL, config = NULL, sessionobj = NULL, ...){
   # Preparing Aesthetics:
   label %<>% nameList(gndcd(171,39,69,162,199))
 
-  labelL        = names(label)
-
   obj %<>% prepare4Plot(list(label = label), config = config) %>% DT.applyConfig2Obj(config)
 
   DT::datatable(obj, escape = F, options = config %>% DT.options(obj, sessionobj), ...) %>% DT.applyConfig(config)
 }
 
+# Adds html link (<a>) columns to the table.
+# links: a list of link definitions, each a list with elements:
+#   column.name (column to be added/replaced), class.name, href, inputs (named vector: data attribute names -> source columns), icon and text
+DT.addLinks = function(obj, links){
+  verify(links, 'list')
+  for (link in links){
+    nms  = names(link)
 
+    scr = '<a '
+    if ('class.name' %in% nms){scr = paste0(scr, 'class="', link$class.name, '" ')}
+    if ('href'       %in% nms){scr = paste0(scr, 'href="', link$href, '" ')}
+    if ('inputs'     %in% nms){
+      for (j in names(link$inputs)){
+        scr = paste0(scr, ' data-', j, "=\"", obj[,link$inputs[j]], "\"")
+      }
+    }
+    scr = paste0(scr, '>')
+    if ('icon' %in% nms){scr = paste0(scr, '<i class="', link$icon, '"></i>')}
+    if ('text' %in% nms){scr = paste0(scr, link$text)}
+    scr = paste0(scr, '</a>')
+
+    if(nrow(obj) == length(scr)){obj[, link$column.name] = scr}
+  }
+  return(obj)
+}
 
 # This function changes the data.frame according to the config and returns the modified data.frame
 # input argument obj must be the data.frame which is going to be plotted.
 # This function currently only takes care of property 'links' in the config
 # If any other properties impact the data.frame to be plotted, you should add it here
 DT.applyConfig2Obj = function(obj, config){
-  if(!is.null(config$links)){
-    verify(config$links, 'list')
-    for (i in sequence(length(config$links))){
-      link = config$links[[i]]
-      nms  = names(link)
-      # verify(link, 'list', names_include = c('colName'), varname = 'link')
-      # verify(link$column.name, 'character')
-
-      scr = '<a '
-
-      if ('class.name' %in% nms){scr = paste0(scr, 'class="', link$class.name, '" ')}
-      if ('href'       %in% nms){scr = paste0(scr, 'href="', link$href, '" ')}
-
-      if ('inputs'       %in% nms){
-        for (j in names(link$inputs)){
-          scr = paste0(scr, ' data-', j, "=\"", obj[,link$inputs[j]], "\"")
-        }
-      }
-      scr = paste0(scr, '>')
-      if ('icon' %in% nms){scr = paste0(scr, '<i class="', link$icon, '"></i>')}
-      if ('text' %in% nms){scr = paste0(scr, link$text)}
-      scr = paste0(scr, '</a>')
-
-      if(nrow(obj) == length(scr)){obj[, link$column.name] = scr}
-    }
-  }
+  if(!is.null(config$links)){obj %<>% DT.addLinks(config$links)}
   return(obj)
 }
 
@@ -136,30 +132,7 @@ DT.Table = function(x, links = NULL, session = NULL, options = list(), rownames 
   }
 
   if (!is.null(links)){
-    verify(links, 'list')
-    for (i in sequence(length(links))){
-      link = links[[i]]
-      nms  = names(link)
-      # verify(link, 'list', names_include = c('colName'), varname = 'link')
-      # verify(link$column.name, 'character')
-
-      scr = '<a '
-
-      if ('class.name' %in% nms){scr = paste0(scr, 'class="', link$class.name, '" ')}
-      if ('href'       %in% nms){scr = paste0(scr, 'href="', link$href, '" ')}
-
-      if ('inputs'       %in% nms){
-        for (j in names(link$inputs)){
-          scr = paste0(scr, ' data-', j, "=\"", TBL[,link$inputs[j]], "\"")
-        }
-      }
-      scr = paste0(scr, '>')
-      if ('icon' %in% nms){scr = paste0(scr, '<i class="', link$icon, '"></i>')}
-      if ('text' %in% nms){scr = paste0(scr, link$text)}
-      scr = paste0(scr, '</a>')
-
-      if(nrow(TBL) == length(scr)){TBL[, link$column.name] = scr}
-    }
+    TBL %<>% DT.addLinks(links)
     action   <- DT::dataTableAjax(session, TBL)
     opt$ajax <- list(url = action)
   }
@@ -170,11 +143,8 @@ DT.Table = function(x, links = NULL, session = NULL, options = list(), rownames 
 #' @export
 DT.Table.Classify.bold = function(x, classColumn, boldValues = 'TRUE'){
   assert(inherits(x, 'datatables'), "Class verification failed! Argument 'x' must be of class 'datatables'!")
-  nms  = names(x$x$data)
   lvls = unique(x$x$data[,classColumn])
   vals = rep('normal', length(lvls))
   vals[lvls %in% boldValues] = 'bold'
   DT::formatStyle(x, classColumn, target = 'row', fontWeight = DT::styleEqual(levels = lvls, values = vals))
 }
-
-

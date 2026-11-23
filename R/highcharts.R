@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     12 May 2017
-# Last Revision:  12 May 2017
-# Version:        1.0.0
+# Last Revision:  23 November 2026
+# Version:        1.0.1
 #
 
 # Version History:
@@ -16,6 +16,11 @@
 # Version   Date                Action
 # ----------------------------------
 # 1.0.0     12 May 2017         Initial issue separated from rCharts.R
+# 1.0.1     23 November 2026    Bug fixes: wrong defset name (rCharts.highcharts.scatter.molten.defset) corrected; unknown shapes
+#                               are now set to 'bubble' (a comparison '==' was used instead of an assignment).
+#                               Shape translation moved to shared function rCharts.hPlotType().
+
+#' @include visgen.R
 
 highcharts.scatter.molten.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -30,6 +35,16 @@ highcharts.scatter.molten.defset = defset %<==>% list(
   horizontal = F
 )
 
+# Translates rvis shapes into rCharts hPlot chart types.
+# Missing shapes give 'scatter', unknown shapes give 'bubble'.
+# horizontal: if TRUE, shape 'bar' is translated to horizontal bars, otherwise to columns.
+rCharts.hPlotType = function(shape, horizontal = F){
+  translateShape = c(square = 'scatter', bubble = 'bubble', point = 'scatter', circle = 'bubble', bar = ifelse(isTRUE(horizontal), 'bar', 'column'), line  = 'line')
+  if(is.empty(shape)){return('scatter')}
+  type = translateShape[shape]
+  type[is.na(type)] <- 'bubble'
+  return(unname(type))
+}
 
 # Use with molten table:
 # valid shapes are: square, circle, bar, line
@@ -39,7 +54,7 @@ highcharts.scatter.molten = function(obj, x = NULL, y = NULL, size = NULL, shape
   # Verifications:
   if (is.empty(obj)){return(NULL)}
   assert(require(rCharts), "Package rCharts is not installed!", err_src = match.call()[[1]])
-  config = rCharts.highcharts.scatter.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
+  config = highcharts.scatter.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
 
   # Preparing Aesthetics:
   a = prepareAesthetics(x = x, y = y, size = size, shape = shape, group = group)
@@ -48,15 +63,6 @@ highcharts.scatter.molten = function(obj, x = NULL, y = NULL, size = NULL, shape
 
   obj %<>% prepare4Plot(A, config = config)
 
-  translateShape = c(square = 'scatter', bubble = 'bubble', point = 'scatter', circle = 'bubble', bar   = ifelse(config$horizontal, 'bar', 'column'), line  = 'line')
-  # warn if bar is not among shapes, horizontal does not work!
-
-  L$shape = translateShape[L$shape]
-  if(is.empty(L$shape)){L$shape = 'scatter'}
-  L$shape[is.na(L$shape)] == 'bubble'
-
   hPlot(x = L$x, y = L$y, data = obj,
-        type = L$shape, group = L$group, size = L$size)
+        type = rCharts.hPlotType(L$shape, config$horizontal), group = L$group, size = L$size)
 }
-
-

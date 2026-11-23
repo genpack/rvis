@@ -1,14 +1,14 @@
 # dashboard.R ----------------------------------------------------------------
 
-# Headerdata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAbElEQVR4Xs2RQQrAMAgEfZgf7W9LAguybljJpR3wEse5JOL3ZObDb4x1loDhHbBOFU6i2Ddnw2KNiXcdAXygJlwE8OFVBHDgKrLgSInN4WMe9iXiqIVsTMjH7z/GhNTEibOxQswcYIWYOR/zAjBJfiXh3jZ6AAAAAElFTkSuQmCC
+# Header
 # Filename:      dashboard.R
 # Description:   This project, aims to create a ref class containing multiple objects
 #                that can issue a shiny dashboard
 # Author:        Nima Ramezani
 # Email :        nima.ramezani@gmail.com
 # Start Date:    22 January 2016
-# Last Revision: 16 January 2023
-# Version:       2.6.0
+# Last Revision: 23 November 2026
+# Version:       2.6.1
 
 # Version History:
 
@@ -96,6 +96,12 @@
 # 2.5.8     05 January 2023     cloth icon can be of class icon
 # 2.5.9     05 January 2023     Argument 'width' added to slider Input
 # 2.6.0     16 January 2023     upsetjsOuptput added
+# 2.6.1     23 November 2026    Bug fixes: box cloth 'footer' was passed as a second 'title' argument; navbarPage 'fluid = FALSE'
+#                               was misspelled; icons of navbarMenu and tabPanel were badly quoted (navbarPage has no icon
+#                               argument, so its icon is ignored instead of breaking the page); pivotOutput had no
+#                               render function; header title CSS was always generated for skin 'blue' instead of the page skin;
+#                               actionBttn default status 'unite' is not a valid status (now 'default'). loginVerify() rewritten
+#                               with explicit return values.
 
 support('shiny', 'shinydashboard', 'htmlwidgets')
 
@@ -137,17 +143,20 @@ nListOrCharItems = function(lst){
   return(sum)
 }
 
-# 1: Username and Password don't match
-# 2: Username does not exist
+# Verifies a username and password against table logtable (rownames: usernames, column 'password').
+# encryption: 'none' (plain passwords) or 'bcrypt' (passwords encrypted by bcrypt::hashpw()).
+# Returns the username if verified, 1 if username and password do not match, 2 if the username does not exist.
 loginVerify = function(logtable, username, password, encryption = 'none'){
   username %>% verify('character', lengths = 1, null_allowed = F)
   password %>% verify('character', lengths = 1, null_allowed = F)
-  if(username %in% rownames(logtable)){
-    switch(encryption,
-           'none'   = {if(identical(password, logtable[username,'password'])){res = username} else {res = 1}},
-           'bcrypt' = {support('bcrypt'); if(bcrypt::checkpw(password, logtable[username,'password'] %>% as.character)){res = username} else {res = 1}}
-    )
-  } else {return(2)}
+  if(!(username %in% rownames(logtable))){return(2)}
+
+  stored = logtable[username, 'password']
+  verified = switch(encryption,
+         'none'   = identical(password, stored),
+         'bcrypt' = {support('bcrypt'); bcrypt::checkpw(password, stored %>% as.character)},
+         stop("Unknown password encryption: ", encryption))
+  if(verified){return(username)} else {return(1)}
 }
 
 
@@ -283,7 +292,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                     }
                                     if (!is.null(cloth$footer)){
                                       verify(cloth$footer, 'character')
-                                      scr = paste0(scr, "title = ", cloth.str, "$title,")
+                                      scr = paste0(scr, "footer = ", cloth.str, "$footer,")
                                     }
                                     if (!is.null(cloth$status)){
                                       verify(cloth$status, 'character', domain = valid.box.statuses)
@@ -571,7 +580,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                       "actionBttn"     = {
                                         support('shinyWidgets')
                                         stl = items[[i]]$style  %>% verify('character', domain = c('simple', 'bordered', 'minicolasl', 'stretch', 'jelly', 'gradient', 'fill', 'material-circle', 'material-flat', 'pill', 'float', 'unite'), default = 'unite', varname = "items[['" %++% i %++% "']]$style")
-                                        sts = items[[i]]$status %>% verify('character', domain = c('default', 'primary', 'warning', 'danger', 'success', 'royal'), default = 'unite', varname = "items[['" %++% i %++% "']]$status")
+                                        sts = items[[i]]$status %>% verify('character', domain = c('default', 'primary', 'warning', 'danger', 'success', 'royal'), default = 'default', varname = "items[['" %++% i %++% "']]$status")
                                         sz  = items[[i]]$size   %>% verify('character', domain = c('xs', 'sm', 'md', 'lg'), default = 'md', varname = "items[['" %++% i %++% "']]$size")
                                         blk = items[[i]]$fullwidth   %>% verify('logical', domain = c(T, F), default = F, varname = "items[['" %++% i %++% "']]$fullwidth")
                                         nol = items[[i]]$no_outline  %>% verify('logical', domain = c(T, F), default = T, varname = "items[['" %++% i %++% "']]$no_outline")
@@ -643,10 +652,10 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         ttle = verify(items[[i]]$title, 'character' , default = '', varname  = paste0("items[['",i,"']]$title"))
                                         fotr = verify(items[[i]]$footer, 'character' , default = '', varname = paste0("items[['",i,"']]$footer"))
                                         stus = verify(items[[i]]$status, 'character' , domain = valid.box.statuses, varname = paste0("items[['",i,"']]$status"))
-                                        shdr = verify(items[[i]]$solidHeader, 'logical' , default = 'F', domain = c(T, F), varname = paste0("items[['",i,"']]$solidHeader"))
+                                        shdr = verify(items[[i]]$solidHeader, 'logical' , default = F, domain = c(T, F), varname = paste0("items[['",i,"']]$solidHeader"))
                                         bgrd = verify(items[[i]]$background, 'character' , domain = valid.colors, default = 'blue', varname = paste0("items[['",i,"']]$background"))
-                                        cpbl = verify(items[[i]]$collapsible, 'logical' , default = 'F', domain = c(T, F), varname = paste0("items[['",i,"']]$collapsible"))
-                                        cpsd = verify(items[[i]]$collapsed, 'logical' , default = 'F', domain = c(T, F), varname = paste0("items[['",i,"']]$collapsed"))
+                                        cpbl = verify(items[[i]]$collapsible, 'logical' , default = F, domain = c(T, F), varname = paste0("items[['",i,"']]$collapsible"))
+                                        cpsd = verify(items[[i]]$collapsed, 'logical' , default = F, domain = c(T, F), varname = paste0("items[['",i,"']]$collapsed"))
 
                                         if(!is.null(stus)){scr = paste0(scr,"status = '", stus, "',")}
                                         scr = paste0(scr,'width = ', wdth, ',')
@@ -680,7 +689,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         skn = verify(items[[i]]$skin, 'character', varname = paste0("items[['",i,"']]$skin"), domain = valid.dashboard.skins)
                                         if (!is.null(ttl)){scr %<>% paste0("title = '", ttl, "', ")}
                                         if (!is.null(skn)){scr %<>% paste0("skin  = '", skn, "', ")}
-                                        scr %<>% layscript.dashboard(lst.head = items[[i]]$layout.head, lst.side = items[[i]]$layout.side, lst.body = items[[i]]$layout.body, header.title = items[[i]]$header.title, header.title.width = items[[i]]$header.title.width, sidebar.width = items[[i]]$sidebar.width,
+                                        scr %<>% layscript.dashboard(skin = chif(is.null(skn), 'blue', skn), lst.head = items[[i]]$layout.head, lst.side = items[[i]]$layout.side, lst.body = items[[i]]$layout.body, header.title = items[[i]]$header.title, header.title.width = items[[i]]$header.title.width, sidebar.width = items[[i]]$sidebar.width,
                                                                      header.title.color = items[[i]]$header.title.color, header.title.background.color = items[[i]]$header.title.background.color, header.title.hover.color = items[[i]]$header.title.hover.color, header.title.hover.background.color = items[[i]]$header.title.hover.background.color,
                                                                      header.title.font = items[[i]]$header.title.font, header.title.font.weight = items[[i]]$header.title.font.weight, header.title.font.size = items[[i]]$header.title.font.size,
                                                                      header.title.hover.font = items[[i]]$header.title.hover.font, header.title.hover.font.weight = items[[i]]$header.title.hover.font.weight, header.title.hover.font.size = items[[i]]$header.title.hover.font.size)
@@ -710,12 +719,12 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         if (!is.null(items[[i]]$header)){scr = scr %++% "header = '" %++% verify(items[[i]]$header, 'character')  %++% "', "}
                                         if (!is.null(items[[i]]$footer)){scr = scr %++% "footer = '" %++% verify(items[[i]]$footer, 'character')  %++% "', "}
                                         if (!is.null(items[[i]]$wintitle)){scr = scr %++% "windowTitle = '" %++% verify(items[[i]]$wintitle, 'character')  %++% "', "}
-                                        if (!is.null(items[[i]]$icon)){scr = scr %++% "icon = icon('" %++% verify(items[[i]]$icon, 'character')  %++% ")', "}
+                                        # Note: shiny::navbarPage() has no icon argument, so items$icon is ignored here
                                         if (!is.null(i)){scr = scr %++% "id = '" %++% verify(i, 'character')  %++% "', "}
                                         clp = verify(items[[i]]$collapsible, 'logical', domain = c(T,F), default = F)
                                         fld = verify(items[[i]]$fluid, 'logical', domain = c(T,F), default = T)
                                         if (clp) {scr = scr %++% "collapsible = TRUE, "}
-                                        if (!fld){scr = scr %++% "fluid = FASLE, "}
+                                        if (!fld){scr = scr %++% "fluid = FALSE, "}
                                         if (!is.null(items[[i]]$theme)){scr = scr %++% "theme = '" %++% verify(items[[i]]$theme, 'character')  %++% "', "}
                                         scr = insert.io.strs(scr, items[[i]]$layout)
                                         scr = scr %++% ")"
@@ -725,7 +734,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         scr = "navbarMenu("
                                         if (is.null(items[[i]]$title)){items[[i]]$title <<- ''}
                                         scr = scr %++% "title = '" %++% verify(items[[i]]$title, 'character')  %++% "', "
-                                        if (!is.null(items[[i]]$icon)){scr = scr %++% "icon = icon('" %++% verify(items[[i]]$icon, 'character')  %++% ")', "}
+                                        if (!is.null(items[[i]]$icon)){scr = scr %++% "icon = icon('" %++% verify(items[[i]]$icon, 'character')  %++% "'), "}
                                         scr = insert.io.strs(scr, items[[i]]$layout)
                                         scr = scr %++% ")"
                                         obj = eval(parse(text = scr))},
@@ -766,7 +775,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                         if (is.null(items[[i]]$value)){items[[i]]$value <<- i}
                                         scr = scr %++% "title = '" %++% verify(items[[i]]$title, 'character')  %++% "', "
                                         scr = scr %++% "value = '" %++% verify(items[[i]]$value, 'character')  %++% "', "
-                                        if (!is.null(items[[i]]$icon)){scr = scr %++% "icon = icon('" %++% verify(items[[i]]$icon, 'character')  %++% ")', "}
+                                        if (!is.null(items[[i]]$icon)){scr = scr %++% "icon = icon('" %++% verify(items[[i]]$icon, 'character')  %++% "'), "}
                                         cpl = verify(items[[i]]$col.framed, 'logical', varname = paste0("items[['",i,"']]$col.framed"), domain = c(T,F), default = F)
                                         if      (inherits(items[[i]]$layout, 'list')){scr = layscript.RCPanel(s = scr, lst = items[[i]]$layout, col.panel = cpl)}
                                         else if (inherits(items[[i]]$layout, 'character')){scr = insert.io.strs(scr, items[[i]]$layout)} else {stop("Invalid type for argument 'layout'!")}
@@ -1088,7 +1097,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                             "upsetjsOutput"      = {script.func = 'upsetjs::renderUpsetjs'},
                                             "sunburstOutput"     = {script.func = 'sunburstR::renderSunburst'},
                                             "rHandsonTableOutput"= {script.func = 'renderRHandsontable'},
-                                            "pivot"              = {script.func = 'renderPivot'},
+                                            "pivotOutput"        = {script.func = 'renderPivot'},
                                             "htmlOutput"         = {script.func = 'renderUI'},
                                             "dygraphOutput"      = {script.func = 'dygraphs::renderDygraph'},
                                             "gglVisChartOutput"  = {script.func = 'renderGvis'},
@@ -1162,5 +1171,3 @@ DASHBOARD <- setRefClass("DASHBOARD",
 
 # Any time you change the value of a reactive variable, within an observer code,
 # you should put that code in isolate({}), because the observer will be called again!
-
-

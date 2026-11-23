@@ -1,17 +1,27 @@
 Package: rvis
 Type: Package
-Title: NIRASOFT R package for visualization 
-Version: 5.9.10
-Date: 03 January 2025
+Title: NIRASOFT R package for visualization
+Version: 5.10.0
+Date: 2026-11-23
 Author: Nima Ramezani
 Maintainer: <nima.ramezani@gmail.com>
 Description: A toolbox for generating of more elegant visualizations and easier built of shiny applications
 License: MIT
 Encoding: UTF-8
+Imports:
+    rutils,
+    magrittr,
+    htmlwidgets,
+    crosstalk,
+    dplyr,
+    stringr
+Remotes: genpack/rutils
 Suggests: knitr, rmarkdown, pkgdown
 VignetteBuilder: knitr
-Collate: 
+Collate:
+    'visgen.R'
     'amcharts.R'
+    'jscripts.R'
     'billboarder.R'
     'bpexploder.R'
     'bubblecloud.R'
@@ -19,7 +29,6 @@ Collate:
     'c3.R'
     'calheatmap.R'
     'candela.R'
-    'visgen.R'
     'coffeewheel.R'
     'csscripts.R'
     'd3plus.R'
@@ -32,7 +41,6 @@ Collate:
     'dialogs.R'
     'dimple.R'
     'dt.R'
-    'jscripts.R'
     'dygraphs.R'
     'echarts.R'
     'ggvis.R'
@@ -52,7 +60,7 @@ Collate:
     'rvisplot.R'
     'xcharts.R'
     'visnetwork.R'
-    'rvis.R'
-    'sankeytree.R'
     'streamgraph.R'
+    'sankeytree.R'
+    'rvis.R'
 Config/roxygen2/version: 8.1.1

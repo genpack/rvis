@@ -9,8 +9,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 April 2017
-# Last Revision:  29 August 2017
-# Version:        0.0.3
+# Last Revision:  23 November 2026
+# Version:        0.0.4
 #
 
 # Version History:
@@ -20,6 +20,7 @@
 # 0.0.1     14 April 2017      Initial issue
 # 0.0.2     20 July 2017       widget embedded in the package
 # 0.0.3     29 August 2017     config$tree.function added to apply user's desired function to nibe tree elements: leafs and branches
+# 0.0.4     23 November 2026   Comments added, commented code removed
 
 #' @include visgen.R
 
@@ -35,6 +36,7 @@ coffeewheel.sunburst.defset = defset %<==>% list(
   labelTheta = T
 )
 
+# Converts a rutils TREE object (output of df2tree()) into the nested list structure expected by coffeewheel
 tree2cwTree = function(tr, attributes = c('colour', 'value')){
   cwt = list()
   for (e in tr){
@@ -60,6 +62,7 @@ coffeewheel.prepareConfig = function(config){
   return(config)
 }
 
+# Creates the embedded coffeewheel (zoomable sunburst) htmlwidget from a nested list of nodes (name, children, value, colour)
 coffeewheel <- function(treeData, width=400, height=400, main="", partitionAttribute="value") {
   x <- list(
     treeData = treeData,
@@ -92,7 +95,6 @@ rendercoffeewheel <- function(expr, env = parent.frame(), quoted = FALSE) {
 coffeewheel.sunburst = function(obj, theta = NULL, label = NULL, color = NULL, config = NULL, ...){
   # Verifications:
   if (is.empty(obj)){return(NULL)}
-  # assert(require(coffeewheel), "Package highcharter is not installed!", err_src = match.call()[[1]])
 
   config = coffeewheel.sunburst.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
 
@@ -117,4 +119,3 @@ coffeewheel.sunburst = function(obj, theta = NULL, label = NULL, color = NULL, c
   cwt %>% tree2cwTree(attributes = c(L$theta, L$color)) %>%
     coffeewheel(width = config$width, height = config$height, main = config$title, partitionAttribute = L$theta)
 }
-

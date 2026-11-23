@@ -9,8 +9,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     28 July 2017
-# Last Revision:  28 July 2018
-# Version:        0.0.1
+# Last Revision:  23 November 2026
+# Version:        0.0.2
 #
 
 # Version History:
@@ -18,6 +18,10 @@
 # Version   Date               Action
 # ----------------------------------
 # 0.0.1     28 July 2018      Initial issue
+# 0.0.2     23 November 2026  Bug fix: dc.bar() passed the raw x and y arguments instead of the prepared column names
+#                             (failed for named lists of columns).
+
+#' @include visgen.R
 
 dc.bar.defset = defset %<==>% list(
   dimclass   = list(
@@ -65,7 +69,7 @@ dc.bar = function(obj, x = NULL, y = NULL, config = NULL, ...){
 
   if(ncol(obj) == 1){obj$key = as.integer(sequence(nrow(obj)))}
 
-  obj %>% dcr::dcr(type = 'column', x = x, y = y, config = config %>% dc.prepareConfig)
+  obj %>% dcr::dcr(type = "column", x = L$x, y = L$y, config = config %>% dc.prepareConfig)
 }
 
 dc.scatter = function(obj, x = NULL, y = NULL, group = NULL, shape = NULL, config = NULL, ...){
@@ -94,4 +98,3 @@ dc.scatter = function(obj, x = NULL, y = NULL, group = NULL, shape = NULL, confi
   obj %>% dcr::dcr(type = type, x = L$x, y = L$y, group = L$group, config = config %>% dc.prepareConfig)
 
 }
-

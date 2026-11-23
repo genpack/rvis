@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 April 2017
-# Last Revision:  17 September 2018
-# Version:        0.1.0
+# Last Revision:  23 November 2026
+# Version:        0.1.1
 #
 
 # Version History:
@@ -23,6 +23,13 @@
 # 0.0.6     24 July 2018       Function c3.bar() is re-written: needed to call c3_bar because combo does not accept argument 'rotated'
 # 0.0.9     24 July 2018       Functions c3.line() and c3.area() and c3.tsarea() added
 # 0.1.0     17 September 2018  Functions c3.tsarea() modified
+# 0.1.1     23 November 2026   Bug fixes: c3.bar() failed (series colours were never assigned, the assignment pipe was misused,
+#                              NULL config and NULL stack.enabled were not handled).
+#                              c3.gauge() also accepts the standard (obj, theta) arguments (column aggregated by config$aggregator, default mean);
+#                              a numeric value as first argument still works.
+#                              c3.combo() aggregation builds the summarise call directly instead of eval(parse()).
+
+#' @include visgen.R
 
 c3.combo.defset = defset %<==>% list(
   dimclass   = list(
@@ -77,10 +84,10 @@ c3.applyConfig = function(chart, config){
   return(chart)
 }
 
+# Sets the colour pattern of the chart. Other properties can be changed here as well:
+# reference: https://c3js.org/reference.html
 c3.applyColors <- function(ct, colorvect) {
   ct$x$color$pattern <- colorvect
-  # You can change all other properties here
-  # reference: https://c3js.org/reference.html
   return(ct)
 }
 
@@ -104,18 +111,12 @@ c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
 
   obj %<>% prepare4Plot(A, config)
 
-  # assert(length(L$y) > 1, "THE MOST STUPID PACKAGE I HAVE SEEN!!")
-
+  # Aggregate duplicated x values with config$aggregator (name of a function like 'sum' or 'mean'):
   if(obj[, L$x] %>% duplicated %>% sum > 0 & !is.null(config$aggregator)){
-    # if(inherits(config$aggregator, 'function')){config$aggregator = as.character(substitute(config$aggregator))}
     config$aggregator %>% verify('character')
-    obj %<>% dplyr::group_by(dplyr::across(dplyr::all_of(L$x)))
-    scr = "obj %>% dplyr::summarise("
-    N   = length(L$y)
-    for (i in sequence(N)){
-      scr %<>% paste0("`", L$y[i], "` = ", config$aggregator, "(`", L$y[i], "`)", chif(i < N, ", ", ")"))
-    }
-    obj = parse(text = scr) %>% eval %>% as.data.frame
+    aggfun = match.fun(config$aggregator)
+    obj = obj %>% dplyr::group_by(dplyr::across(dplyr::all_of(L$x))) %>%
+      dplyr::summarise(dplyr::across(dplyr::all_of(L$y), aggfun)) %>% as.data.frame
   }
 
   if (!is.null(L$x)){
@@ -133,9 +134,7 @@ c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
 
   L$shape %<>% vect.extend(length(L$y))
   if(is.empty(config$stack.groups)){config$stack.groups = L$y}
-  options(warn = -1)
-  ct %<>% c3_mixedGeom(type = c3.mostCommon(L$shape), types = L$shape %>% as.list, stacked = chif(config$stack.enabled, config$stack.groups, NULL))
-  options(warn = 1)
+  ct = suppressWarnings(c3_mixedGeom(ct, type = c3.mostCommon(L$shape), types = L$shape %>% as.list, stacked = chif(config$stack.enabled, config$stack.groups, NULL)))
 
   return(ct %>% c3.applyConfig(config))
 }
@@ -192,7 +191,7 @@ c3.bar = function(obj, x = NULL, y = NULL, color = NULL, config = NULL){
   if (is.empty(obj)){return(NULL)}
 
   assert(require('c3'), "Package 'c3' is not installed!", err_src = match.call()[[1]])
-  (c3.bar.defset %<==>% config) %>%
+  (c3.bar.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))) %>%
     verifyConfig(plotter = 'c3') %>%
     verifyConfigDimProperties(dims = 'color') -> config
 
@@ -206,9 +205,9 @@ c3.bar = function(obj, x = NULL, y = NULL, color = NULL, config = NULL){
   hor = isHorizontal(obj, L$x, L$y)
   Ly = chif(hor, L$x, L$y); Lx = chif(hor, L$y, L$x)
 
-  getColorVect(Ly, L$color, config)
+  clrvect = getColorVect(Ly, L$color, config)
 
-  obj[, c(Lx, Ly)] %>% c3 %<>% c3_bar(stacked = config$stack.enabled, rotated = hor, bar_width = 0.6, zerobased = TRUE) %>%
+  obj[, c(Lx, Ly)] %>% c3 %>% c3_bar(stacked = isTRUE(config$stack.enabled), rotated = hor, bar_width = 0.6, zerobased = TRUE) %>%
     xAxis(type = 'category', categories = obj[, Lx] %>% as.character) %>%
     c3.applyConfig(config) %>% c3.applyColors(clrvect)
 }
@@ -233,7 +232,16 @@ c3.pie = function(obj, theta = NULL, label = NULL, config = NULL, ...){
   df %>% c3 %>% c3_donut(title = config$title)
 }
 
-c3.gauge = function(theta, config = NULL, ...){
-  theta %>% verify('numeric') %>% data.frame %>% c3 %>% c3_gauge(...)
+# Gauge chart. Either give a numeric value as the first argument (old usage: c3.gauge(75)),
+# or give a table and the name of its numeric column in 'theta'. Column values are aggregated by config$aggregator (default: mean).
+c3.gauge = function(obj = NULL, theta = NULL, config = NULL, ...){
+  assert(require(c3), "Package c3 is not installed!", err_src = match.call()[[1]])
+  if (inherits(obj, 'data.frame')){
+    a = prepareAesthetics(theta = theta)
+    aggregator = chif(is.null(config$aggregator), mean, match.fun(config$aggregator))
+    value = aggregator(obj[, a$labels$theta[1]])
+  } else {
+    value = chif(is.null(obj), theta, obj)
+  }
+  value %>% verify('numeric') %>% data.frame %>% c3 %>% c3_gauge(...)
 }
-

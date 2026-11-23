@@ -113,5 +113,3 @@ build.container.get.table = function(name, classes, outputvar = name %>% paste('
 # ui     <- dash$dashboard.ui()
 # server <- dash$dashboard.server()
 # shinyApp(ui, server)
-
-

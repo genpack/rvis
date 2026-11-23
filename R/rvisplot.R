@@ -5,8 +5,8 @@
 # Author:         Nima Ramezani
 # Email :         nima.ramezani@gmail.com
 # Start Date:     13 July 2017
-# Last Revision:  13 July 2017
-# Version:        0.0.1
+# Last Revision:  23 November 2026
+# Version:        0.0.2
 #
 
 # Version History:
@@ -14,6 +14,8 @@
 # Version   Date               Action
 # ------------------------------------
 # 0.0.1     13 July 2017       Initial issue
+# 0.0.2     23 November 2026   Dispatch builds the call directly instead of eval(parse()); gives a clear error
+#                              message if the requested wrapper does not exist.
 
 
 #' Plot with an rvis wrapper
@@ -47,5 +49,10 @@
 #' }
 #' @export
 rvisPlot = function(type, plotter, ...){
-  parse(text = paste0(plotter, '.', type, "(...)")) %>% eval
+  fname = paste0(plotter, '.', type)
+  if (!exists(fname, mode = 'function')){
+    stop(sprintf("No rvis wrapper named '%s' was found for plotter '%s' and type '%s'.", fname, plotter, type), call. = FALSE)
+  }
+  # Calling by name keeps the wrapper name in match.call() so error messages refer to it:
+  eval(as.call(list(as.name(fname), quote(...))))
 }

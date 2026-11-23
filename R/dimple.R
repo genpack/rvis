@@ -8,8 +8,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     12 May 2017
-# Last Revision:  27 July 2017
-# Version:        1.0.5
+# Last Revision:  23 November 2026
+# Version:        1.0.6
 #
 
 # Version History:
@@ -22,6 +22,11 @@
 # 1.0.3     24 July 2018        Function dimple.applyConfig() added.
 # 1.0.4     24 July 2018        Function dimple.combo() added.
 # 1.0.5     27 July 2018        Function dimple.scatter() added.
+# 1.0.6     23 November 2026    Bug fix: filter() called as dplyr::filter() (stats::filter() was used when dplyr was not attached).
+#                               Column type detection simplified.
+
+#' @include visgen.R
+#' @include jscripts.R
 
 dimple.combo.defset = defset %<==>% list(
   # Valid classes for all dimensions
@@ -79,12 +84,17 @@ dimple.combo = function(obj, x = NULL, y = NULL, t = NULL, size = NULL, group = 
 
   obj %<>% prepare4Plot(A, config = config)
 
-  xnum = length(L$x) == obj[, L$x, drop = F] %>% names %>% sapply(function(col){obj[, col] %>% is.numeric}) %>% sum
-  xdte = length(L$x) == obj[, L$x, drop = F] %>% names %>% sapply(function(col){obj[, col] %>% inherits('Date')}) %>% sum
-  xtim = length(L$x) == obj[, L$x, drop = F] %>% names %>% sapply(function(col){obj[, col] %>% inherits('POSIXct')}) %>% sum
-  ynum = length(L$y) == obj[, L$y, drop = F] %>% names %>% sapply(function(col){obj[, col] %>% is.numeric}) %>% sum
-  ydte = length(L$y) == obj[, L$y, drop = F] %>% names %>% sapply(function(col){obj[, col] %>% inherits('Date')}) %>% sum
-  ytim = length(L$y) == obj[, L$y, drop = F] %>% names %>% sapply(function(col){obj[, col] %>% inherits('POSIXct')}) %>% sum
+  # TRUE if all given columns of obj pass the test:
+  allColumns = function(cols, test){all(vapply(cols, function(col) test(obj[, col]), logical(1)))}
+  isDate = function(v) inherits(v, 'Date')
+  isTime = function(v) inherits(v, 'POSIXct')
+
+  xnum = allColumns(L$x, is.numeric)
+  xdte = allColumns(L$x, isDate)
+  xtim = allColumns(L$x, isTime)
+  ynum = allColumns(L$y, is.numeric)
+  ydte = allColumns(L$y, isDate)
+  ytim = allColumns(L$y, isTime)
 
   if(xdte | xtim){for (col in L$x){obj[, col] %<>% as.character}}
   if(ydte | ytim){for (col in L$y){obj[, col] %<>% as.character}}
@@ -107,7 +117,7 @@ dimple.combo = function(obj, x = NULL, y = NULL, t = NULL, size = NULL, group = 
     dp <- dPlot(x      = chif(hor, 'value', Lx),
                 y      = chif(hor, Lx, 'value'),
                 z      = L$size[1],
-                data   = obj %>% filter(variable %in% series[which(L$shape == shapes[1])]),
+                data   = obj %>% dplyr::filter(variable %in% series[which(L$shape == shapes[1])]),
                 groups = 'variable',
                 type   = shapes[1], ...)
     if(nshape > 1){
@@ -115,7 +125,7 @@ dimple.combo = function(obj, x = NULL, y = NULL, t = NULL, size = NULL, group = 
         dp$layer(x      = chif(hor, 'value', Lx),
                  y      = chif(hor, Lx, 'value'),
                  z      = L$size[i %>% min(length(L$size))],
-                 data   = obj %>% filter(variable %in% series[which(L$shape == shapes[i])]),
+                 data   = obj %>% dplyr::filter(variable %in% series[which(L$shape == shapes[i])]),
                  groups = 'variable',
                  type   = shapes[i])
       }
@@ -155,7 +165,7 @@ dimple.combo = function(obj, x = NULL, y = NULL, t = NULL, size = NULL, group = 
   else {for(col in L$y){obj[, col] %<>% as.character}; dp$yAxis(type = "addCategoryAxis")}
 
   if(!is.null(size)){
-    # Felan hamash numerice
+    # Only numeric size columns are measured, others are treated as categories
     if(inherits(obj[, L$size], c('numeric', 'integer'))){dp$zAxis(type = "addMeasureAxis", overrideMax = config$maxSizeOverride)} else {dp$zAxis(type = "addCategoryAxis")}
   }
   dp %<>% dimple.applyConfig(config)
@@ -220,6 +230,7 @@ dimple.scatter = function(obj, x = NULL, y = NULL, t = NULL, size = NULL, shape 
 }
 
 
+# Shows an rCharts object in the viewer (used by plotHtml())
 show = function(rc)
 {
   dir.create(temp_dir <- tempfile(pattern = "rCharts"))
@@ -228,4 +239,3 @@ show = function(rc)
   visfun = options('viewer')[[1]]
   visfun(tf)
 }
-

@@ -6,8 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     09 November 2016
-# Last Revision:  27 June 2018
-# Version:        1.1.5
+# Last Revision:  23 November 2026
+# Version:        1.1.6
 #
 
 # Version History:
@@ -22,6 +22,11 @@
 # 1.1.3     11 May 2017        Config properties: 'layout' and 'direction' added. Global variable 'visNetwork.shape' modified: added more shapes
 # 1.1.4     27 June 2018       Config properties: more config properties added.
 # 1.1.5     27 June 2018       Dimension 'key' added to specify id of nodes
+# 1.1.6     23 November 2026   Bug fixes: node size scaling checked node.size.min twice instead of min and max; dplyr::distinct()
+#                              namespaced. Duplicated 'essentials' and 'bubble' entries removed. visNetwork.graphChart() (empty
+#                              old function returning an undefined object) now gives an informative error.
+
+#' @include visgen.R
 
 
 visNetwork.graph.defset = defset %<==>% list(
@@ -49,9 +54,7 @@ visNetwork.graph.defset = defset %<==>% list(
                  linkColor       = c('gray',  'black'),
                  labelColor      = c('black', 'black'),
                  linkLabelColor  = c('black', 'black'),
-                 borderColor     = c('black', 'black')),
-
-  essentials = c('key', 'source', 'target')
+                 borderColor     = c('black', 'black'))
 )
 
 #
@@ -59,7 +62,7 @@ visNetwork.graph.defset = defset %<==>% list(
 # image, circularImage, diamond/rhombus, bubble/dot, star, triangle/delta, triangleDown/curl, square and icon: size is determined by column 'size' or 'config$node.size'. column values outweight config value!
 
 visNetwork.shape = c(square = 'square', delta = 'triangle', curl = 'triangleDown', icon = 'icon', triangleDown = 'triangleDown', point = 'dot',
-                     triangle = 'triangle', box = 'box', rectangle = 'box', dot = 'dot', bubble = 'dot', circle = gndcd(88,4,1,18,199,94), bubble = 'circle',
+                     triangle = 'triangle', box = 'box', rectangle = 'box', dot = 'dot', bubble = 'dot', circle = gndcd(88,4,1,18,199,94),
                      star = 'star', ellipse = 'ellipse', cylinder = "database", diamond = 'diamond', rhombus = 'diamond',
                      image = 'image', circularImage = 'circularImage', database = 'database', text = 'text')
 
@@ -168,16 +171,16 @@ visNetwork.graph = function(obj,
     } else {obj$nodes$key = nodeids}
   }
 
-  obj$nodes %<>% prepare4Plot(A %>% list.extract('key', 'label', 'shape', 'size', 'tooltip', 'color', 'borderColor'), config) %>% distinct(id, .keep_all = T)
+  obj$nodes %<>% prepare4Plot(A %>% list.extract('key', 'label', 'shape', 'size', 'tooltip', 'color', 'borderColor'), config) %>% dplyr::distinct(id, .keep_all = T)
   obj$links %<>% prepare4Plot(A %>% list.extract('source', 'target', 'linkColor', 'linkLength', 'linkWidth',
                                                  'linkLabel', 'linkLabelColor', 'linkLabelSize'), config)
 
   # if (is.empty(obj$links)){cat("Table 'links' is empty! Nothing to plot."); return(NULL)}
 
-  assert(obj$links[, L$source] %<% obj$nodes$id, "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'visNetwork.graph')
-  assert(obj$links[, L$target] %<% obj$nodes$id, "Value in column '" %++% L$target %++% "' must be a seubset of node IDs'", err_src = 'visNetwork.graph')
+  assert(obj$links[, L$source] %<% obj$nodes$id, "Value in column '" %++% L$source %++% "' must be a subset of node IDs'", err_src = 'visNetwork.graph')
+  assert(obj$links[, L$target] %<% obj$nodes$id, "Value in column '" %++% L$target %++% "' must be a subset of node IDs'", err_src = 'visNetwork.graph')
 
-  if(!is.null(config$node.size.min) & !is.null(config$node.size.min) & !is.null(L$size)){
+  if(!is.null(config$node.size.min) & !is.null(config$node.size.max) & !is.null(L$size)){
     obj$nodes$value %<>% vect.map(min = config$node.size.min, max = config$node.size.max)
   }
 
@@ -202,28 +205,8 @@ visNetwork.graph = function(obj,
   visNetwork(obj$nodes, obj$links, ...)  %>% visNetwork.applyConfig(config)
 }
 
-
-
-
-
-
-
-## OLD FUNCTIONS:
-
-
-
-#sizeColumn
-#sizeLegend
-
-'Old'
+# Deprecated: replaced by visNetwork.graph(). Kept only for backward compatibility of the exported name.
 #' @export
 visNetwork.graphChart = function(nodes, links, size = NULL, sizeLegend = NULL, shape = NULL, shapeLegend = NULL, color = NULL, colorLegend = NULL, label = NULL, linkColor = NULL, linkLength = NULL, linkLengthLegend = NULL, linkSource = NULL, linkTarget = NULL, linkWidth = NULL, ...){
-  # Currently only valid.visNetwork.linkTypes are supported, todo: generate values for categorical fields
-  # todo: add linkType to arguments, valid.linkTypes = c('continuous', 'dashed', ...)
-  # linkType   = verify(linkType, 'character', lengths = 1, domain = valid.visNetwork.linkTypes, default = 'continuous', varname = 'linkType')
-  # shadow for nodes
-
-  return(v)
+  stop("Function visNetwork.graphChart() is no longer supported. Use visNetwork.graph() instead.")
 }
-
-

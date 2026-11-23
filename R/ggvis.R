@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     14 April 2017
-# Last Revision:  14 April 2017
-# Version:        0.0.1
+# Last Revision:  23 November 2026
+# Version:        0.0.2
 #
 
 # Version History:
@@ -16,6 +16,9 @@
 # Version   Date               Action
 # ----------------------------------
 # 0.0.1     14 April 2017      Initial issue
+# 0.0.2     23 November 2026   Bug fix: config$point.shape was written as a 'size' property instead of 'shape'
+
+#' @include visgen.R
 
 
 ggvis.shape = c('+' = 'cross', plus = 'cross')
@@ -56,12 +59,7 @@ ggvis.scatter = function(obj, x = NULL, y = NULL, size = NULL, color = NULL, sha
 
   obj %<>% prepare4Plot(A, config)
 
-  # if(is.null(L$shape)){L$shape = 'point'}
-  # L$shape = translateShape[L$shape]
-  # names(L$shape) <- NULL
-  symbol = L$shape
-
-
+  # The ggvis call is built as a script because constant properties (:=) and mapped columns (= ~) have different syntax:
   scr = paste("obj %>% ggvis(x = ~", L$x, ", y = ~", L$y,
               chif(is.null(config$point.color),
                    chif(is.null(L$color), "",
@@ -78,7 +76,7 @@ ggvis.scatter = function(obj, x = NULL, y = NULL, size = NULL, color = NULL, sha
                         chif(inherits(obj[, L$shape], 'character'),
                              ", shape := '" %++% ggvis.shape[obj[1, L$shape]]  %++% "'",
                              ", shape = ~" %++% L$shape)),
-                   ", size  :=  '" %++% ggvis.shape[config$point.shape]  %++% "'"),
+                   ", shape := '" %++% ggvis.shape[config$point.shape]  %++% "'"),
               chif(is.null(config$point.border.color), "" , ", stroke := '" %++% config$point.border.color %++% "'"),
               chif(is.null(config$point.opacity), "" , ", opacity := " %++% config$point.opacity), ", ...)",
               chif(is.null(config$point.tooltip), "" , "%>% add_tooltip(" %++% config$point.tooltip %++% ")"),
@@ -108,4 +106,3 @@ ggvis.histogram = function(obj, x = NULL, config = NULL, ...){
   parse(text = scr) %>% eval
 
 }
-
