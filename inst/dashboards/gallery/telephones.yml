@@ -1,0 +1,31 @@
+# Shiny gallery: Telephones by region (shiny-examples 064-telephones-by-region)
+# https://shiny.posit.co/r/gallery/start-simple/telephones-by-region/
+name: Telephones by region
+layout: page
+items:
+  page:
+    type: sidebarLayout
+    title: Telephones by region
+    layout.side: [region, rule, help]
+    layout.main: [phonePlot]
+
+  region:
+    type: selectInput
+    title: "Region:"
+    choices: !expr colnames(WorldPhones)
+
+  rule:
+    type: static
+    html: <hr/>
+
+  help:
+    type: static
+    html: <span class="help-block">Data from AT&amp;T (1961) The World's Telephones.</span>
+
+  phonePlot:
+    type: plotOutput
+    service: |
+      barplot(WorldPhones[, input$region] * 1000,
+              main = input$region,
+              ylab = "Number of Telephones",
+              xlab = "Year")

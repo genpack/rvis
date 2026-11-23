@@ -1,0 +1,70 @@
+# The standard shiny output items. Each output has a service: R code returning its content.
+name: Output items
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: Output items
+    layout:
+      - [cars]
+      - - [text_title, text, verbatim_title, verbatim, html_title, html, download]
+        - [plot_title, plot]
+        - [table_title, table]
+      - [dt_title, dt]
+
+  cars:
+    type: selectInput
+    title: Car
+    choices: !expr rownames(mtcars)
+
+  text_title:     {type: static, html: <h4>textOutput</h4>}
+  verbatim_title: {type: static, html: <h4>verbatimTextOutput</h4>}
+  html_title:     {type: static, html: <h4>htmlOutput</h4>}
+  plot_title:     {type: static, html: <h4>plotOutput</h4>}
+  table_title:    {type: static, html: <h4>tableOutput</h4>}
+  dt_title:       {type: static, html: <h4>dataTableOutput (package DT)</h4>}
+
+  # text
+  text:
+    type: textOutput
+    service: paste(input$cars, "does", mtcars[input$cars, "mpg"], "miles per gallon.")
+
+  # printed output
+  verbatim:
+    type: verbatimTextOutput
+    service: mtcars[input$cars, 1:4]
+
+  # html (the service returns html tags)
+  html:
+    type: htmlOutput
+    service: tags$p("Weight:", tags$b(mtcars[input$cars, "wt"] * 1000, "lbs"))
+
+  # a plot
+  plot:
+    type: plotOutput
+    height: 300px
+    service: |
+      plot(mtcars$wt, mtcars$mpg, xlab = "Weight (1000 lbs)", ylab = "Miles per gallon", pch = 19, col = "grey")
+      points(mtcars[input$cars, "wt"], mtcars[input$cars, "mpg"], pch = 19, col = "red", cex = 2)
+
+  # a table, with arguments of renderTable(): striped, hover, digits, ...
+  table:
+    type: tableOutput
+    striped: true
+    hover: true
+    digits: 1
+    service: head(mtcars[order(abs(mtcars$mpg - mtcars[input$cars, "mpg"])), 1:5], 8)
+
+  # an interactive table, with DataTables options
+  dt:
+    type: dataTableOutput
+    options: {pageLength: 5}
+    service: mtcars
+
+  # a download button: filename and service are R code; the service writes the file
+  download:
+    type: downloadButton
+    title: Download mtcars
+    filename: '"mtcars.csv"'
+    service: write.csv(mtcars, file)

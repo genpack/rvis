@@ -1,0 +1,50 @@
+# A guided tour (package rintrojs): items with a tutor lesson are highlighted one after the other.
+name: Guided tour
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: A dashboard with a guided tour
+    layout:
+      - [start]
+      - - {weight: 4, items: [inputs]}
+        - {weight: 8, items: [plot]}
+
+  # the tour starts when the button is clicked
+  start:
+    type: actionButton
+    title: Start the tour
+    icon: circle-question
+    class: btn-info
+    service: rintrojs::introjs(session, options = list(nextLabel = "Next", prevLabel = "Back", doneLabel = "Done"))
+
+  # a tutor box: a container with a lesson for all its items
+  inputs:
+    type: tutorBox
+    tutor.lesson: These inputs choose what the plot shows.
+    tutor.step: 1
+    layout: [x, y]
+
+  # tutor.lesson: text shown for the item (several lines are joined), tutor.step: its order in the tour
+  x:
+    type: selectInput
+    title: Horizontal axis
+    choices: !expr names(trees)
+    selected: Girth
+    tutor.lesson: Choose the variable of the horizontal axis.
+    tutor.step: 2
+
+  y:
+    type: selectInput
+    title: Vertical axis
+    choices: !expr names(trees)
+    selected: Volume
+    tutor.lesson: [Choose the variable of the vertical axis., Volume is the timber volume in cubic feet.]
+    tutor.step: 3
+
+  plot:
+    type: plotOutput
+    service: plot(trees[[input$x]], trees[[input$y]], pch = 19, col = "#5CB85C", xlab = input$x, ylab = input$y, main = "Black cherry trees")
+    tutor.lesson: The plot of the 31 felled black cherry trees.
+    tutor.step: 4

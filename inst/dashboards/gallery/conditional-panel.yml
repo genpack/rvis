@@ -1,0 +1,41 @@
+# Shiny gallery: conditionalPanel demo (shiny-examples 033-conditionalpanel-demo)
+# https://shiny.posit.co/r/gallery/dynamic-user-interface/conditionalpanel-demo/
+name: Conditional panels
+layout: page
+items:
+  page:
+    type: fluidPage
+    title: Conditional panels
+    layout:
+      - - {weight: 4, items: controls}
+        - {weight: 5, items: [note, plot_panel]}
+
+  controls:
+    type: wellPanel
+    layout: [n]
+
+  n:
+    type: sliderInput
+    title: "Number of points:"
+    min: 10
+    max: 200
+    value: 50
+    step: 10
+
+  note:
+    type: static
+    html: The plot below will be not displayed when the slider value is less than 50.
+
+  # the condition is a javascript expression of the inputs
+  plot_panel:
+    type: conditionalPanel
+    condition: input.n >= 50
+    layout: [scatterPlot]
+
+  scatterPlot:
+    type: plotOutput
+    height: 300px
+    service: |
+      x <- rnorm(input$n)
+      y <- rnorm(input$n)
+      plot(x, y)

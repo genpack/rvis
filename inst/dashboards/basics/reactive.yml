@@ -1,0 +1,89 @@
+# Server-side state: reactive values (sync), session objects, a prescript, input services and observers.
+name: Reactive values
+layout: page
+
+# objects: copied into session$userData of each session (not reactive)
+objects:
+  step: 1
+  greeting: Hello from session$userData
+
+# values: initial values of the reactive list 'sync' of each session; outputs using sync$... update when they change
+values:
+  count: 0
+  log: []
+
+# prescript: run at the start of each session, for example to define reactive expressions and functions
+prescript: |
+  squared <- reactive(sync$count^2)
+  add_log <- function(text) isolate(sync$log <- head(c(paste(format(Sys.time(), "%H:%M:%S"), text), unlist(sync$log)), 10))
+
+# observers: R code run in observe(): run again whenever a reactive value used in them changes
+observers:
+  - if (sync$count >= 10) showNotification("The count reached 10 or more!", type = "warning")
+
+items:
+  page:
+    type: fluidPage
+    title: Reactive values, services and observers
+    layout:
+      - - {weight: 4, items: controls}
+        - {weight: 8, items: [count_text, squared_text, greeting, log_title, log]}
+
+  controls:
+    type: wellPanel
+    layout: [step, plus, minus, reset]
+
+  step:
+    type: numericInput
+    title: Step
+    value: 1
+    min: 1
+    # service of an input: run when the input changes
+    service: session$userData$step <- input$step
+
+  # services of action buttons run when they are clicked
+  plus:
+    type: actionButton
+    title: Add
+    icon: plus
+    service: |
+      sync$count <- sync$count + session$userData$step
+      add_log(paste("added", session$userData$step))
+    # isolate: true runs the service in isolate(), so reading reactive values does not create dependencies
+    isolate: true
+
+  minus:
+    type: actionButton
+    title: Subtract
+    icon: minus
+    isolate: true
+    service: |
+      sync$count <- sync$count - session$userData$step
+      add_log(paste("subtracted", session$userData$step))
+
+  reset:
+    type: actionLink
+    title: Reset
+    service: |
+      sync$count <- 0
+      add_log("reset")
+
+  count_text:
+    type: textOutput
+    tag: h2
+    service: paste("Count:", sync$count)
+
+  squared_text:
+    type: textOutput
+    service: paste("Count squared (a reactive expression from the prescript):", squared())
+
+  greeting:
+    type: textOutput
+    service: session$userData$greeting
+
+  log_title: {type: static, html: "<h4>Log</h4>"}
+
+  log:
+    type: verbatimTextOutput
+    placeholder: true
+    service: cat(unlist(sync$log), sep = "\n")

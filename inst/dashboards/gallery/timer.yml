@@ -1,0 +1,15 @@
+# Shiny gallery: Timer (shiny-examples 011-timer)
+# https://shiny.posit.co/r/gallery/reactive-programming/timer/
+name: Timer
+layout: page
+items:
+  page:
+    type: fluidPage
+    layout: [currentTime]
+
+  currentTime:
+    type: textOutput
+    tag: h2
+    service: |
+      invalidateLater(1000, session)
+      paste("The current time is", Sys.time())

@@ -1,0 +1,19 @@
+# Shiny gallery: Modal dialogs (shiny-examples 114-modal-dialog)
+# https://shiny.posit.co/r/gallery/advanced-shiny/modal-dialogs/
+name: Modal dialog
+layout: page
+items:
+  page:
+    type: fluidPage
+    layout: [show]
+
+  # the service of an input runs when the input changes (here: when the button is clicked)
+  show:
+    type: actionButton
+    title: Show modal dialog
+    service: |
+      showModal(modalDialog(
+        title = "Important message",
+        "This is an important message!",
+        easyClose = TRUE
+      ))

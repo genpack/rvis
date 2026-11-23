@@ -1,0 +1,47 @@
+# A login box: content shown only to users of the login table.
+# Users: guest (password guest) and admin (password admin123). Passwords can also be bcrypt hashes
+# (settings: passEncryption: bcrypt).
+name: Login
+layout: page
+
+loginTable:
+  guest: guest
+  admin: admin123
+
+settings:
+  # do not save the session data of the users when they log out
+  saveSession: false
+
+messages:
+  initial: Please log in (users guest/guest or admin/admin123).
+  loginFail: Wrong password, please try again.
+
+items:
+  page:
+    type: fluidPage
+    title: Members area
+    layout:
+      - - {weight: 3, items: [login, message]}
+        - {weight: 9, items: [private]}
+
+  # a login item shows a login box, then the user name with a log out link
+  login:
+    type: loginInput
+
+  message:
+    type: textOutput
+    service: sync$message
+
+  # sync$user is the name of the logged in user (NULL when nobody is logged in)
+  private:
+    type: dynamicInput
+    service: |
+      if (is.null(sync$user)) {
+        tags$div(class = "well", icon("lock"), " The content is shown after logging in.")
+      } else {
+        tagList(
+          tags$h3("Welcome", sync$user, "!"),
+          renderTable(head(chickwts[order(-chickwts$weight), ], if (sync$user == "admin") 20 else 5)),
+          tags$p(if (sync$user == "admin") "Admins see 20 rows." else "Guests see 5 rows.")
+        )
+      }

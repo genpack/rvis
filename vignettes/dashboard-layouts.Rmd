@@ -1,0 +1,147 @@
+---
+title: "Dashboards: layouts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dashboards: layouts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("dashboard-setup.R")
+```
+
+The page of a dashboard is made of **containers**: items holding other items, given by name in
+their `layout`. This guide shows the page containers (`fluidPage`, `sidebarLayout`, `navbarPage`,
+`dashboardPage`), the grid of rows and columns, tabs, and **clothes**. All examples come with rvis:
+run them with `runDashboard(rvisDashboardExample("<name>"))`.
+[Getting started](dashboards.html) introduces dashboards.
+
+## Rows and columns {#grid}
+
+The layout of a `fluidPage` (and of `tabPanel`, `tabItem` and `conditionalPanel`) can be a list
+which is turned into a grid of rows and columns ([Bootstrap grid](https://getbootstrap.com/docs/3.4/css/#grid):
+a row is 12 units wide):
+
+* the elements of the layout are **rows**;
+* a character element (item names) puts its items directly in the row or column;
+* a list element of a row is a **column**, a list element of a column is a **row**, and so on;
+* the width of a column is its `weight` (or the mean weight of its items), or an equal share of the 12 units.
+  `offset` moves the column to the right.
+
+A column with settings is written as a mapping: `{weight: 4, offset: 1, items: [a, b]}`
+(the field holding the item names can have any name).
+
+```{r, echo=FALSE}
+show_yaml("layout-grid")
+```
+
+```{r, echo=FALSE}
+show_shot("layout-grid")
+```
+
+With `col.framed: true`, the content of each column is put in a well panel. A character vector
+layout (`layout: [a, b, c]`) puts each item in its own row.
+
+## Sidebar layout {#sidebar}
+
+A `sidebarLayout` is a page with a title, a side panel (`layout.side`) and a main panel
+(`layout.main`). See the [first dashboard](dashboards.html) and the gallery apps
+[Telephones by region](dashboard-gallery.html#telephones) or [Tabsets](dashboard-gallery.html#tabsets).
+
+## Tabs and navigation lists {#tabs}
+
+A `tabsetPanel` shows one of its tab panels at a time (`shape: tabs` or `pills`, `selected` is
+the title of the first tab shown). A `navlistPanel` lists its tabs on the left (`widths` of the list
+and of the content). Tab panels are `tabPanel` items, or other items with a `tabPanel` cloth.
+
+```{r, echo=FALSE}
+show_yaml("tabs")
+```
+
+```{r, echo=FALSE}
+show_shot("tabs")
+```
+
+## Navigation bar pages {#navbar}
+
+A `navbarPage` has a navigation bar of tab panels and drop-down menus (`navbarMenu`). Its `theme`
+is the path of a Bootstrap css file, for example from package
+[shinythemes](https://rstudio.github.io/shinythemes/). The item name is the id of the page:
+`input$nav` is the `value` of the selected tab panel (its item name unless a value is given).
+
+```{r, echo=FALSE}
+show_yaml("navbar")
+```
+
+```{r, echo=FALSE}
+show_shot("navbar")
+```
+
+## shinydashboard pages {#shinydashboard}
+
+A `dashboardPage` ([shinydashboard](https://rstudio.github.io/shinydashboard/)) has a header
+(`layout.head`, title settings `header.title...`), a sidebar (`layout.side`) and a body
+(`layout.body`). Several pages are made with a `sidebarMenu` of `menuItem`s (with optional
+`menuSubItem`s) and `tabItems` holding `tabItem`s: a menu item shows the tab item with the same
+`tabName` (the name of the tab item by default). The sidebar menu is an input: `input$menu` is the
+selected tab.
+
+```{r, echo=FALSE}
+show_yaml("shinydashboard")
+```
+
+```{r, echo=FALSE}
+show_shot("shinydashboard")
+```
+
+The header title can be styled: `header.title.color`, `header.title.background.color`,
+`header.title.font`, `header.title.font.weight` and `header.title.font.size`, and the same with
+`header.title.hover...` when the mouse is over it.
+
+## Clothes {#clothes}
+
+The `cloth` of an item wraps it in another element, without a container item:
+
+| Cloth `type` | Settings |
+|:---|:---|
+| `box` | `title`, `footer`, `status` (primary, success, info, warning, danger), `solidHeader`, `background` (a colour), `weight`, `height`, `style`, `collapsible`, `collapsed` |
+| `valueBox` | `title` (the subtitle under the value), `icon`, `color`, `weight`, `href` |
+| `infoBox` | `title`, `subtitle`, `icon`, `color`, `weight`, `href`, `fill` |
+| `column` | `weight`, `offset`, `align` |
+| `wellPanel` | |
+| `tabPanel` | `title`, `icon`, `value` |
+
+The value of a value box or info box is the result of the service of the item (use a `uiOutput`).
+If the item has a `title`, it is used as the title of its cloth.
+
+```{r, echo=FALSE}
+show_yaml("clothes")
+```
+
+```{r, echo=FALSE}
+show_shot("clothes")
+```
+
+## Other containers {#containers}
+
+| Container | Settings | Content |
+|:---|:---|:---|
+| `column` | `weight`, `offset` | the items of `layout` in a column |
+| `box` | `title`, `footer`, `status`, `solidHeader`, `background` (default `blue`), `weight`, `collapsible`, `collapsed` | a shinydashboard box |
+| `wellPanel` | | a panel with a grey background |
+| `bag` | | a plain `div` (items one after the other) |
+| `conditionalPanel` | `condition` (javascript, like `input.n > 5`) | shown only when the condition is true |
+| `bsModal` | `title`, `trigger` (id of the button opening it), `size` | a modal window (shinyBS) |
+| `bsCollapse`, `bsCollapsePanel` | `multiple`, `open`; `title`, `value`, `style` | collapsible panels (shinyBS) |
+| `tutorBox` | `tutor.lesson`, `tutor.step`, `tutor.hint` | a group highlighted in a guided tour (rintrojs) |
+
+Containers can have a cloth too, for example a `bag` of items with a `box` cloth.
+The [item reference](dashboard-reference.html) gives all settings, and examples of modals,
+collapsible panels and guided tours.
+
+## Several items on the page
+
+`layout` can list several items: they are put on the page one after the other. The
+[shinythemes gallery app](dashboard-gallery.html#shinythemes) uses this to put a theme selector
+above a navbar page.

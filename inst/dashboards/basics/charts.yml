@@ -1,0 +1,63 @@
+# rvis charts in a dashboard: services return rvisPlot() charts (htmlwidgets) shown by the output of their plotter.
+# Needs packages dygraphs, highcharter, plotly and leaflet.
+name: rvis charts
+layout: dash
+
+prescript: |
+  air <- airquality
+  air$date <- as.Date(paste(1973, air$Month, air$Day, sep = "-"))
+  air$month <- month.name[air$Month]
+  monthly <- aggregate(cbind(Ozone, Solar.R, Wind, Temp) ~ month, data = air, FUN = mean)
+  monthly <- monthly[order(match(monthly$month, month.name)), ]
+
+items:
+  dash:
+    type: dashboardPage
+    header.title: rvis charts
+    skin: black
+    layout.side: [variable, about]
+    layout.body: [row1, row2]
+
+  variable:
+    type: radioButtons
+    title: Measure
+    choices: {Ozone (ppb): Ozone, Solar radiation (lang): Solar.R, Wind (mph): Wind, Temperature (F): Temp}
+    selected: Temp
+
+  about:
+    type: static
+    html: <p style="padding:15px; color:#b8c7ce;">New York air quality measurements, May to September 1973 (data set airquality).</p>
+
+  row1: {type: fluidPage, layout: [[trend, bars]]}
+  row2: {type: fluidPage, layout: [[scatter, map]]}
+
+  # dygraphs time series
+  trend:
+    type: dygraphOutput
+    height: 300px
+    service: rvisPlot(type = "tsline", plotter = "dygraphs", obj = air, x = "date", y = input$variable)
+    cloth: {type: box, title: Daily values, weight: 7}
+
+  # highcharter bar chart
+  bars:
+    type: highcharterOutput
+    height: 300px
+    service: rvisPlot(type = "bar", plotter = "highcharter", obj = monthly, x = "month", y = input$variable)
+    cloth: {type: box, title: Monthly means, weight: 5}
+
+  # plotly scatter chart
+  scatter:
+    type: plotlyOutput
+    height: 350px
+    service: rvisPlot(type = "scatter", plotter = "plotly", obj = air[!is.na(air[[input$variable]]) & !is.na(air$Ozone), ], x = input$variable, y = "Ozone", color = "month")
+    cloth: {type: box, title: Ozone against the measure, weight: 7}
+
+  # a leaflet map (any htmlwidget made by the service can be shown by its output type)
+  map:
+    type: leafletOutput
+    height: 350px
+    service: |
+      leaflet::leaflet() %>%
+        leaflet::addTiles() %>%
+        leaflet::addMarkers(lng = -73.97, lat = 40.78, popup = "Central Park, New York")
+    cloth: {type: box, title: Location, weight: 5}

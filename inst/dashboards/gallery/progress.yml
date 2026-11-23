@@ -1,0 +1,75 @@
+# Shiny gallery: Progress bar example (shiny-examples 085-progress)
+# https://shiny.posit.co/r/gallery/advanced-shiny/progress-bar-example/
+name: Progress bar example
+layout: page
+
+# a function used by the table service, defined at the start of each session
+prescript: |
+  compute_data <- function(updateProgress = NULL) {
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    for (i in 1:10) {
+      Sys.sleep(0.25)
+      new_row <- data.frame(x = rnorm(1), y = rnorm(1))
+      if (is.function(updateProgress)) {
+        text <- paste0("x:", round(new_row$x, 2), " y:", round(new_row$y, 2))
+        updateProgress(detail = text)
+      }
+      dat <- rbind(dat, new_row)
+    }
+    dat
+  }
+
+items:
+  page:
+    type: fluidPage
+    layout: [plot, table, style, goPlot, goTable]
+
+  plot:
+    type: plotOutput
+    width: 300px
+    height: 300px
+    service: |
+      input$goPlot # Re-run when button is clicked
+      style <- isolate(input$style)
+      withProgress(message = 'Creating plot', style = style, value = 0.1, {
+        Sys.sleep(0.25)
+        dat <- data.frame(x = numeric(0), y = numeric(0))
+        withProgress(message = 'Generating data', style = style, detail = "part 0", value = 0, {
+          for (i in 1:10) {
+            dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+            incProgress(0.1, detail = paste("part", i))
+            Sys.sleep(0.1)
+          }
+        })
+        incProgress(0.5)
+        withProgress(message = 'And this also', detail = "This other thing", style = style, value = NULL, {
+          Sys.sleep(0.75)
+        })
+        setProgress(1)
+      })
+      plot(cars$speed, cars$dist)
+
+  table:
+    type: tableOutput
+    service: |
+      input$goTable
+      style <- isolate(input$style)
+      progress <- shiny::Progress$new(style = style)
+      progress$set(message = "Computing data", value = 0)
+      on.exit(progress$close())
+      updateProgress <- function(value = NULL, detail = NULL) {
+        if (is.null(value)) {
+          value <- progress$getValue()
+          value <- value + (progress$getMax() - value) / 5
+        }
+        progress$set(value = value, detail = detail)
+      }
+      compute_data(updateProgress)
+
+  style:
+    type: radioButtons
+    title: Progress bar style
+    choices: [notification, old]
+
+  goPlot:  {type: actionButton, title: Go plot}
+  goTable: {type: actionButton, title: Go table}

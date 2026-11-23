@@ -1,0 +1,47 @@
+# A synced TFD3 table (embedded in rvis): with sync: true, the table is the reactive value sync$<item name>.
+# Cell edits made in the browser update sync$scores, and changes made by the server to sync$scores are
+# shown in the browser. Filters and selected rows are reported in report$scores_filtered and report$scores_selected.
+name: Synced table
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: An editable, filterable table synced with the server
+    layout:
+      - - {weight: 7, items: [scores, help]}
+        - {weight: 5, items: [add_point, means_title, means, filtered]}
+
+  scores:
+    type: TFD3Output
+    sync: true
+    height: 420px
+    # the initial table
+    data: !expr data.frame(student = c("Ana", "Ben", "Chen", "Dana", "Eli", "Fay"), maths = c(78, 64, 91, 55, 83, 70), science = c(82, 59, 88, 61, 79, 74), stringsAsFactors = FALSE)
+    config:
+      withRowNames: false
+      column.editable: {maths: true, science: true}
+      column.filter.enabled: true
+      column.footer: {student: Mean, maths: !expr mean, science: !expr mean}
+
+  help:
+    type: static
+    html: <p>Double-click a score to edit it, or type a filter like <code>&gt;70</code> in the filter row.</p>
+
+  # the server changes the synced table: the browser table is updated
+  add_point:
+    type: actionButton
+    title: Add 1 point to all maths scores
+    icon: plus
+    service: sync$scores$maths <- pmin(sync$scores$maths + 1, 100)
+
+  means_title: {type: static, html: "<h4>Means on the server</h4>"}
+
+  means:
+    type: tableOutput
+    digits: 1
+    service: data.frame(subject = c("maths", "science"), mean = c(mean(sync$scores$maths), mean(sync$scores$science)))
+
+  filtered:
+    type: verbatimTextOutput
+    service: cat("Rows passing the filters:", paste(report$scores_filtered, collapse = ", "))

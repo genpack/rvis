@@ -1,0 +1,54 @@
+# Shiny gallery: Widgets (shiny-examples 007-widgets)
+# https://shiny.posit.co/r/gallery/widgets/widgets/
+name: More Widgets
+layout: page
+
+prescript: |
+  # The dataset is only updated when the user clicks the action button
+  datasetInput <- eventReactive(input$update, {
+    switch(input$dataset,
+           "rock" = rock,
+           "pressure" = pressure,
+           "cars" = cars)
+  }, ignoreNULL = FALSE)
+
+items:
+  page:
+    type: sidebarLayout
+    title: More Widgets
+    layout.side: [dataset, obs, help, update]
+    layout.main: [summary_title, summary, view_title, view]
+
+  dataset:
+    type: selectInput
+    title: "Choose a dataset:"
+    choices: [rock, pressure, cars]
+
+  obs:
+    type: numericInput
+    title: "Number of observations to view:"
+    value: 10
+
+  help:
+    type: static
+    html: >
+      <span class="help-block">Note: while the data view will show only the specified number of observations,
+      the summary will still be based on the full dataset.</span>
+
+  update:
+    type: actionButton
+    title: Update View
+
+  summary_title: {type: static, html: <h4>Summary</h4>}
+  view_title:    {type: static, html: <h4>Observations</h4>}
+
+  summary:
+    type: verbatimTextOutput
+    service: |
+      dataset <- datasetInput()
+      summary(dataset)
+
+  # isolate() is used because the table should only update when the user clicks the action button
+  view:
+    type: tableOutput
+    service: head(datasetInput(), n = isolate(input$obs))

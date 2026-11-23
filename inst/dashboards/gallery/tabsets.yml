@@ -1,0 +1,69 @@
+# Shiny gallery: Tabsets (shiny-examples 006-tabsets)
+# https://shiny.posit.co/r/gallery/application-layout/tabsets/
+name: Tabsets
+layout: page
+
+prescript: |
+  # Reactive expression to generate the requested distribution
+  d <- reactive({
+    dist <- switch(input$dist,
+                   norm = rnorm,
+                   unif = runif,
+                   lnorm = rlnorm,
+                   exp = rexp,
+                   rnorm)
+    dist(input$n)
+  })
+
+items:
+  page:
+    type: sidebarLayout
+    title: Tabsets
+    layout.side: [dist, space, n]
+    layout.main: [tabs]
+
+  dist:
+    type: radioButtons
+    title: "Distribution type:"
+    choices:
+      Normal: norm
+      Uniform: unif
+      Log-normal: lnorm
+      Exponential: exp
+
+  space:
+    type: static
+    html: <br/>
+
+  n:
+    type: sliderInput
+    title: "Number of observations:"
+    value: 500
+    min: 1
+    max: 1000
+
+  tabs:
+    type: tabsetPanel
+    shape: tabs
+    layout: [plot_tab, summary_tab, table_tab]
+
+  plot_tab:    {type: tabPanel, title: Plot, layout: [plot]}
+  summary_tab: {type: tabPanel, title: Summary, layout: [summary]}
+  table_tab:   {type: tabPanel, title: Table, layout: [table]}
+
+  plot:
+    type: plotOutput
+    service: |
+      dist <- input$dist
+      n <- input$n
+      hist(d(),
+           main = paste("r", dist, "(", n, ")", sep = ""),
+           col = "#75AADB", border = "white")
+
+  summary:
+    type: verbatimTextOutput
+    service: summary(d())
+
+  table:
+    type: tableOutput
+    service: d()

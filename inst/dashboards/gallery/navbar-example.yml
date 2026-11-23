@@ -1,0 +1,76 @@
+# Shiny gallery: Navbar example (shiny-examples 052-navbar-example)
+# https://shiny.posit.co/r/gallery/application-layout/navbar-example/
+name: Navbar!
+layout: nav
+items:
+  nav:
+    type: navbarPage
+    title: Navbar!
+    layout: [plot_tab, summary_tab, more]
+
+  plot_tab:
+    type: tabPanel
+    title: Plot
+    layout: [plot_page]
+
+  plot_page:
+    type: sidebarLayout
+    layout.side: [plotType]
+    layout.main: [plot]
+
+  plotType:
+    type: radioButtons
+    title: Plot type
+    choices: {Scatter: p, Line: l}
+
+  plot:
+    type: plotOutput
+    service: plot(cars, type = input$plotType)
+
+  summary_tab:
+    type: tabPanel
+    title: Summary
+    layout: [summary]
+
+  summary:
+    type: verbatimTextOutput
+    service: summary(cars)
+
+  more:
+    type: navbarMenu
+    title: More
+    layout: [table_tab, about_tab]
+
+  table_tab:
+    type: tabPanel
+    title: Table
+    layout: [table]
+
+  table:
+    type: dataTableOutput
+    service: DT::datatable(cars)
+
+  about_tab:
+    type: tabPanel
+    title: About
+    # one row with two columns of widths 6 and 3
+    layout:
+      - - {weight: 6, items: about}
+        - {weight: 3, items: photo}
+
+  about:
+    type: static
+    html: |
+      <h3>Speed and Stopping Distances of Cars</h3>
+      <p>The data give the speed of cars and the distances taken to stop. Note that the data were recorded in the 1920s.</p>
+      <ul>
+        <li><strong>Speed</strong> - speed (mph)</li>
+        <li><strong>Dist</strong> - stopping distance (ft)</li>
+      </ul>
+
+  photo:
+    type: static
+    html: |
+      <img class="img-polaroid" src="http://upload.wikimedia.org/wikipedia/commons/9/92/1919_Ford_Model_T_Highboy_Coupe.jpg"/>
+      <small>Source: Photographed at the Bay State Antique Automobile Club's July 10, 2005 show at the Endicott Estate in Dedham, MA by
+      <a href="http://commons.wikimedia.org/wiki/User:Sfoskett">User:Sfoskett</a></small>

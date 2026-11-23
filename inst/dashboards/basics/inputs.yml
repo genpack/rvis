@@ -1,0 +1,60 @@
+# All shiny input items, in three columns, and their current values.
+name: Input items
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: Input items
+    layout:
+      # first row: three columns (a list of three lists of item names)
+      - - [text, password, numeric, slider, range]
+        - [select, multi, radio, checkbox, group]
+        - [date, dates, file, button, link]
+      # second row: the values
+      - [values]
+
+  text:     {type: textInput, title: Text, value: Hello, placeholder: type something}
+  password: {type: passwordInput, title: Password}
+  numeric:  {type: numericInput, title: Number, value: 5, min: 0, max: 10, step: 0.5}
+  slider:   {type: sliderInput, title: Slider, min: 0, max: 100, value: 40}
+  range:    {type: sliderInput, title: Range slider, min: 0, max: 100, value: [20, 60], post: " %"}
+
+  select:
+    type: selectInput
+    title: Select
+    choices: !expr rownames(mtcars)
+    selected: Valiant
+  multi:
+    type: selectInput
+    title: Multiple select
+    choices: [setosa, versicolor, virginica]
+    selected: [setosa, virginica]
+    multiple: true
+  # choices with labels: label -> value
+  radio:
+    type: radioButtons
+    title: Radio buttons
+    choices: {Small: S, Medium: M, Large: L}
+    selected: M
+    inline: true
+  checkbox: {type: checkboxInput, title: Checkbox, value: true}
+  group:
+    type: checkboxGroupInput
+    title: Checkbox group
+    choices: [north, south, east, west]
+    selected: [north, east]
+    inline: true
+
+  date:   {type: dateInput, title: Date, value: 2024-06-01, format: dd M yyyy}
+  dates:  {type: dateRangeInput, title: Date range, start: 2024-06-01, end: 2024-06-30}
+  file:   {type: fileInput, title: File, accept: [.csv, .txt]}
+  button: {type: actionButton, title: Action button, icon: play}
+  link:   {type: actionLink, title: Action link, icon: link}
+
+  values:
+    type: verbatimTextOutput
+    service: |
+      ids <- c("text", "password", "numeric", "slider", "range", "select", "multi", "radio",
+               "checkbox", "group", "date", "dates", "file", "button", "link")
+      str(setNames(lapply(ids, function(id) input[[id]]), ids))

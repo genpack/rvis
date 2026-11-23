@@ -1,0 +1,63 @@
+# A dynamic user interface: inputs built by the server, conditional panels, hiding/showing and
+# enabling/disabling items (package shinyjs) and updating inputs from the server.
+name: Dynamic interface
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: Dynamic user interface
+    layout:
+      - - {weight: 4, items: controls}
+        - {weight: 8, items: [plot, actions]}
+
+  controls:
+    type: wellPanel
+    layout: [dataset, variable, show_options, options]
+
+  dataset:
+    type: selectInput
+    title: Dataset
+    choices: [mtcars, airquality, faithful, trees]
+
+  # a dynamic input: its service returns an input built from the current dataset
+  variable:
+    type: dynamicInput
+    service: selectInput("var", "Variable", choices = names(Filter(is.numeric, get(input$dataset))))
+
+  show_options:
+    type: checkboxInput
+    title: Show plot options
+
+  # shown only when the javascript condition is true
+  options:
+    type: conditionalPanel
+    condition: input.show_options == true
+    layout: [bins, color]
+
+  bins:  {type: sliderInput, title: Bins, min: 5, max: 50, value: 20}
+  color: {type: radioButtons, title: Colour, choices: [steelblue, darkorange, seagreen], inline: true}
+
+  plot:
+    type: plotOutput
+    service: |
+      req(input$var, input$var %in% names(get(input$dataset)))
+      x <- get(input$dataset)[[input$var]]
+      hist(x, breaks = if (is.null(input$bins)) 20 else input$bins, col = if (is.null(input$color)) "steelblue" else input$color,
+           border = "white", main = paste(input$dataset, input$var, sep = ": "), xlab = input$var)
+
+  actions:
+    type: fluidPage
+    layout: [[hide, show, disable, enable, first]]
+
+  # methods hideItems(), showItems(), disableItems() and enableItems() of the dashboard (the shinyjs
+  # javascript is added to the page because the services use them)
+  hide:    {type: actionButton, title: Hide plot, service: hideItems("plot")}
+  show:    {type: actionButton, title: Show plot, service: showItems("plot")}
+  disable: {type: actionButton, title: Disable dataset, service: disableItems("dataset")}
+  enable:  {type: actionButton, title: Enable dataset, service: enableItems("dataset")}
+  # updateItem4Session() updates an input of the session with the shiny update function of its type
+  first:
+    type: actionButton
+    title: First dataset
+    service: updateItem4Session("dataset", session, selected = "mtcars")

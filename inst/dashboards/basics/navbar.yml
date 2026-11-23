@@ -1,0 +1,71 @@
+# A navigation bar page with tabs, a drop-down menu and a bootstrap theme (package shinythemes).
+name: Navbar page
+layout: nav
+
+items:
+  nav:
+    type: navbarPage
+    title: Tooth growth
+    # a theme: the path of a bootstrap css file, here from package shinythemes
+    theme: !expr shinythemes::shinytheme("flatly")
+    collapsible: true
+    footer: "Data: ToothGrowth (effect of vitamin C on tooth growth in guinea pigs)"
+    layout: [plot_tab, data_tab, more]
+
+  plot_tab:
+    type: tabPanel
+    title: Plot
+    icon: chart-column
+    layout:
+      - - {weight: 3, items: [supp, dose]}
+        - {weight: 9, items: boxplot}
+
+  supp:
+    type: checkboxGroupInput
+    title: Supplement
+    choices: {Orange juice: OJ, Ascorbic acid: VC}
+    selected: [OJ, VC]
+
+  dose:
+    type: sliderInput
+    title: Dose (mg/day)
+    min: 0.5
+    max: 2
+    value: [0.5, 2]
+    step: 0.5
+
+  boxplot:
+    type: plotOutput
+    service: |
+      d <- ToothGrowth[ToothGrowth$supp %in% input$supp & ToothGrowth$dose >= input$dose[1] & ToothGrowth$dose <= input$dose[2], ]
+      validate(need(nrow(d) > 0, "Select at least one supplement."))
+      boxplot(len ~ supp + dose, data = droplevels(d), col = c("#F4A460", "#87CEEB"), ylab = "Tooth length")
+
+  data_tab:
+    type: tabPanel
+    title: Data
+    icon: table
+    layout: [table]
+
+  table:
+    type: dataTableOutput
+    options: {pageLength: 10}
+    service: ToothGrowth
+
+  # a drop-down menu of tab panels
+  more:
+    type: navbarMenu
+    title: More
+    icon: bars
+    layout: [summary_tab, about_tab]
+
+  summary_tab: {type: tabPanel, title: Summary, layout: [summary]}
+  about_tab:   {type: tabPanel, title: About, layout: [about]}
+
+  summary:
+    type: verbatimTextOutput
+    service: aggregate(len ~ supp + dose, data = ToothGrowth, FUN = mean)
+
+  about:
+    type: static
+    html: <p>The response is the length of odontoblasts in 60 guinea pigs, each receiving one of three dose levels of vitamin C by one of two delivery methods.</p>

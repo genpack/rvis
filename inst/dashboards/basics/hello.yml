@@ -1,0 +1,30 @@
+# The smallest useful dashboard: one input, one output and a page layout.
+name: Hello rvis
+# the item that makes the page
+layout: page
+
+items:
+  # a container: a fluid page with a title, a side panel and a main panel
+  page:
+    type: sidebarLayout
+    title: Hello rvis!
+    layout.side: [bins]
+    layout.main: [hist]
+
+  # an input: its value is input$bins in the services
+  bins:
+    type: sliderInput
+    title: "Number of bins:"
+    min: 1
+    max: 50
+    value: 30
+
+  # an output: its service is R code returning the content (here a plot) and is run again when input$bins changes
+  hist:
+    type: plotOutput
+    service: |
+      x <- faithful$waiting
+      bins <- seq(min(x), max(x), length.out = input$bins + 1)
+      hist(x, breaks = bins, col = "#75AADB", border = "white",
+           xlab = "Waiting time to next eruption (in mins)",
+           main = "Histogram of waiting times")

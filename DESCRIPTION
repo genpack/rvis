@@ -1,7 +1,7 @@
 Package: rvis
 Type: Package
 Title: NIRASOFT R package for visualization
-Version: 5.11.0
+Version: 5.12.0
 Date: 2026-11-23
 Author: Nima Ramezani
 Maintainer: <nima.ramezani@gmail.com>
@@ -16,7 +16,7 @@ Imports:
     dplyr,
     stringr
 Remotes: genpack/rutils
-Suggests: knitr, rmarkdown, pkgdown
+Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Collate:
     'visgen.R'
@@ -35,6 +35,7 @@ Collate:
     'tfd3.R'
     'd3tablefilter.R'
     'dashboard.R'
+    'dashconfig.R'
     'dashtools.R'
     'dc.R'
     'dfvis.R'
@@ -64,3 +65,4 @@ Collate:
     'sankeytree.R'
     'rvis.R'
 Config/roxygen2/version: 8.1.1
+Config/testthat/edition: 3

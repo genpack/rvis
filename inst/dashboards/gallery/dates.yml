@@ -1,0 +1,67 @@
+# Shiny gallery: Date and date range (shiny-examples 037-date-and-date-range)
+# https://shiny.posit.co/r/gallery/widgets/date-and-date-range/
+name: Dates and date ranges
+layout: page
+items:
+  page:
+    type: fluidPage
+    title: Dates and date ranges
+    layout:
+      - - {weight: 4, items: inputs}
+        - {weight: 6, items: [dateText, dateText2, dateRangeText, dateRangeText2]}
+
+  inputs:
+    type: wellPanel
+    layout: [date, date2, dateRange, dateRange2]
+
+  date:
+    type: dateInput
+    title: "Date input: yyyy-mm-dd"
+    value: !expr Sys.Date()
+
+  date2:
+    type: dateInput
+    title: "Date input 2: string for starting value, dd/mm/yy format, locale ja, range limited, week starts on day 1 (Monday)"
+    value: !expr as.character(Sys.Date())
+    min: !expr Sys.Date() - 5
+    max: !expr Sys.Date() + 5
+    format: dd/mm/yy
+    startview: year
+    language: zh-TW
+    weekstart: 1
+
+  dateRange:
+    type: dateRangeInput
+    title: "Date range input: yyyy-mm-dd"
+    start: !expr Sys.Date() - 2
+    end: !expr Sys.Date() + 2
+
+  dateRange2:
+    type: dateRangeInput
+    title: 'Date range input 2: range is limited, dd/mm/yy, language: fr, week starts on day 1 (Monday), separator is "-", start view is year'
+    start: !expr Sys.Date() - 3
+    end: !expr Sys.Date() + 3
+    min: !expr Sys.Date() - 10
+    max: !expr Sys.Date() + 10
+    separator: " - "
+    format: dd/mm/yy
+    startview: year
+    language: fr
+    weekstart: 1
+
+  # verbatimTextOutput services are printed: cat() prints the text without quotes
+  dateText:
+    type: verbatimTextOutput
+    service: cat(paste("input$date is", as.character(input$date)))
+
+  dateText2:
+    type: verbatimTextOutput
+    service: cat(paste("input$date2 is", as.character(input$date2)))
+
+  dateRangeText:
+    type: verbatimTextOutput
+    service: cat(paste("input$dateRange is", paste(as.character(input$dateRange), collapse = " to ")))
+
+  dateRangeText2:
+    type: verbatimTextOutput
+    service: cat(paste("input$dateRange2 is", paste(as.character(input$dateRange2), collapse = " to ")))

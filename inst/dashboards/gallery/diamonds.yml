@@ -1,0 +1,80 @@
+# Shiny gallery: Plot plus three columns (shiny-examples 057-plot-plus-three-columns)
+# https://shiny.posit.co/r/gallery/application-layout/plot-plus-three-columns/
+# Needs package ggplot2.
+name: Diamonds Explorer
+layout: page
+
+prescript: |
+  library(ggplot2)
+  dataset <- reactive({
+    diamonds[sample(nrow(diamonds), input$sampleSize), ]
+  })
+
+items:
+  page:
+    type: fluidPage
+    wintitle: Diamonds Explorer
+    layout:
+      - [plot]
+      - [rule]
+      # a row of three columns
+      - - {weight: 3, items: [heading, sampleSize, space, jitter, smooth]}
+        - {weight: 4, offset: 1, items: [x, y, color]}
+        - {weight: 4, items: [facet_row, facet_col]}
+
+  plot:
+    type: plotOutput
+    service: |
+      p <- ggplot(dataset(), aes_string(x = input$x, y = input$y)) + geom_point()
+      if (input$color != 'None')
+        p <- p + aes_string(color = input$color)
+      facets <- paste(input$facet_row, '~', input$facet_col)
+      if (facets != '. ~ .')
+        p <- p + facet_grid(facets)
+      if (input$jitter)
+        p <- p + geom_jitter()
+      if (input$smooth)
+        p <- p + geom_smooth()
+      print(p)
+
+  rule:    {type: static, html: <hr/>}
+  heading: {type: static, html: <h4>Diamonds Explorer</h4>}
+  space:   {type: static, html: <br/>}
+
+  sampleSize:
+    type: sliderInput
+    title: Sample Size
+    min: 1
+    max: !expr nrow(ggplot2::diamonds)
+    value: 1000
+    step: 500
+    round: 0
+
+  jitter: {type: checkboxInput, title: Jitter}
+  smooth: {type: checkboxInput, title: Smooth}
+
+  x:
+    type: selectInput
+    title: X
+    choices: !expr names(ggplot2::diamonds)
+
+  y:
+    type: selectInput
+    title: Y
+    choices: !expr names(ggplot2::diamonds)
+    selected: cut
+
+  color:
+    type: selectInput
+    title: Color
+    choices: !expr c('None', names(ggplot2::diamonds))
+
+  facet_row:
+    type: selectInput
+    title: Facet Row
+    choices: !expr c(None = '.', names(ggplot2::diamonds)[sapply(ggplot2::diamonds, is.factor)])
+
+  facet_col:
+    type: selectInput
+    title: Facet Column
+    choices: !expr c(None = '.', names(ggplot2::diamonds)[sapply(ggplot2::diamonds, is.factor)])

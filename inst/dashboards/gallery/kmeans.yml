@@ -1,0 +1,51 @@
+# Shiny gallery: Kmeans example (shiny-examples 050-kmeans-example)
+# https://shiny.posit.co/r/gallery/start-simple/kmeans-example/
+name: Iris k-means clustering
+layout: page
+
+# Reactive expressions used by the services are defined in the prescript, which runs at the start of each session
+prescript: |
+  # Combine the selected variables into a new data frame
+  selectedData <- reactive({
+    iris[, c(input$xcol, input$ycol)]
+  })
+  clusters <- reactive({
+    kmeans(selectedData(), input$clusters)
+  })
+
+items:
+  page:
+    type: sidebarLayout
+    title: Iris k-means clustering
+    layout.side: [xcol, ycol, clusters]
+    layout.main: [plot1]
+
+  # k-means only works with numerical variables, so don't give the user the option to select a categorical variable
+  xcol:
+    type: selectInput
+    title: X Variable
+    choices: !expr setdiff(names(iris), "Species")
+
+  ycol:
+    type: selectInput
+    title: Y Variable
+    choices: !expr setdiff(names(iris), "Species")
+    selected: Sepal.Width
+
+  clusters:
+    type: numericInput
+    title: Cluster count
+    value: 3
+    min: 1
+    max: 9
+
+  plot1:
+    type: plotOutput
+    service: |
+      palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+        "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+      par(mar = c(5.1, 4.1, 0, 1))
+      plot(selectedData(),
+           col = clusters()$cluster,
+           pch = 20, cex = 3)
+      points(clusters()$centers, pch = 4, cex = 4, lwd = 4)

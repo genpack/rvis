@@ -1,0 +1,76 @@
+# Shiny gallery: Plot interaction - basic (shiny-examples 093-plot-interaction-basic)
+# https://shiny.posit.co/r/gallery/interactive-plots/plot-interaction-basic/
+# Needs package ggplot2.
+name: Plot interaction - basic
+layout: page
+prescript: library(ggplot2)
+items:
+  page:
+    type: fluidPage
+    layout:
+      - [style]
+      # a row of two columns of width 4
+      - - {weight: 4, items: controls}
+        - {weight: 4, items: plot1}
+      # a row of four columns: each column gets 12/4 = 3 grid units
+      - - [click_info]
+        - [dblclick_info]
+        - [hover_info]
+        - [brush_info]
+
+  style:
+    type: static
+    html: |
+      <style>
+        pre, table.table {
+          font-size: smaller;
+        }
+      </style>
+
+  controls:
+    type: wellPanel
+    layout: [plot_type]
+
+  plot_type:
+    type: radioButtons
+    title: Plot type
+    choices: [base, ggplot2]
+
+  # click, dblclick, hover and brush give the ids of the inputs reporting mouse events on the plot
+  plot1:
+    type: plotOutput
+    height: 350px
+    click: plot_click
+    dblclick: plot_dblclick
+    hover: plot_hover
+    brush: plot_brush
+    service: |
+      if (input$plot_type == "base") {
+        plot(mtcars$wt, mtcars$mpg)
+      } else if (input$plot_type == "ggplot2") {
+        ggplot(mtcars, aes(wt, mpg)) + geom_point()
+      }
+
+  click_info:
+    type: verbatimTextOutput
+    service: |
+      cat("input$plot_click:\n")
+      str(input$plot_click)
+
+  dblclick_info:
+    type: verbatimTextOutput
+    service: |
+      cat("input$plot_dblclick:\n")
+      str(input$plot_dblclick)
+
+  hover_info:
+    type: verbatimTextOutput
+    service: |
+      cat("input$plot_hover:\n")
+      str(input$plot_hover)
+
+  brush_info:
+    type: verbatimTextOutput
+    service: |
+      cat("input$plot_brush:\n")
+      str(input$plot_brush)

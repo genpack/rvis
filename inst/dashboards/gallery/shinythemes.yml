@@ -1,0 +1,62 @@
+# Shiny gallery: Shiny theme selector (shiny-examples 117-shinythemes)
+# https://shiny.posit.co/r/gallery/application-layout/shiny-theme-selector/
+# Needs package shinythemes.
+name: shinythemes
+# two items make the page: the theme selector and the navbar page
+layout: [selector, nav]
+items:
+  selector:
+    type: static
+    object: !expr shinythemes::themeSelector()
+
+  nav:
+    type: navbarPage
+    title: shinythemes
+    layout: [navbar1, navbar2, navbar3]
+
+  navbar1:
+    type: tabPanel
+    title: Navbar 1
+    layout: [navbar1_page]
+
+  navbar1_page:
+    type: sidebarLayout
+    layout.side: [file, txt, slider, default_label, action, primary_label, action2]
+    layout.main: [tabs]
+
+  file:   {type: fileInput, title: "File input:"}
+  txt:    {type: textInput, title: "Text input:", value: general}
+  slider: {type: sliderInput, title: "Slider input:", min: 1, max: 100, value: 30}
+  default_label: {type: static, html: "<h5>Default actionButton:</h5>"}
+  action: {type: actionButton, title: Search}
+  primary_label: {type: static, html: "<h5>actionButton with CSS class:</h5>"}
+  action2: {type: actionButton, title: Action button, class: btn-primary}
+
+  tabs:
+    type: tabsetPanel
+    layout: [tab1, tab2, tab3]
+
+  tab1:
+    type: tabPanel
+    title: Tab 1
+    layout: [table_title, table, txt_title, txtout, headers]
+
+  tab2: {type: tabPanel, title: Tab 2, layout: [blank]}
+  tab3: {type: tabPanel, title: Tab 3, layout: [blank]}
+  navbar2: {type: tabPanel, title: Navbar 2, layout: [blank]}
+  navbar3: {type: tabPanel, title: Navbar 3, layout: [blank]}
+
+  blank: {type: static, html: This panel is intentionally left blank}
+  table_title: {type: static, html: <h4>Table</h4>}
+  txt_title: {type: static, html: <h4>Verbatim text output</h4>}
+  headers:
+    type: static
+    html: <h1>Header 1</h1><h2>Header 2</h2><h3>Header 3</h3><h4>Header 4</h4><h5>Header 5</h5>
+
+  table:
+    type: tableOutput
+    service: head(cars, 4)
+
+  txtout:
+    type: verbatimTextOutput
+    service: cat(paste(input$txt, input$slider, format(input$date), sep = ", "))

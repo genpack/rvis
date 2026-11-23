@@ -1,0 +1,259 @@
+---
+title: "Dashboards: item reference"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dashboards: item reference}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("dashboard-setup.R")
+```
+
+This reference lists every item type of a dashboard and its settings, the server environment of
+the services, and the special features: reactive values, dynamic interfaces, tooltips and popovers,
+modal windows, guided tours, login and synced tables. Each feature has an example dashboard
+that comes with rvis (`runDashboard(rvisDashboardExample("<name>"))`).
+Containers and clothes are described in [Layouts](dashboard-layouts.html).
+
+## Settings of all items {#common}
+
+| Setting | Meaning |
+|:---|:---|
+| `type` | The item type (required). |
+| `title` | Label of an input, title of a container or of the cloth of the item. |
+| `service` | R code: the content of an output, or code run when an input changes. |
+| `weight`, `offset` | Width and offset (in 12ths of the row) of the column holding the item, in row/column layouts. |
+| `cloth` | A box, value box, info box, column, well panel or tab panel around the item ([clothes](dashboard-layouts.html#clothes)). |
+| `tooltip`, `tooltip.placement`, `tooltip.trigger`, `tooltip.options` | A tooltip ([shinyBS](https://ebailey78.github.io/shinyBS/)). Placement: `top`, `bottom` (default), `left`, `right`; trigger: `hover` (default), `focus`, `click`, `manual`. |
+| `popover`, `popover.title`, `popover.placement`, `popover.trigger`, `popover.options` | A popover (html allowed). |
+| `tutor.lesson`, `tutor.step`, `tutor.hint` | A lesson of the guided tour ([rintrojs](https://carlganz.github.io/rintrojs/)). |
+
+## Inputs {#inputs}
+
+The name of an input item is its id (`input$<name>`). `title` is its label. The `service` of an
+input is run (in `observeEvent()`) when the input changes; with `isolate: true` it is run in
+`isolate()`. `choices` and `selected` can be vectors or mappings of labels to values.
+
+| Type | Settings |
+|:---|:---|
+| `textInput`, `passwordInput` | `value`, `width`, `placeholder` |
+| `numericInput` | `value`, `min`, `max`, `step` |
+| `sliderInput` | `min`, `max`, `value` (two values for a range), `step`, `round`, `ticks`, `sep`, `pre`, `post`, `animate` (`true` or `!expr animationOptions(...)`), `dragRange`, `timeFormat`, `timezone`, `width` |
+| `selectInput` | `choices`, `selected`, `multiple`, `selectize`, `width` |
+| `radioButtons` | `choices`, `selected`, `inline`, `width` |
+| `checkboxInput` | `value`, `inline`, `vertical_align`, `float` |
+| `checkboxGroupInput` | `choices`, `selected` (or `choiceNames` and `choiceValues`), `inline`, `width` |
+| `dateInput` | `value`, `min`, `max`, `format`, `startview`, `weekstart`, `language`, `autoclose`, `datesdisabled`, `daysofweekdisabled`, `width` |
+| `dateRangeInput` | `start`, `end`, `min`, `max`, `format`, `startview`, `weekstart`, `language`, `separator`, `autoclose`, `width` |
+| `fileInput` | `multiple`, `accept`, `buttonLabel`, `placeholder`, `width` |
+| `actionButton` | `icon`, `class` (like `btn-primary`), `width`, `inline`, `vertical_align`, `float` |
+| `actionLink` | `icon` |
+| `actionBttn` ([shinyWidgets](https://dreamrs.github.io/shinyWidgets/)) | `icon`, `style`, `status`, `size`, `fullwidth`, `no_outline` |
+| `actionGroupButtons` (shinyWidgets) | `inputIds`, `labels`, `status`, `size`, `inline`, `fullwidth` |
+| `airDatepickerInput` (shinyWidgets) | `value`, `min`, `max`, `range`, `multiple`, `view`, `minView`, `dateFormat`, `timePicker`, `language`, `clearButton`, `todayButton`, `autoClose`, `inline`, ... |
+
+Icons are [Font Awesome](https://fontawesome.com/search?ic=free) names, like `play`.
+
+```{r, echo=FALSE}
+show_yaml("inputs")
+```
+
+```{r, echo=FALSE}
+show_shot("inputs")
+```
+
+## Outputs {#outputs}
+
+The `service` of an output is the R code of its render function: the output is updated when an
+input or reactive value used by the service changes.
+
+| Type | Render function | Settings |
+|:---|:---|:---|
+| `textOutput` | `renderText()` | `tag` (html tag of the text, like `h3`), `inline` |
+| `verbatimTextOutput` | `renderPrint()` | `placeholder` |
+| `htmlOutput` | `renderUI()` | `tag`, `inline` |
+| `uiOutput` | `renderText()` (the text is html) | `tag`, `inline`; used for the value of value box and info box clothes |
+| `dynamicInput` | `renderUI()` | `inline`; the service returns inputs or any user interface |
+| `plotOutput` | `renderPlot()` | `width`, `height`, `click`, `dblclick`, `hover`, `brush` (ids of the inputs reporting mouse events), `spinner`, `spinner.color` (shinyWidgets) |
+| `imageOutput` | `renderImage()` | `deleteFile` |
+| `tableOutput` | `renderTable()` | `striped`, `hover`, `bordered`, `spacing`, `width`, `align`, `rownames`, `colnames`, `digits`, `na` |
+| `dataTableOutput` | `DT::renderDataTable()` | `width`, `height`, `options` (DataTables options) |
+| `valueBoxOutput`, `infoBoxOutput` | `renderValueBox()`, `renderInfoBox()` | `weight` |
+| `downloadButton`, `downloadLink` | `downloadHandler()` | `title`, `filename` (R code), `class`, `style`; the service writes the content into `file` |
+| `static` | none | `html` (html text) or `object` (any shiny tag, like `!expr hr()`) |
+
+```{r, echo=FALSE}
+show_yaml("outputs")
+```
+
+```{r, echo=FALSE}
+show_shot("outputs")
+```
+
+### htmlwidgets outputs {#widgets}
+
+These outputs show htmlwidgets made by their service, for example rvis charts made by `rvisPlot()`.
+They have `width` and `height` settings (defaults in brackets).
+
+| Type | Package | Default size |
+|:---|:---|:---|
+| `highcharterOutput` | highcharter | 100%, 400px |
+| `plotlyOutput` | plotly | 100%, 400px |
+| `dygraphOutput` | dygraphs | 100%, 400px |
+| `leafletOutput` | leaflet | 100%, 400px |
+| `amChartsOutput` | rAmCharts | 100%, 400px |
+| `billboarderOutput` | billboarder | 100%, 400px |
+| `c3Output` | c3 | 100%, 100% |
+| `morrisjsOutput` | morrisjs | 100%, 400px |
+| `d3plusOutput` | d3plus | 100%, 500px |
+| `bubblesOutput` | bubbles | 600px, 600px |
+| `sankeyNetworkOutput` | networkD3 | 100%, 500px |
+| `sankeytreeOutput` | sankeytreeR | 100%, 400px |
+| `coffeewheelOutput` | rvis (embedded) | 400, 400 |
+| `grvizOutput` | rvis (DiagrammeR graphs) | 100%, 400px |
+| `wordcloud2Output` | wordcloud2 | 100%, 400px |
+| `sunburstOutput` | sunburstR | 100%, 400px |
+| `upsetjsOutput` | upsetjs | 100%, 500px |
+| `pivotOutput` | rpivotTable | 100%, 500px |
+| `TFD3Output` | rvis (embedded) | 100%, 400px |
+| `d3tfOutput` | D3TableFilter | 100%, 400px |
+| `rHandsonTableOutput` | rhandsontable | 100%, 100% |
+| `gglVisChartOutput` | googleVis | |
+| `rChartsdPlotOutput` | rCharts (dimple) | |
+
+```{r, echo=FALSE}
+show_yaml("charts")
+```
+
+```{r, echo=FALSE}
+show_shot("charts")
+```
+
+## Reactive values, objects and observers {#reactive}
+
+* `values` gives the initial values of the reactive list `sync` of each session. Outputs using
+  `sync$<name>` are updated when it changes.
+* `objects` are copied into `session$userData` of each session (not reactive).
+* `prescript` is run at the start of each session: define reactive expressions, event reactives
+  and functions there.
+* `observers` is a list of R code, each run in `observe()`: it is run again when the reactive
+  values it uses change.
+
+```{r, echo=FALSE}
+show_yaml("reactive")
+```
+
+```{r, echo=FALSE}
+show_shot("reactive")
+```
+
+## Dynamic interfaces {#dynamic}
+
+* A `dynamicInput` shows the inputs (or any interface) returned by its service, for example a
+  selection of the columns of the chosen data set.
+* A `conditionalPanel` shows its items only when its javascript `condition` is true.
+* Methods `hideItems()`, `showItems()`, `disableItems()` and `enableItems()` hide, show, disable
+  or enable items (tab panels too). They use package [shinyjs](https://deanattali.com/shinyjs/),
+  whose javascript is added to the page when a service, observer or the prescript uses them
+  (or with `settings: {shinyjs: true}`).
+* `updateItem4Session(item, session, ...)` updates an input with the shiny update function of its
+  type (`updateSelectInput()`, `updateSliderInput()`, ...; also the selected tab of a navbar page,
+  navigation list or sidebar menu). `updateItem(item, ...)` updates it in all open sessions
+  (with `settings: {keepSessions: true}`).
+
+```{r, echo=FALSE}
+show_yaml("dynamic")
+```
+
+```{r, echo=FALSE}
+show_shot("dynamic")
+```
+
+## Modal windows, collapsible panels, tooltips and popovers {#shinybs}
+
+These use package [shinyBS](https://ebailey78.github.io/shinyBS/). A `bsModal` opens when its
+`trigger` (a button) is clicked. Modal dialogs can also be shown by a service with
+`showModal(modalDialog(...))` ([example](dashboard-gallery.html#modal-dialog)).
+
+```{r, echo=FALSE}
+show_yaml("modals-tooltips")
+```
+
+```{r, echo=FALSE}
+show_shot("modals-tooltips")
+```
+
+## shinyWidgets {#shinywidgets}
+
+```{r, echo=FALSE}
+show_yaml("shinywidgets")
+```
+
+```{r, echo=FALSE}
+show_shot("shinywidgets")
+```
+
+## Guided tours {#tutor}
+
+Items with a `tutor.lesson` are steps of a guided tour, in the order of their `tutor.step`. A
+`tutorBox` is a container highlighted as a whole. The tour is started by a service calling
+`rintrojs::introjs(session)`; the javascript of rintrojs is added to the page when an item has a lesson.
+
+```{r, echo=FALSE}
+show_yaml("tutor")
+```
+
+```{r, echo=FALSE}
+show_shot("tutor")
+```
+
+## Login {#login}
+
+A `loginInput` shows a login box (`input$getUser`, `input$getPass`, `input$login`), and once the
+user is logged in, the user name with a log out link. The users are the row names of the
+`loginTable` (column `password`), which can be given as a mapping `user: password`.
+`sync$user` is the logged in user (`NULL` otherwise) and `sync$message` the last login message.
+
+| Settings | Meaning |
+|:---|:---|
+| `settings: passEncryption` | `none` (default) or `bcrypt` (passwords are hashes from `bcrypt::hashpw()`). |
+| `settings: saveSession` | If `true` (default), the session data (`session$userData` and `sync`) of each user is saved in a file `<user>.rds` when the user logs out, and loaded when the user logs in again. |
+| `settings: savePath` | Folder of the saved sessions. |
+| `messages` | `initial`, `loginSuccess`, `loginFail` and `usernameNotFound` messages. |
+
+```{r, echo=FALSE}
+show_yaml("login")
+```
+
+```{r, echo=FALSE}
+show_shot("login")
+```
+
+## Synced tables {#sync}
+
+A `TFD3Output` (or `d3tfOutput`) with `sync: true` shows the data frame of its `data` field, with
+the settings of its `config` (see the [tables guide](tables.html)). The table is the reactive
+value `sync$<name>`: edits made in the browser change it, and changes made by the server are sent
+to the browser. `report$<name>_filtered` gives the rows passing the filters,
+`report$<name>_selected` the selected rows and `report$<name>_lastEdits` the last edits.
+
+```{r, echo=FALSE}
+show_yaml("synced-table")
+```
+
+```{r, echo=FALSE}
+show_shot("synced-table")
+```
+
+## Methods of a dashboard {#methods}
+
+| Method | Use |
+|:---|:---|
+| `app()`, `run(...)` | The shiny app object; run the app (arguments of `shiny::runApp()`). |
+| `dashboard.ui()`, `dashboard.server()` | The user interface and the server function. |
+| `hideItems(...)`, `showItems(...)`, `disableItems(...)`, `enableItems(...)` | In services: hide, show, disable or enable items. |
+| `updateItem4Session(item, session, ...)` | In services: update an input of the session. |
+| `updateItem(item, ...)` | Update an input in all open sessions (`settings: {keepSessions: true}`). |
+| `getItemObject(name)` | The user interface object of an input or container item. |

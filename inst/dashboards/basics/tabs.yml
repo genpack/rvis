@@ -1,0 +1,70 @@
+# Tabs: tabset panels (tabs or pills) and a navigation list, made of tab panels.
+name: Tabs
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: Tabs and navigation lists
+    layout:
+      - [species]
+      - - [tabs_title, tabs]
+        - [pills_title, pills]
+      - [navlist_title, navlist]
+
+  species:
+    type: radioButtons
+    title: Species
+    choices: [setosa, versicolor, virginica]
+    inline: true
+
+  tabs_title:    {type: static, html: "<h4>tabsetPanel, shape: tabs</h4>"}
+  pills_title:   {type: static, html: "<h4>tabsetPanel, shape: pills</h4>"}
+  navlist_title: {type: static, html: "<h4>navlistPanel</h4>"}
+
+  # a tabset panel: its layout gives the tab panels
+  tabs:
+    type: tabsetPanel
+    selected: Sepals
+    layout: [sepal_tab, petal_tab]
+
+  # a tab panel has a title, an optional icon and a layout (item names or a list of rows and columns)
+  sepal_tab: {type: tabPanel, title: Sepals, icon: leaf, layout: [sepals]}
+  petal_tab: {type: tabPanel, title: Petals, icon: seedling, layout: [petals]}
+
+  # tab panels can also be given as clothes of the items
+  pills:
+    type: tabsetPanel
+    shape: pills
+    layout: [summary, counts]
+  summary:
+    type: verbatimTextOutput
+    service: summary(iris[iris$Species == input$species, 1:4])
+    cloth: {type: tabPanel, title: Summary}
+  counts:
+    type: tableOutput
+    service: as.data.frame(table(cut(iris$Petal.Length[iris$Species == input$species], 4)))
+    cloth: {type: tabPanel, title: Petal length classes}
+
+  # a navigation list: tabs listed on the left, widths of the list and the content (12 grid units in total)
+  navlist:
+    type: navlistPanel
+    widths: [3, 9]
+    layout: [about_tab, data_tab]
+  about_tab: {type: tabPanel, title: About, layout: [about]}
+  data_tab:  {type: tabPanel, title: Data, layout: [data]}
+  about:
+    type: static
+    html: <p>Edgar Anderson's iris data give four measurements (cm) of 50 flowers of each of three species.</p>
+  data:
+    type: tableOutput
+    service: head(iris[iris$Species == input$species, ])
+
+  sepals:
+    type: plotOutput
+    height: 300px
+    service: plot(Sepal.Width ~ Sepal.Length, data = iris[iris$Species == input$species, ], pch = 19, col = "#4DAF4A")
+  petals:
+    type: plotOutput
+    height: 300px
+    service: plot(Petal.Width ~ Petal.Length, data = iris[iris$Species == input$species, ], pch = 19, col = "#984EA3")

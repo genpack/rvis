@@ -1,0 +1,94 @@
+---
+title: "Dashboards: gallery"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dashboards: gallery}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("dashboard-setup.R")
+
+# Writes the section of an example: title, links, notes, screenshot and YAML configuration
+example_section <- function(name, title, source = NULL, notes = NULL) {
+  x <- readLines(rvisDashboardExample(name), warn = FALSE, encoding = "UTF-8")
+  cat(sprintf("\n## %s {#%s}\n\n", title, name))
+  if (!is.null(source)) cat(sprintf("Original: [%s](https://shiny.posit.co/r/gallery/%s/) (source in [shiny-examples](https://github.com/rstudio/shiny-examples/tree/main/%s)).\n\n",
+                                    title, source[1], source[2]))
+  cat(sprintf("Run it: `runDashboard(rvisDashboardExample(\"%s\"))`\n\n", name))
+  if (!is.null(notes)) cat(notes, "\n\n")
+  cat(sprintf("![](figures/dash-%s.png){width=100%%}\n\n", name))
+  cat("<details><summary>YAML configuration</summary>\n\n```yaml\n", paste(x, collapse = "\n"), "\n```\n\n</details>\n\n", sep = "")
+}
+```
+
+The apps of the [Shiny gallery](https://shiny.posit.co/r/gallery/) are written as R code (a user
+interface and a server function). Here they are rebuilt from YAML configurations: the same
+inputs, outputs, layout and server code, with the server code split into the services of the
+outputs and a prescript for the reactive expressions. Small differences of the html structure
+(for example rows around columns, or a `titlePanel` instead of a `headerPanel`) are noted for each app.
+
+The second part shows two large **showcase** dashboards combining most features of rvis dashboards.
+
+# Shiny gallery apps
+
+```{r, echo=FALSE, results='asis'}
+gallery <- list(
+  list("faithful", "Faithful", c("start-simple/faithful", "083-front-page"),
+       "The original is a `bootstrapPage` and its check box labels are bold: here a `fluidPage` with plain labels. The bandwidth slider is in a `conditionalPanel`."),
+  list("kmeans", "Kmeans example", c("start-simple/kmeans-example", "050-kmeans-example"),
+       "The reactive expressions `selectedData()` and `clusters()` are defined in the prescript. The original uses `pageWithSidebar()` with a `headerPanel`: here a `sidebarLayout` with a `titlePanel`."),
+  list("telephones", "Telephones by region", c("start-simple/telephones-by-region", "064-telephones-by-region"),
+       "The horizontal rule and the help text are static html items."),
+  list("tabsets", "Tabsets", c("application-layout/tabsets", "006-tabsets"), NULL),
+  list("navbar-example", "Navbar example", c("application-layout/navbar-example", "052-navbar-example"),
+       "The text of the About tab is html in the configuration, instead of a markdown file read by `includeMarkdown()`."),
+  list("diamonds", "Plot plus three columns", c("application-layout/plot-plus-three-columns", "057-plot-plus-three-columns"),
+       "Needs package ggplot2. The inputs of each column are in a row inside the column."),
+  list("more-widgets", "Widgets", c("widgets/widgets", "007-widgets"),
+       "The event reactive `datasetInput()` (updated when the button is clicked) is defined in the prescript."),
+  list("sliders", "Sliders", c("widgets/sliders", "005-sliders"),
+       "The looping animation is given as an R expression: `animate: !expr shiny::animationOptions(interval = 300, loop = TRUE)`."),
+  list("dates", "Date and date range", c("widgets/date-and-date-range", "037-date-and-date-range"),
+       "Dates relative to today are R expressions (`!expr Sys.Date() - 5`). The verbatim outputs use `cat()`: their render function is `renderPrint()` (the original uses `renderText()`)."),
+  list("download", "File download", c("widgets/file-download", "010-download"),
+       "The `filename` of a download button is R code giving the file name, its service writes the file."),
+  list("basic-datatable", "Basic DataTable", c("widgets/basic-datatable", "030-basic-datatable"),
+       "Needs packages ggplot2 (data set `mpg`) and DT."),
+  list("reactivity", "Reactivity", c("reactive-programming/reactivity", "003-reactivity"),
+       "The caption is a text output with `tag: h3`."),
+  list("isolate", "isolate demo", c("reactive-programming/isolate-demo", "049-isolate-demo"), NULL),
+  list("timer", "Timer", c("reactive-programming/timer", "011-timer"),
+       "`invalidateLater(1000, session)` in the service updates the text every second."),
+  list("dynamic-ui", "Dynamic UI", c("dynamic-user-interface/dynamic-ui", "041-dynamic-ui"),
+       "The dynamic input is a `dynamicInput` item: its service returns the input to show."),
+  list("conditional-panel", "conditionalPanel demo", c("dynamic-user-interface/conditionalpanel-demo", "033-conditionalpanel-demo"), NULL),
+  list("modal-dialog", "Modal dialogs", c("advanced-shiny/modal-dialogs", "114-modal-dialog"),
+       "The service of the button shows the modal dialog."),
+  list("progress", "Progress bar example", c("advanced-shiny/progress-bar-example", "085-progress"),
+       "The function `compute_data()` is defined in the prescript."),
+  list("plot-interaction", "Plot interaction - basic", c("interactive-plots/plot-interaction-basic", "093-plot-interaction-basic"),
+       "Needs package ggplot2. The plot output gives the ids of the click, double-click, hover and brush inputs; the css of the original page header is a static `style` item."),
+  list("shinythemes", "Shiny theme selector", c("application-layout/shiny-theme-selector", "117-shinythemes"),
+       "Needs package shinythemes. The page is made of two items: the theme selector (`!expr shinythemes::themeSelector()`) and the navbar page.")
+)
+for (g in gallery) example_section(g[[1]], g[[2]], g[[3]], g[[4]])
+```
+
+# Showcase dashboards
+
+```{r, echo=FALSE, results='asis'}
+example_section("us-states", "US states explorer", notes = paste(
+  "A multi-page shinydashboard about the 50 US states (R data sets `state.x77`, `state.region` and `state.center`):",
+  "a sidebar menu with six pages and two filters applying to all pages, value boxes, rvis charts made by `rvisPlot()`",
+  "(highcharter bar and pie charts, a plotly scatter chart), a leaflet map, a table with download button,",
+  "a help window (`bsModal`), tooltips, a popover and a guided tour.",
+  "Needs packages shinydashboard, shinyBS, highcharter, plotly, leaflet, DT and rintrojs."))
+example_section("data-explorer", "Data explorer", notes = paste(
+  "A navbar page with a theme: choose an R data set or upload a CSV file, explore it with charts whose inputs",
+  "depend on the columns of the data and on the chart type (dynamic inputs, conditional panels), select points",
+  "by brushing, fit a linear model on demand (the button is enabled only when predictors are selected, with an",
+  "observer and `enableItems()`/`disableItems()`) and download the data.",
+  "Needs packages shinythemes, shinyjs and DT."))
+```

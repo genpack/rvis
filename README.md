@@ -19,6 +19,27 @@ The chart method is dispatched using the exact function name
 `type = "bar"` call `amCharts.bar()`. Wrapper dependencies are optional; install
 the plotting package for the wrapper you want to use.
 
+## Dashboards
+
+rvis also builds complete shiny dashboards from a YAML (or JSON) configuration listing their
+inputs, outputs, containers and layout, with the R code of their services:
+
+```yaml
+name: Hello rvis
+layout: page
+items:
+  page: {type: sidebarLayout, title: Hello rvis!, layout.side: [bins], layout.main: [hist]}
+  bins: {type: sliderInput, title: "Number of bins:", min: 1, max: 50, value: 30}
+  hist:
+    type: plotOutput
+    service: hist(faithful$waiting, breaks = input$bins)
+```
+
+```r
+runDashboard("hello.yml")
+rvisDashboardExample()      # 38 example dashboards, including apps of the Shiny gallery
+```
+
 ## User guides
 
 - [Getting started with `rvisPlot`](articles/getting-started.html)
@@ -32,7 +53,14 @@ the plotting package for the wrapper you want to use.
 - [Chart type and plotter reference](articles/chart-types.html)
 - [Configuration reference](articles/configuration.html)
 - [Plotters: what is covered and how to add more](articles/adding-plotters.html)
+- Dashboard guides:
+  - [Dashboards: getting started](articles/dashboards.html)
+  - [Dashboards: layouts](articles/dashboard-layouts.html)
+  - [Dashboards: item reference](articles/dashboard-reference.html)
+  - [Dashboards: gallery](articles/dashboard-gallery.html)
+  - [Dashboards: Shiny packages](articles/dashboard-extensions.html)
 
-## Main function
+## Main functions
 
 - [`rvisPlot()`](reference/rvisPlot.html)
+- [`rvisDashboard()`](reference/rvisDashboard.html), [`runDashboard()`](reference/runDashboard.html), [`rvisDashboardExample()`](reference/rvisDashboardExample.html)

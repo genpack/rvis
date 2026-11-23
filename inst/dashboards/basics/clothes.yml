@@ -1,0 +1,81 @@
+# Clothes: any item can be wrapped in a box, info box, value box, column, well panel or tab panel
+# with its 'cloth' field, without defining a container item.
+name: Clothes
+layout: dash
+
+items:
+  dash:
+    type: dashboardPage
+    title: Clothes
+    header.title: Clothes
+    layout.body: [kpis, boxes, others, footer]
+
+  # rows of the body: boxes have a width, so they can be put in a row directly
+  kpis:   {type: fluidPage, layout: [[days, temperature, ozone]]}
+  boxes:  {type: fluidPage, layout: [[plot, table]]}
+  # a row of three columns (a list of lists): the column widths are the weights of their items
+  others: {type: fluidPage, layout: [[[month], [notes], [tabs]]]}
+  footer: {type: fluidPage, layout: [[source]]}
+
+  month:
+    type: selectInput
+    title: Month
+    choices: {May: 5, June: 6, July: 7, August: 8, September: 9}
+    weight: 3
+
+  # value box and info box clothes (shinydashboard): the service gives the value
+  days:
+    type: uiOutput
+    service: sum(airquality$Month == input$month)
+    cloth: {type: valueBox, title: Days measured, icon: calendar, color: aqua, weight: 4}
+
+  temperature:
+    type: uiOutput
+    service: paste(round(mean(airquality$Temp[airquality$Month == input$month])), "°F")
+    cloth: {type: valueBox, title: Mean temperature, icon: temperature-half, color: orange, weight: 4}
+
+  ozone:
+    type: uiOutput
+    service: round(mean(airquality$Ozone[airquality$Month == input$month], na.rm = TRUE), 1)
+    cloth: {type: infoBox, title: Mean ozone, subtitle: parts per billion, icon: smog, color: purple, weight: 4, fill: true}
+
+  # box clothes
+  plot:
+    type: plotOutput
+    height: 250px
+    service: |
+      d <- airquality[airquality$Month == input$month, ]
+      plot(d$Day, d$Temp, type = "b", pch = 19, col = "darkorange", xlab = "Day", ylab = "Temperature")
+    cloth: {type: box, title: Daily temperature, status: warning, solidHeader: true, collapsible: true, weight: 7}
+
+  table:
+    type: tableOutput
+    service: head(airquality[airquality$Month == input$month, ], 6)
+    cloth: {type: box, title: First days, footer: Data set airquality, status: primary, weight: 5}
+
+  # a well panel cloth
+  notes:
+    type: htmlOutput
+    service: tags$p("Month", input$month, "has", sum(is.na(airquality$Ozone[airquality$Month == input$month])), "days without ozone value.")
+    cloth: {type: wellPanel}
+    weight: 4
+
+  # tab panel clothes: items of a tabset panel
+  tabs:
+    type: tabsetPanel
+    layout: [wind, solar]
+    weight: 5
+  wind:
+    type: verbatimTextOutput
+    service: summary(airquality$Wind[airquality$Month == input$month])
+    cloth: {type: tabPanel, title: Wind, icon: wind}
+  solar:
+    type: verbatimTextOutput
+    service: summary(airquality$Solar.R[airquality$Month == input$month])
+    cloth: {type: tabPanel, title: Solar radiation, icon: sun}
+
+  # a column cloth: the item is put in a column of the given weight and offset
+  source:
+    type: static
+    html: <p style="text-align:center; color:grey;">Data set airquality, New York, May to September 1973.</p>
+    cloth: {type: column, weight: 6, offset: 3}

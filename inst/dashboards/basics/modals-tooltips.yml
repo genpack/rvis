@@ -1,0 +1,67 @@
+# Modal windows, collapsible panels, tooltips and popovers (package shinyBS).
+name: Modals and tooltips
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: Modals, collapsible panels, tooltips and popovers
+    layout:
+      - - {weight: 4, items: [variable, open, details]}
+        - {weight: 8, items: [panels]}
+
+  # a tooltip shows when the mouse is over the item
+  variable:
+    type: selectInput
+    title: Variable
+    choices: !expr names(swiss)
+    tooltip: Variables of the Swiss fertility and socio-economic indicators (1888)
+    tooltip.placement: right
+
+  open:
+    type: actionButton
+    title: Show the data
+    icon: table
+    tooltip: Opens a modal window
+    tooltip.placement: right
+
+  # a modal window, opened by the item given as trigger
+  details:
+    type: bsModal
+    title: Swiss provinces
+    trigger: open
+    size: large
+    layout: [swiss_table]
+
+  swiss_table:
+    type: dataTableOutput
+    options: {pageLength: 8}
+    service: swiss
+
+  # collapsible panels: multiple panels can be open, panel 'Histogram' is open at start
+  panels:
+    type: bsCollapse
+    multiple: true
+    open: Histogram
+    layout: [hist_panel, summary_panel, about_panel]
+
+  hist_panel:    {type: bsCollapsePanel, title: Histogram, style: primary, layout: [hist]}
+  summary_panel: {type: bsCollapsePanel, title: Summary, style: info, layout: [summary]}
+  about_panel:   {type: bsCollapsePanel, title: About the data, layout: [about]}
+
+  # a popover shows a title and content (html allowed) when the mouse is over the item
+  hist:
+    type: plotOutput
+    height: 300px
+    service: hist(swiss[[input$variable]], col = "#337AB7", border = "white", main = input$variable, xlab = input$variable)
+    popover: Distribution of the selected variable over the <b>47</b> French-speaking provinces.
+    popover.title: Histogram
+    popover.placement: left
+
+  summary:
+    type: verbatimTextOutput
+    service: summary(swiss[[input$variable]])
+
+  about:
+    type: static
+    html: <p>Standardized fertility measure and socio-economic indicators for each of 47 French-speaking provinces of Switzerland at about 1888.</p>

@@ -1,0 +1,50 @@
+# Shiny gallery: Reactivity (shiny-examples 003-reactivity)
+# https://shiny.posit.co/r/gallery/reactive-programming/reactivity/
+name: Reactivity
+layout: page
+
+prescript: |
+  datasetInput <- reactive({
+    switch(input$dataset,
+           "rock" = rock,
+           "pressure" = pressure,
+           "cars" = cars)
+  })
+
+items:
+  page:
+    type: sidebarLayout
+    title: Reactivity
+    layout.side: [caption, dataset, obs]
+    layout.main: [caption_text, summary, view]
+
+  caption:
+    type: textInput
+    title: "Caption:"
+    value: Data Summary
+
+  dataset:
+    type: selectInput
+    title: "Choose a dataset:"
+    choices: [rock, pressure, cars]
+
+  obs:
+    type: numericInput
+    title: "Number of observations to view:"
+    value: 10
+
+  # a text output shown as a level 3 heading
+  caption_text:
+    type: textOutput
+    tag: h3
+    service: input$caption
+
+  summary:
+    type: verbatimTextOutput
+    service: |
+      dataset <- datasetInput()
+      summary(dataset)
+
+  view:
+    type: tableOutput
+    service: head(datasetInput(), n = input$obs)

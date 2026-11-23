@@ -1,0 +1,91 @@
+---
+title: "Dashboards: Shiny packages"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dashboards: Shiny packages}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("dashboard-setup.R")
+```
+
+Many packages extend Shiny with page layouts, inputs, outputs, notifications or javascript tools.
+This page lists the ones rvis dashboards support today, the ones they can use without changes,
+and the ones that could be supported by new item types, with what that would take.
+
+## Supported packages
+
+| Package | Supported through |
+|:---|:---|
+| [shiny](https://shiny.posit.co/) | all standard inputs and outputs, `fluidPage`, `sidebarLayout`, `navbarPage`, `navbarMenu`, `tabsetPanel`, `navlistPanel`, `tabPanel`, `conditionalPanel`, `wellPanel`, `column`, plot interactions, download buttons |
+| [shinydashboard](https://rstudio.github.io/shinydashboard/) | `dashboardPage` (header style), `sidebarMenu`, `menuItem`, `menuSubItem`, `tabItems`, `tabItem`, `box`, value and info boxes (outputs and clothes) |
+| [shinyBS](https://ebailey78.github.io/shinyBS/) | `bsModal`, `bsCollapse`, `bsCollapsePanel`, tooltips and popovers of any item |
+| [shinyWidgets](https://dreamrs.github.io/shinyWidgets/) | `actionBttn`, `actionGroupButtons`, `airDatepickerInput`, plot spinners |
+| [shinyjs](https://deanattali.com/shinyjs/) | methods `hideItems()`, `showItems()`, `enableItems()`, `disableItems()`; any shinyjs function in services |
+| [rintrojs](https://carlganz.github.io/rintrojs/) | guided tours: `tutor.lesson` of any item, `tutorBox` |
+| [DT](https://rstudio.github.io/DT/) | `dataTableOutput` with DataTables options |
+| [bcrypt](https://github.com/jeroen/bcrypt) | encrypted passwords of the login table |
+| htmlwidgets | 23 output types: highcharter, plotly, dygraphs, leaflet, rAmCharts, billboarder, c3, morrisjs, d3plus, bubbles, networkD3, sankeytreeR, wordcloud2, sunburstR, upsetjs, rpivotTable, rhandsontable, googleVis, rCharts and the widgets embedded in rvis (TFD3, coffeewheel, grviz); see the [item reference](dashboard-reference.html#widgets) |
+
+## Packages usable without changes
+
+These packages work in configurations as they are: their functions are called in services,
+the prescript, observers, `!expr` values or `static` items.
+
+| Package | How |
+|:---|:---|
+| [shinythemes](https://rstudio.github.io/shinythemes/) | `theme: !expr shinythemes::shinytheme("flatly")` of a `navbarPage`, `fluidPage` or `sidebarLayout`; theme selector as a static item `object: !expr shinythemes::themeSelector()` |
+| [bslib](https://rstudio.github.io/bslib/) | `theme: !expr bslib::bs_theme(bootswatch = "minty")` of a page |
+| shiny notifications, modal dialogs, progress | `showNotification()`, `showModal(modalDialog(...))`, `withProgress()` in services ([gallery](dashboard-gallery.html#modal-dialog)) |
+| [shinyalert](https://github.com/daattali/shinyalert), [sweetalert of shinyWidgets](https://dreamrs.github.io/shinyWidgets/) | `shinyalert::shinyalert(...)`, `shinyWidgets::sendSweetAlert(session, ...)` in services |
+| [markdown](https://github.com/rstudio/markdown) | `object: !expr shiny::includeMarkdown("about.md")` in a static item |
+| any htmlwidget | a `dynamicInput` whose service returns the widget (rendered by `renderUI()`), or `htmlOutput` |
+| any input function | a `dynamicInput` returning the input (its value is `input$<id>`) or a static item `object: !expr pkg::someInput("id", ...)` |
+
+## Packages that could be supported {#candidates}
+
+These need new item types in `dashboard.R`: the input or output function in `getItemObject()` or
+`outputObject()`, the render function in `outputScript()`, and their names in
+`valid.input.types`, `valid.output.types` or `valid.container.types`.
+
+| Package | Items | Effort | Notes |
+|:---|:---|:---|:---|
+| [shinyWidgets](https://dreamrs.github.io/shinyWidgets/) | `pickerInput`, `switchInput`, `materialSwitch`, `prettyCheckbox`, `prettyRadioButtons`, `radioGroupButtons`, `checkboxGroupButtons`, `sliderTextInput`, `noUiSliderInput`, `knobInput`, `searchInput`, `dropdownButton`, `progressBar` | small | inputs with the same `choices`/`selected` settings as shiny inputs; the most useful next step |
+| [bslib](https://rstudio.github.io/bslib/) | `page_sidebar`, `page_navbar`, `card`, `value_box`, `layout_columns`, `accordion` | medium | modern Bootstrap 5 pages and cards; containers like `box` and `dashboardPage` |
+| [bs4Dash](https://bs4dash.rinterface.com/) | `dashboardPage` (Bootstrap 4), `bs4Card`, `bs4ValueBox`, `tabItems` | medium | similar to shinydashboard, with more box options |
+| [shinydashboardPlus](https://rinterface.github.io/shinydashboardPlus/) | `box` options (sidebar, dropdown), user boxes, right sidebar | small | extends the current shinydashboard items |
+| [waiter](https://waiter.john-coene.com/), [shinycssloaders](https://github.com/daattali/shinycssloaders) | `spinner` setting for all outputs | small | the current spinner only applies to `plotOutput` |
+| [reactable](https://glin.github.io/reactable/) | `reactableOutput` | small | interactive tables |
+| [timevis](https://daattali.com/shiny/timevis-demo/) | `timevisOutput` | small | timelines |
+| [sortable](https://rstudio.github.io/sortable/) | `rank_list`, `bucket_list` inputs | small | drag and drop ordering (instead of sortableR) |
+| [shinyFiles](https://github.com/thomasp85/shinyFiles) | `shinyFilesButton`, `shinyDirButton` | medium | server-side file selection; needs `shinyFileChoose()` in the server (could be generated) |
+| [colourpicker](https://github.com/daattali/colourpicker) | `colourInput` | small | colour input |
+| [shinyAce](https://github.com/trestletech/shinyAce) | `aceEditor` | small | code editor input |
+| [shinyFeedback](https://merlinoa.github.io/shinyFeedback/), [shinyvalidate](https://rstudio.github.io/shinyvalidate/) | `validate` rules of inputs | medium | input validation messages from the configuration |
+| [shinymanager](https://datastorm-open.github.io/shinymanager/) | secure login for the whole app | medium | an alternative to the login item |
+| [cicerone](https://cicerone.john-coene.com/) | guided tours | small | an alternative to rintrojs |
+| [shiny.i18n](https://appsilon.github.io/shiny.i18n/) | translated titles | medium | titles could be translation keys |
+| [shinyjqui](https://yang-tang.github.io/shinyjqui/) | `draggable`, `resizable`, `sortable` settings of any item | small | jQuery UI interactions, like tooltips are added to any item |
+| [shiny.semantic](https://appsilon.github.io/shiny.semantic/) | Fomantic UI pages and inputs | large | a different css framework: a parallel set of item types |
+| [rhandsontable](https://jrowen.github.io/rhandsontable/) | editable table synced with `sync` | small | the output is supported; syncing edits like TFD3 tables would need observers |
+
+## The example files of the user {#user-examples}
+
+The `shiny_examples` folder of the rvis repository has examples of Shiny packages. This is how
+they map to rvis dashboards:
+
+| Example | rvis dashboard |
+|:---|:---|
+| `bscollapse_example.R`, `bsmodal_example.R`, `tooltip_example.R`, `popover_example.R` | supported: `bsCollapse`, `bsModal`, `tooltip`, `popover` ([example](dashboard-reference.html#shinybs)) |
+| `gettablemodal_example.R` | supported: `build.container.get.table()` returns the items of a dialog reading a CSV table |
+| `rintrojs_example_1.R` to `_3.R` | supported: `tutor.lesson`, `tutorBox` ([example](dashboard-reference.html#tutor)) |
+| `modalDialog.R`, `showNotification.R`, `progressbar.R` | usable in services ([modal dialog](dashboard-gallery.html#modal-dialog), [progress](dashboard-gallery.html#progress)) |
+| `shinythemes.R`, `themeSelector.R` | usable: `theme: !expr shinythemes::shinytheme(...)`, static theme selector ([example](dashboard-gallery.html#shinythemes)) |
+| `scrollable_panel.R` | supported: box cloth with `height` and `style: "overflow-y: scroll"` |
+| `shinywidgets_examples.R` | partly supported (`actionBttn`, `actionGroupButtons`, `airDatepickerInput`, spinners); more shinyWidgets inputs are candidates (see above) |
+| `shinyFiles_example.R` | candidate (server-side file choosers) |
+| `sortableR_examples.R` | candidate, with package sortable (sortableR is no longer maintained) |
+| `shinySky_example.R` | not recommended: package shinysky is no longer maintained; its inputs exist in shinyWidgets |
+| `links.R` (reference links) | next/previous buttons: `updateItem4Session()` on a `navbarPage`, `navlistPanel` or `sidebarMenu` (a `tabsetPanel` has no id yet); shinyjs and shinyWidgets: see above; semi-collapsible sidebar: shinydashboard sidebars collapse with the header button; shinyjqui and shiny.semantic: candidates (see above) |

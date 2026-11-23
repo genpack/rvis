@@ -2,7 +2,7 @@ template:
   bootstrap: 5
 navbar:
   structure:
-    left: [intro, reference, manuals, configuration]
+    left: [intro, reference, manuals, dashboards, configuration]
     right: [search, github]
   components:
     manuals:
@@ -25,6 +25,19 @@ navbar:
           href: articles/chart-types.html
         - text: "Plotters: covered and planned"
           href: articles/adding-plotters.html
+    dashboards:
+      text: Dashboards
+      menu:
+        - text: "Getting started"
+          href: articles/dashboards.html
+        - text: "Layouts"
+          href: articles/dashboard-layouts.html
+        - text: "Item reference"
+          href: articles/dashboard-reference.html
+        - text: "Gallery: Shiny apps from YAML"
+          href: articles/dashboard-gallery.html
+        - text: "Shiny packages"
+          href: articles/dashboard-extensions.html
     configuration:
       text: Configuration
       href: articles/configuration.html
@@ -41,6 +54,13 @@ articles:
       - time-series
       - networks-hierarchies
       - tables
+  - title: Dashboards
+    contents:
+      - dashboards
+      - dashboard-layouts
+      - dashboard-reference
+      - dashboard-gallery
+      - dashboard-extensions
   - title: Reference
     contents:
       - chart-types
@@ -49,3 +69,8 @@ reference:
   - title: Main entry point
     contents:
       - rvisPlot
+  - title: Dashboards
+    contents:
+      - rvisDashboard
+      - runDashboard
+      - rvisDashboardExample

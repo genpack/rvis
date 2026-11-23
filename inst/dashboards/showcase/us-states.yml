@@ -1,0 +1,258 @@
+# A multi-page shinydashboard about the 50 US states (data sets state.x77, state.region, state.center).
+# It shows: sidebar menu and pages, filters in the sidebar, value boxes, rvis charts (highcharter, plotly),
+# a leaflet map, tables with download, a modal help window, tooltips, popovers and a guided tour.
+# Needs packages shinydashboard, shinyBS, highcharter, plotly, leaflet, DT and rintrojs.
+name: US states explorer
+layout: dash
+
+# data prepared at the start of each session
+prescript: |
+  states <- data.frame(
+    state = state.name, abb = state.abb, region = as.character(state.region),
+    lat = state.center$y, long = state.center$x, state.x77, check.names = FALSE, stringsAsFactors = FALSE)
+  names(states) <- c("state", "abb", "region", "lat", "long", "Population", "Income", "Illiteracy",
+                     "Life.Exp", "Murder", "HS.Grad", "Frost", "Area")
+  measures <- c("Population (thousands)" = "Population", "Income per capita ($)" = "Income",
+                "Illiteracy (%)" = "Illiteracy", "Life expectancy (years)" = "Life.Exp",
+                "Murder rate (per 100,000)" = "Murder", "High-school graduates (%)" = "HS.Grad",
+                "Days with frost" = "Frost", "Area (square miles)" = "Area")
+  label <- function(m) names(measures)[measures == m]
+  selected <- reactive({
+    validate(need(length(input$regions) > 0, "Select at least one region."))
+    states[states$region %in% input$regions, ]
+  })
+
+items:
+  dash:
+    type: dashboardPage
+    title: US states explorer
+    skin: blue
+    header.title: US states
+    header.title.font: trebuchet ms
+    header.title.font.weight: bold
+    layout.side: [menu, regions, measure, help, tour]
+    layout.body: [pages, help_modal]
+
+  # ---- sidebar ----
+  menu:
+    type: sidebarMenu
+    layout: [m_overview, m_rankings, m_relations, m_map, m_data, m_about]
+  m_overview:  {type: menuItem, title: Overview, tabName: overview, icon: gauge}
+  m_rankings:  {type: menuItem, title: Rankings, tabName: rankings, icon: ranking-star}
+  m_relations: {type: menuItem, title: Relationships, tabName: relations, icon: chart-line}
+  m_map:       {type: menuItem, title: Map, tabName: map, icon: map-location-dot}
+  m_data:      {type: menuItem, title: Data, tabName: data, icon: table}
+  m_about:     {type: menuItem, title: About, tabName: about, icon: circle-info}
+
+  regions:
+    type: checkboxGroupInput
+    title: Regions
+    choices: !expr levels(state.region)
+    selected: !expr levels(state.region)
+    tooltip: The states of the selected regions are shown on all pages.
+    tooltip.placement: right
+    tutor.lesson: Choose the regions of the states shown on all pages.
+    tutor.step: 2
+
+  measure:
+    type: selectInput
+    title: Measure
+    choices: {Population (thousands): Population, Income per capita ($): Income, Illiteracy (%): Illiteracy, Life expectancy (years): Life.Exp, Murder rate (per 100000): Murder, High-school graduates (%): HS.Grad, Days with frost: Frost, Area (square miles): Area}
+    selected: Income
+    tutor.lesson: The measure shown by the charts, the map and the rankings.
+    tutor.step: 3
+
+  help:
+    type: actionButton
+    title: Help
+    icon: circle-question
+    width: 85%
+
+  tour:
+    type: actionButton
+    title: Guided tour
+    icon: route
+    width: 85%
+    service: rintrojs::introjs(session)
+
+  help_modal:
+    type: bsModal
+    title: How to use this dashboard
+    trigger: help
+    layout: [help_text]
+  help_text:
+    type: static
+    html: |
+      <p>Use the menu on the left to change pages. The <b>Regions</b> and <b>Measure</b> filters apply to all pages.</p>
+      <ul>
+        <li><b>Overview</b>: key figures and the measure by region.</li>
+        <li><b>Rankings</b>: states with the highest and lowest values.</li>
+        <li><b>Relationships</b>: compare two measures.</li>
+        <li><b>Map</b>: the measure at the centre of each state.</li>
+        <li><b>Data</b>: the table, which can be downloaded.</li>
+      </ul>
+
+  # ---- pages ----
+  pages:
+    type: tabItems
+    layout: [overview, rankings, relations, map, data, about]
+
+  overview:
+    type: tabItem
+    layout:
+      - [n_states, population, income, life]
+      - [by_region, share]
+  rankings:
+    type: tabItem
+    layout:
+      - [top_n]
+      - [top, bottom]
+  relations:
+    type: tabItem
+    layout:
+      - [x_measure, y_measure]
+      - [scatter, correlations]
+  map:
+    type: tabItem
+    layout: [leaflet_map]
+  data:
+    type: tabItem
+    layout: [table_box]
+  about:
+    type: tabItem
+    layout: [about_text]
+
+  # ---- overview ----
+  n_states:
+    type: valueBoxOutput
+    weight: 3
+    service: valueBox(nrow(selected()), "States", icon = icon("flag-usa"), color = "blue")
+    tutor.lesson: Key figures of the selected states.
+    tutor.step: 1
+  population:
+    type: valueBoxOutput
+    weight: 3
+    service: valueBox(format(round(sum(selected()$Population) / 1000, 1), nsmall = 1), "Population (millions, 1975)", icon = icon("users"), color = "aqua")
+  income:
+    type: valueBoxOutput
+    weight: 3
+    service: valueBox(paste0("$", format(round(mean(selected()$Income)), big.mark = ",")), "Mean income per capita (1974)", icon = icon("dollar-sign"), color = "green")
+  life:
+    type: valueBoxOutput
+    weight: 3
+    service: valueBox(round(mean(selected()$Life.Exp), 1), "Mean life expectancy (1969-71)", icon = icon("heart-pulse"), color = "red")
+
+  by_region:
+    type: highcharterOutput
+    height: 320px
+    service: |
+      d <- aggregate(selected()[input$measure], list(region = selected()$region), mean)
+      rvisPlot(type = "bar", plotter = "highcharter", obj = d, x = "region", y = input$measure)
+    cloth: {type: box, title: Mean by region, status: primary, solidHeader: true, weight: 7}
+    popover: Mean of the selected measure over the states of each region.
+    popover.title: By region
+
+  share:
+    type: highcharterOutput
+    height: 320px
+    service: |
+      d <- aggregate(Population ~ region, data = selected(), FUN = sum)
+      rvisPlot(type = "pie", plotter = "highcharter", obj = d, label = "region", theta = "Population")
+    cloth: {type: box, title: Population by region, status: primary, solidHeader: true, weight: 5}
+
+  # ---- rankings ----
+  top_n:
+    type: sliderInput
+    title: Number of states
+    min: 3
+    max: 15
+    value: 8
+    cloth: {type: box, weight: 4}
+
+  top:
+    type: highcharterOutput
+    height: 360px
+    service: |
+      d <- head(selected()[order(-selected()[[input$measure]]), c("state", input$measure)], input$top_n)
+      rvisPlot(type = "bar", plotter = "highcharter", obj = d, x = "state", y = input$measure)
+    cloth: {type: box, title: Highest, status: success, weight: 6}
+
+  bottom:
+    type: highcharterOutput
+    height: 360px
+    service: |
+      d <- head(selected()[order(selected()[[input$measure]]), c("state", input$measure)], input$top_n)
+      rvisPlot(type = "bar", plotter = "highcharter", obj = d, x = "state", y = input$measure)
+    cloth: {type: box, title: Lowest, status: danger, weight: 6}
+
+  # ---- relationships ----
+  x_measure:
+    type: selectInput
+    title: Horizontal axis
+    choices: [Population, Income, Illiteracy, Life.Exp, Murder, HS.Grad, Frost, Area]
+    selected: Illiteracy
+    cloth: {type: box, weight: 6}
+  y_measure:
+    type: selectInput
+    title: Vertical axis
+    choices: [Population, Income, Illiteracy, Life.Exp, Murder, HS.Grad, Frost, Area]
+    selected: Murder
+    cloth: {type: box, weight: 6}
+
+  scatter:
+    type: plotlyOutput
+    height: 400px
+    service: rvisPlot(type = "scatter", plotter = "plotly", obj = selected(), x = input$x_measure, y = input$y_measure, color = "region", label = "state")
+    cloth: {type: box, title: States, weight: 8}
+
+  correlations:
+    type: tableOutput
+    digits: 2
+    rownames: true
+    service: cor(selected()[, c("Population", "Income", "Illiteracy", "Life.Exp", "Murder", "HS.Grad", "Frost")])[, c(input$x_measure, input$y_measure), drop = FALSE]
+    cloth: {type: box, title: Correlations, weight: 4}
+
+  # ---- map ----
+  leaflet_map:
+    type: leafletOutput
+    height: 560px
+    service: |
+      d <- selected()
+      v <- d[[input$measure]]
+      pal <- leaflet::colorNumeric("viridis", v)
+      leaflet::leaflet(d) %>%
+        leaflet::addTiles() %>%
+        leaflet::addCircleMarkers(lng = ~long, lat = ~lat, radius = 6 + 14 * (v - min(v)) / diff(range(v)),
+                                  color = pal(v), fillOpacity = 0.8, stroke = FALSE,
+                                  label = paste0(d$state, ": ", format(v, big.mark = ","))) %>%
+        leaflet::addLegend(pal = pal, values = v, title = label(input$measure))
+    cloth: {type: box, title: Measure at the centre of each state, weight: 12}
+
+  # ---- data ----
+  # a bag (a simple container) with a box cloth
+  table_box:
+    type: bag
+    layout: [download, states_table]
+    cloth: {type: box, title: The selected states, weight: 12}
+
+  download:
+    type: downloadButton
+    title: Download CSV
+    filename: '"us-states.csv"'
+    service: write.csv(selected(), file, row.names = FALSE)
+
+  states_table:
+    type: dataTableOutput
+    options: {pageLength: 10, scrollX: true}
+    service: selected()
+
+  # ---- about ----
+  about_text:
+    type: static
+    html: |
+      <div class="box box-primary"><div class="box-body">
+      <h3>About the data</h3>
+      <p>Statistics of the 50 US states from the 1977 <i>Statistical Abstract of the United States</i> (R data sets
+      <code>state.x77</code>, <code>state.region</code> and <code>state.center</code>).</p>
+      <p>This dashboard is made of a single YAML file: <code>rvisDashboardExample("us-states")</code>.</p>
+      </div></div>

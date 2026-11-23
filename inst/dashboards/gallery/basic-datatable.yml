@@ -1,0 +1,47 @@
+# Shiny gallery: Basic DataTable (shiny-examples 030-basic-datatable)
+# https://shiny.posit.co/r/gallery/widgets/basic-datatable/
+# Needs packages ggplot2 (dataset mpg) and DT.
+name: Basic DataTable
+layout: page
+items:
+  page:
+    type: fluidPage
+    title: Basic DataTable
+    layout:
+      # a row of three columns (each column gets 12/3 = 4 grid units), then the table
+      - - [man]
+        - [trans]
+        - [cyl]
+      - [table]
+
+  man:
+    type: selectInput
+    title: "Manufacturer:"
+    choices: !expr c("All", unique(as.character(ggplot2::mpg$manufacturer)))
+
+  trans:
+    type: selectInput
+    title: "Transmission:"
+    choices: !expr c("All", unique(as.character(ggplot2::mpg$trans)))
+
+  cyl:
+    type: selectInput
+    title: "Cylinders:"
+    choices: !expr c("All", unique(as.character(ggplot2::mpg$cyl)))
+
+  table:
+    type: dataTableOutput
+    service: |
+      DT::datatable({
+        data <- ggplot2::mpg
+        if (input$man != "All") {
+          data <- data[data$manufacturer == input$man,]
+        }
+        if (input$cyl != "All") {
+          data <- data[data$cyl == input$cyl,]
+        }
+        if (input$trans != "All") {
+          data <- data[data$trans == input$trans,]
+        }
+        data
+      })

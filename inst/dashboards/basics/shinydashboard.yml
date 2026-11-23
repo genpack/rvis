@@ -1,0 +1,105 @@
+# A shinydashboard page: header, sidebar with a menu, and body pages (tab items) selected by the menu.
+name: Earthquakes
+layout: dash
+
+items:
+  dash:
+    type: dashboardPage
+    title: Earthquakes off Fiji
+    skin: green
+    # header title and its style
+    header.title: Fiji earthquakes
+    header.title.width: 250
+    header.title.font: verdana
+    header.title.font.weight: bold
+    header.title.hover.background.color: darkgreen
+    sidebar.width: 250
+    layout.side: [menu, magnitude]
+    layout.body: [pages]
+
+  # the sidebar menu: menu items select the tab items of the body with the same tabName
+  menu:
+    type: sidebarMenu
+    layout: [overview_menu, map_menu, data_menu]
+
+  overview_menu: {type: menuItem, title: Overview, tabName: overview, icon: gauge}
+  map_menu:      {type: menuItem, title: Location, tabName: location, icon: map, badgeLabel: new, badgeColor: green}
+  # a menu item with sub-items
+  data_menu:
+    type: menuItem
+    title: Data
+    icon: table
+    layout: [table_menu, summary_menu]
+  table_menu:   {type: menuSubItem, title: Table, tabName: table}
+  summary_menu: {type: menuSubItem, title: Summary, tabName: summary}
+
+  magnitude:
+    type: sliderInput
+    title: Magnitude (Richter)
+    min: 4
+    max: 6.4
+    value: [4, 6.4]
+    step: 0.1
+
+  # the body pages
+  pages:
+    type: tabItems
+    layout: [overview, location, table, summary]
+
+  overview:
+    type: tabItem
+    layout:
+      - [count, depth, stations]
+      - [histogram, depth_plot]
+  location:
+    type: tabItem
+    layout: [map]
+  table:
+    type: tabItem
+    layout: [quakes_table]
+  summary:
+    type: tabItem
+    layout: [quakes_summary]
+
+  # value box outputs: the service returns a value box
+  count:
+    type: valueBoxOutput
+    weight: 4
+    service: valueBox(sum(quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2]), "Earthquakes", icon = icon("house-crack"), color = "green")
+  depth:
+    type: valueBoxOutput
+    weight: 4
+    service: valueBox(paste(round(mean(quakes$depth[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2]])), "km"), "Mean depth", icon = icon("arrow-down"), color = "teal")
+  stations:
+    type: valueBoxOutput
+    weight: 4
+    service: valueBox(round(mean(quakes$stations[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2]])), "Reporting stations (mean)", icon = icon("tower-broadcast"), color = "olive")
+
+  histogram:
+    type: plotOutput
+    height: 300px
+    service: hist(quakes$mag[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2]], breaks = 20, col = "#00A65A", border = "white", main = "", xlab = "Magnitude")
+    cloth: {type: box, title: Magnitudes, status: success, solidHeader: true, weight: 6}
+  depth_plot:
+    type: plotOutput
+    height: 300px
+    service: plot(depth ~ mag, data = quakes[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2], ], pch = 19, col = "#00A65A80", xlab = "Magnitude", ylab = "Depth (km)")
+    cloth: {type: box, title: Depth and magnitude, status: success, solidHeader: true, weight: 6}
+
+  map:
+    type: plotOutput
+    height: 500px
+    service: |
+      d <- quakes[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2], ]
+      plot(lat ~ long, data = d, pch = 19, cex = d$mag - 3.5, col = "#00A65A80", xlab = "Longitude", ylab = "Latitude", asp = 1)
+    cloth: {type: box, title: Locations (point size is the magnitude), weight: 12}
+
+  quakes_table:
+    type: dataTableOutput
+    service: quakes[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2], ]
+    cloth: {type: box, title: Earthquakes, weight: 12}
+
+  quakes_summary:
+    type: verbatimTextOutput
+    service: summary(quakes[quakes$mag >= input$magnitude[1] & quakes$mag <= input$magnitude[2], ])
+    cloth: {type: box, title: Summary, weight: 12}

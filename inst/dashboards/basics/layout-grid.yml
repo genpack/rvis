@@ -1,0 +1,58 @@
+# Rows and columns: how a list layout is turned into a grid of rows and columns.
+# A layout list alternates between rows and columns: the elements of a page layout are rows, the list
+# elements of a row are columns, the list elements of a column are rows again, and so on.
+# Character elements (item names) are put directly in the row or column.
+name: Layout grid
+layout: page
+
+items:
+  page:
+    type: fluidPage
+    title: Rows and columns
+    layout:
+      - [style, intro]
+      # a row with two items (no columns): the items are stacked
+      - [row_a, row_b]
+      # a row with three columns: list elements of a row are columns, each gets 12/3 = 4 grid units
+      - - [col_1]
+        - [col_2]
+        - [col_3]
+      # column widths and offsets: weight and offset of the column (12 grid units make a row)
+      - - {weight: 8, items: wide}
+        - {weight: 4, items: narrow}
+      - - {weight: 4, offset: 4, items: centered}
+      # columns of single items take the weight and offset of their items
+      - - [w3]
+        - [w9]
+      # a column containing a row of two columns: nested lists
+      - - - [top]
+          - - [bottom_left]
+            - [bottom_right]
+        - [right]
+
+  style:
+    type: static
+    html: |
+      <style>
+        .cell {background: #e8f0fe; border: 1px solid #8ab4f8; border-radius: 4px; padding: 10px; margin: 4px 0; text-align: center;}
+        .cell code {background: none;}
+      </style>
+
+  intro:
+    type: static
+    html: <p>Each blue cell is a static item placed by the layout of the page.</p>
+
+  row_a:        {type: static, html: '<div class="cell">row item <code>row_a</code></div>'}
+  row_b:        {type: static, html: '<div class="cell">row item <code>row_b</code></div>'}
+  col_1:        {type: static, html: '<div class="cell">column 1 of 3</div>'}
+  col_2:        {type: static, html: '<div class="cell">column 2 of 3</div>'}
+  col_3:        {type: static, html: '<div class="cell">column 3 of 3</div>'}
+  wide:         {type: static, html: '<div class="cell">weight: 8</div>'}
+  narrow:       {type: static, html: '<div class="cell">weight: 4</div>'}
+  centered:     {type: static, html: '<div class="cell">weight: 4, offset: 4</div>'}
+  w3:           {type: static, html: '<div class="cell">item weight: 3</div>', weight: 3}
+  w9:           {type: static, html: '<div class="cell">item weight: 9</div>', weight: 9}
+  top:          {type: static, html: '<div class="cell">top</div>'}
+  bottom_left:  {type: static, html: '<div class="cell">bottom left</div>'}
+  bottom_right: {type: static, html: '<div class="cell">bottom right</div>'}
+  right:        {type: static, html: '<div class="cell" style="height: 96px;">right</div>'}

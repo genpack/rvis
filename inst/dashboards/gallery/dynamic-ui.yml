@@ -1,0 +1,60 @@
+# Shiny gallery: Dynamic UI (shiny-examples 041-dynamic-ui)
+# https://shiny.posit.co/r/gallery/dynamic-user-interface/dynamic-ui/
+name: Dynamically generated user interface components
+layout: page
+items:
+  page:
+    type: fluidPage
+    title: Dynamically generated user interface components
+    layout:
+      - - {weight: 3, items: type_panel}
+        - {weight: 3, items: ui_panel}
+        - {weight: 3, items: [type_label, input_type_text, value_label, dynamic_value]}
+
+  type_panel:
+    type: wellPanel
+    layout: [input_type]
+
+  ui_panel:
+    type: wellPanel
+    layout: [ui]
+
+  input_type:
+    type: selectInput
+    title: Input type
+    choices: [slider, text, numeric, checkbox, checkboxGroup, radioButtons, selectInput, selectInput (multi), date, daterange]
+
+  # a dynamicInput item is rendered by renderUI(): its service returns the input to show
+  ui:
+    type: dynamicInput
+    service: |
+      if (is.null(input$input_type))
+        return()
+      switch(input$input_type,
+        "slider" = sliderInput("dynamic", "Dynamic", min = 1, max = 20, value = 10),
+        "text" = textInput("dynamic", "Dynamic", value = "starting value"),
+        "numeric" = numericInput("dynamic", "Dynamic", value = 12),
+        "checkbox" = checkboxInput("dynamic", "Dynamic", value = TRUE),
+        "checkboxGroup" = checkboxGroupInput("dynamic", "Dynamic",
+          choices = c("Option 1" = "option1", "Option 2" = "option2"), selected = "option2"),
+        "radioButtons" = radioButtons("dynamic", "Dynamic",
+          choices = c("Option 1" = "option1", "Option 2" = "option2"), selected = "option2"),
+        "selectInput" = selectInput("dynamic", "Dynamic",
+          choices = c("Option 1" = "option1", "Option 2" = "option2"), selected = "option2"),
+        "selectInput (multi)" = selectInput("dynamic", "Dynamic",
+          choices = c("Option 1" = "option1", "Option 2" = "option2"),
+          selected = c("option1", "option2"), multiple = TRUE),
+        "date" = dateInput("dynamic", "Dynamic"),
+        "daterange" = dateRangeInput("dynamic", "Dynamic")
+      )
+
+  type_label:  {type: static, html: "<p>Input type:</p>"}
+  value_label: {type: static, html: "<p>Dynamic input value:</p>"}
+
+  input_type_text:
+    type: verbatimTextOutput
+    service: cat(input$input_type)
+
+  dynamic_value:
+    type: verbatimTextOutput
+    service: str(input$dynamic)

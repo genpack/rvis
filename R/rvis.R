@@ -262,5 +262,19 @@
 #                             * echarts: config properties size.min/size.max recorded as numbers.
 #                             * d3plus: helper d3plus.bubbles() renamed d3plusBubbles() (it was dispatchable as a chart type).
 #                             See the version history of each file for details.
+# 5.12.0 (23 November 2026) - Dashboards (dashboard.R 2.7.0, new dashconfig.R 0.1.0):
+#                             * DASHBOARD code review: the user interface is built by calling shiny functions directly
+#                               instead of parsing generated R code (about 2.5 times faster), server code is parsed once
+#                               per app instead of once per session; same user interface and services (checked on 15
+#                               test dashboards). Many bugs fixed (tabPanel cloth, several king items, tooltips, tutor
+#                               lessons and shinyjs methods that had no javascript on the page, observers of synced
+#                               tables added again in each session, ...).
+#                             * New item types: conditionalPanel, navlistPanel, sidebarMenu, menuItem, menuSubItem,
+#                               tabItems, tabItem; new settings for date, slider, button, plot and text items; themes.
+#                             * Dashboards from YAML or JSON files or R lists: rvisDashboard(), runDashboard(),
+#                               rvisDashboardExample() with 38 example dashboards (inst/dashboards): 16 basic features,
+#                               20 apps of the Shiny gallery rebuilt from YAML, and two large showcase dashboards.
+#                             * Five dashboard vignettes: getting started, layouts, item reference, gallery, Shiny packages.
+#                             See the version history of each file for details.
 NULL
 #> NULL

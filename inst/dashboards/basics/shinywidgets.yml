@@ -1,0 +1,61 @@
+# Items from package shinyWidgets: styled buttons, button groups, an air date picker and plot spinners.
+name: shinyWidgets
+layout: page
+
+values:
+  clicked: Normal
+
+# the buttons of a group are not dashboard items: their events are observed in the prescript
+prescript: |
+  observeEvent(input$normal, sync$clicked <- "Normal")
+  observeEvent(input$uniform, sync$clicked <- "Uniform")
+  observeEvent(input$exponential, sync$clicked <- "Exponential")
+
+items:
+  page:
+    type: fluidPage
+    title: shinyWidgets items
+    layout:
+      - - {weight: 4, items: [go, group, month, last]}
+        - {weight: 8, items: plot}
+
+  # an action button with a style, a status (colour) and a size
+  go:
+    type: actionBttn
+    title: Random distribution
+    icon: rotate
+    style: jelly
+    status: success
+    size: md
+    service: sync$clicked <- sample(c("Normal", "Uniform", "Exponential"), 1)
+
+  # a group of action buttons: each button is an input with its own id
+  group:
+    type: actionGroupButtons
+    inputIds: [normal, uniform, exponential]
+    labels: [Normal, Uniform, Exponential]
+    status: primary
+
+  # a month picker
+  month:
+    type: airDatepickerInput
+    title: Month
+    value: 2024-06-01
+    view: months
+    minView: months
+    dateFormat: MMMM yyyy
+
+  last:
+    type: textOutput
+    service: paste("Last button clicked:", sync$clicked)
+
+  # a spinner is shown while the plot is computed
+  plot:
+    type: plotOutput
+    spinner: cube-grid
+    spinner.color: "#2E8B57"
+    service: |
+      input$go
+      Sys.sleep(1)
+      x <- switch(sync$clicked, "Uniform" = runif(500), "Exponential" = rexp(500), rnorm(500))
+      hist(x, breaks = 30, col = "#2E8B57", border = "white", main = paste(sync$clicked, format(input$month, "%B %Y")))

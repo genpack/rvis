@@ -1,0 +1,35 @@
+# Shiny gallery: File Download (shiny-examples 010-download)
+# https://shiny.posit.co/r/gallery/widgets/file-download/
+name: Downloading Data
+layout: page
+
+prescript: |
+  datasetInput <- reactive({
+    switch(input$dataset,
+           "rock" = rock,
+           "pressure" = pressure,
+           "cars" = cars)
+  })
+
+items:
+  page:
+    type: sidebarLayout
+    title: Downloading Data
+    layout.side: [dataset, downloadData]
+    layout.main: [table]
+
+  dataset:
+    type: selectInput
+    title: "Choose a dataset:"
+    choices: [rock, pressure, cars]
+
+  # filename: R code returning the file name; service: R code writing the content to 'file'
+  downloadData:
+    type: downloadButton
+    title: Download
+    filename: paste(input$dataset, ".csv", sep = "")
+    service: write.csv(datasetInput(), file, row.names = FALSE)
+
+  table:
+    type: tableOutput
+    service: datasetInput()

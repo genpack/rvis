@@ -1,0 +1,53 @@
+# Shiny gallery: isolate demo (shiny-examples 049-isolate-demo)
+# https://shiny.posit.co/r/gallery/reactive-programming/isolate-demo/
+name: isolate example
+layout: page
+items:
+  page:
+    type: fluidPage
+    title: isolate example
+    layout:
+      - - {weight: 4, items: controls}
+        - {weight: 8, items: [summary_title, summary, summary2_title, summary2]}
+
+  controls:
+    type: wellPanel
+    layout: [n, text, space, goButton]
+
+  n:
+    type: sliderInput
+    title: "n (isolated):"
+    min: 10
+    max: 1000
+    value: 200
+    step: 10
+
+  text:
+    type: textInput
+    title: "text (not isolated):"
+    value: input text
+
+  space: {type: static, html: <br/>}
+
+  goButton:
+    type: actionButton
+    title: Go!
+
+  summary_title:  {type: static, html: <h4>summary</h4>}
+  summary2_title: {type: static, html: <h4>summary2</h4>}
+
+  summary:
+    type: textOutput
+    service: |
+      input$goButton
+      paste0('input$text is "', input$text, '", and input$n is ', isolate(input$n))
+
+  summary2:
+    type: textOutput
+    service: |
+      input$goButton
+      str <- paste0('input$text is "', input$text, '"')
+      isolate({
+        str <- paste0(str, ', and input$n is ')
+        paste0(str, isolate(input$n))
+      })
