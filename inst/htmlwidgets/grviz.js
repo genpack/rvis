@@ -22,27 +22,34 @@ HTMLWidgets.widget({
       }
     }
 
-    if (x.diagram !== "") {
-      if (typeof x.config === "undefined"){
-        x.config = {};
-        x.config.engine = "dot";
-        x.config.options = {};
+    if (typeof x.diagram === "string" && x.diagram !== "") {
+      var config = x.config || {};
+      var vizOptions = {};
+      var suppliedOptions = config.options || {};
+      for (var option in suppliedOptions) {
+        if (Object.prototype.hasOwnProperty.call(suppliedOptions, option)) {
+          vizOptions[option] = suppliedOptions[option];
+        }
       }
+      vizOptions.format = "svg";
+      vizOptions.engine = config.engine || vizOptions.engine || "dot";
+
       try {
-        el.innerHTML = Viz(x.diagram, format="svg", engine=x.config.engine, options=x.config.options);
+        el.innerHTML = Viz(x.diagram, vizOptions);
         makeResponsive(el);
 
         // set up a container for tasks to perform after completion
         //  one example would be add callbacks for event handling
         //  styling
-        if (typeof x.tasks !== "undefined") {
-          if ((typeof x.tasks.length === "undefined") ||
-              (typeof x.tasks === "function")) {
+        var tasks = config.tasks;
+        if (typeof tasks !== "undefined" && tasks !== null) {
+          if ((typeof tasks.length === "undefined") ||
+              (typeof tasks === "function")) {
             // handle a function not enclosed in array
             // should be able to remove once using jsonlite
-            x.tasks = [x.tasks];
+            tasks = [tasks];
           }
-          x.tasks.map(function(t){
+          tasks.map(function(t){
             // for each tasks add it to the mermaid.tasks with el
             t.call(el);
           });

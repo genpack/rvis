@@ -229,9 +229,7 @@ d3plus.bar = function(obj, x = NULL, y = NULL, group = NULL, color = NULL, confi
     }
     clrlist = getColorList(Ly, L$color, config)
   }
-  attributes = clrlist %>%
-    as.data.frame %>% t %>% rownames2Column(Lgroup) %>% as.data.frame %>% list
-  names(attributes) <- Lgroup
+  attributes = d3plus.colorAttributes(clrlist, Lgroup)
 
   d3 %>% d3plusAttrs(value = attributes) %>% d3plusColor(value = "V1") %>%
     d3plus.applyConfig(config)
@@ -240,6 +238,22 @@ d3plus.bar = function(obj, x = NULL, y = NULL, group = NULL, color = NULL, confi
 d3plus.applyConfig = function(chart, config){
   chart %>% d3plusLegend(value = config$legend.enabled, size = config$legend.size, data = config$legend.tooltip.enabled) %>%
     d3plusTooltip(value = config$tooltip) %>% d3plusTitle(config$title)
+}
+
+d3plus.colorAttributes = function(colors, group){
+  if (length(colors) == 0L) {
+    attributes = data.frame(group = character(), V1 = character(), stringsAsFactors = FALSE)
+  } else {
+    attributes = as.data.frame(colors, stringsAsFactors = FALSE) %>%
+      t %>%
+      as.data.frame(stringsAsFactors = FALSE)
+    attributes[[group]] = rownames(attributes)
+    rownames(attributes) = NULL
+    attributes = attributes[, c(group, setdiff(names(attributes), group)), drop = FALSE]
+  }
+
+  names(attributes)[1] = group
+  stats::setNames(list(attributes), group)
 }
 
 # to be removed
@@ -258,10 +272,9 @@ d3plus.bar.molten = function(obj, x = NULL, y = NULL, group = NULL, config = NUL
   obj %<>% prepare4Plot(A, config = config)
 
   attributes = getColorList(obj[, L$group] %>% unique, L$color, config) %>%
-    as.data.frame %>% t %>% rownames2Column(L$group) %>% as.data.frame %>% list
-  names(attributes) <- L$group
+    d3plus.colorAttributes(L$group)
 
-  d3plus(data = obj, id = L$group, type = 'bar') %>%
+  d3plus(data = obj, id = L$group, type = d3plus.shape[config$shape] %>% unname) %>%
     d3plusX(value = L$x) %>%
     d3plusY(value = L$y) %>%
     d3plusAttrs(value = attributes) %>%
@@ -271,12 +284,12 @@ d3plus.bar.molten = function(obj, x = NULL, y = NULL, group = NULL, config = NUL
 
 d3plus.line.molten = function(obj, x = NULL, y = NULL, group = NULL, config = NULL, ...){
   config = d3plus.line.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
-  obj %>% d3plus.bar.molten(x = NULL, y = NULL, group = NULL, config = NULL, ...)
+  obj %>% d3plus.bar.molten(x = x, y = y, group = group, config = config, ...)
 }
 
 d3plus.area.molten = function(obj, x = NULL, y = NULL, group = NULL, config = NULL, ...){
   config = d3plus.area.molten.defset %<==>% (config %>% verify('list', default = list(), varname = 'config'))
-  obj %>% d3plus.bar.molten(x = NULL, y = NULL, group = NULL, config = NULL, ...)
+  obj %>% d3plus.bar.molten(x = x, y = y, group = group, config = config, ...)
 }
 
 d3plus.tsline = function(obj, x = NULL, y = NULL, group = NULL, config = NULL, ...){

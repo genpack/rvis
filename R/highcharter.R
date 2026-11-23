@@ -157,8 +157,8 @@ highcharter.applyConfig = function(h, config = list()){
   verify(config, 'list', varname = 'config')
 
 
-  if(!is.null(config$title)){h = hc_title(h, text = config$title)}
-  if(!is.null(config$subtitle)){h = hc_subtitle(h, text = config$subtitle)}
+  if(!is.null(config$title)){h = highcharter::hc_title(h, text = config$title)}
+  if(!is.null(config$subtitle)){h = highcharter::hc_subtitle(h, text = config$subtitle)}
 
   thm = highcharter::hc_theme(
     chart = list(
@@ -197,8 +197,8 @@ highcharter.applyConfig = function(h, config = list()){
   }
 
   if(!is.null(config$yAxis.gridLine.width)){thm$yAxis$gridLineWidth = config$yAxis.gridLine.width}
-  if(!is.null(config$tooltip)){h %<>% hc_tooltip(headerFormat = config$tooltip[1],
-                                                 pointFormat  = config$tooltip[2])}
+  if(!is.null(config$tooltip)){h %<>% highcharter::hc_tooltip(headerFormat = config$tooltip[1],
+                                                               pointFormat  = config$tooltip[2])}
 
   if(!is.empty(thm)){h %<>% highcharter::hc_add_theme(thm)}
   h %<>%
@@ -211,7 +211,7 @@ highcharter.applyConfig = function(h, config = list()){
   if(!is.null(config$border.radius)){h %<>% highcharter::hc_xAxis(borderRadius = config$border.radius)}
 
   config$barMode %<>% verify('character', lengths = 1, domain = c('group', 'stack', 'relative'), varname = config$barMode, default = 'group')
-  if(config$barMode == 'stack'){h %<>% hc_plotOptions(column = list(stacking = "normal"), bar = list(stacking = "normal"))}
+  if(config$barMode == 'stack'){h %<>% highcharter::hc_plotOptions(column = list(stacking = "normal"), bar = list(stacking = "normal"))}
   return(h)
 }
 
@@ -403,7 +403,8 @@ highcharter.area.range = function(obj, x = NULL, low = NULL, high = NULL, color 
   config = highcharter.area.range.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %<==>%
     list(dimclass = highcharter.area.range.defset$dimclass %<==>% list(y = 'numeric'), multiples = c('y', 'low', 'high', 'color'))
 
-  obj %>% highcharter.combo(shape = chif(config$link.smooth.enabled, 'areasplinerange', 'arearange'), x = x, low = low, high = high, color = color, config = config)
+  shape = if (isTRUE(config$link.smooth.enabled)) 'areasplinerange' else 'arearange'
+  obj %>% highcharter.combo(shape = shape, x = x, low = low, high = high, color = color, config = config)
 }
 
 highcharter.funnel = function(obj, label = NULL, size = NULL, color = NULL, config = NULL){

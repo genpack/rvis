@@ -71,6 +71,7 @@ c3.scatter.molten.defset = defset %<==>% list(
 )
 
 c3.applyConfig = function(chart, config){
+  if (is.null(chart$x$message)) {chart$x$message = ""}
   if(!is.null(config$xAxis.label)){chart %<>% xAxis(label = config$xAxis.label)}
   if(!is.null(config$yAxis.label)){chart %<>% yAxis(label = config$yAxis.label)}
   return(chart)
@@ -81,6 +82,11 @@ c3.applyColors <- function(ct, colorvect) {
   # You can change all other properties here
   # reference: https://c3js.org/reference.html
   return(ct)
+}
+
+c3.mostCommon = function(x) {
+  values = unique(x)
+  values[which.max(tabulate(match(x, values)))]
 }
 
 c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
@@ -103,7 +109,7 @@ c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
   if(obj[, L$x] %>% duplicated %>% sum > 0 & !is.null(config$aggregator)){
     # if(inherits(config$aggregator, 'function')){config$aggregator = as.character(substitute(config$aggregator))}
     config$aggregator %>% verify('character')
-    obj %<>% dplyr::group_by_(L$x)
+    obj %<>% dplyr::group_by(dplyr::across(dplyr::all_of(L$x)))
     scr = "obj %>% dplyr::summarise("
     N   = length(L$y)
     for (i in sequence(N)){
@@ -114,7 +120,8 @@ c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
 
   if (!is.null(L$x)){
     if (inherits(obj[,L$x], 'Date')){ct = obj %>% c3(x = L$x)} else {
-      ct = obj %>% c3 %>% xAxis(type = 'category', categories = obj[, L$x] %>% as.character)
+      ct = obj %>% c3(x = L$x) %>%
+        xAxis(type = 'category', categories = obj[, L$x] %>% as.character)
     }
   } else {ct = obj %>% c3}
   if(!is.null(L$shape)){names(L$shape) <- L$y}
@@ -127,7 +134,7 @@ c3.combo = function(obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...){
   L$shape %<>% vect.extend(length(L$y))
   if(is.empty(config$stack.groups)){config$stack.groups = L$y}
   options(warn = -1)
-  ct %<>% c3_mixedGeom(type = most.common(L$shape), types = L$shape %>% as.list, stacked = chif(config$stack.enabled, config$stack.groups, NULL))
+  ct %<>% c3_mixedGeom(type = c3.mostCommon(L$shape), types = L$shape %>% as.list, stacked = chif(config$stack.enabled, config$stack.groups, NULL))
   options(warn = 1)
 
   return(ct %>% c3.applyConfig(config))

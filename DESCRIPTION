@@ -1,7 +1,7 @@
 Package: rvis
 Type: Package
 Title: NIRASOFT R package for visualization 
-Version: 5.9.3
+Version: 5.9.10
 Date: 03 January 2025
 Author: Nima Ramezani
 Maintainer: <nima.ramezani@gmail.com>
@@ -55,4 +55,4 @@ Collate:
     'rvis.R'
     'sankeytree.R'
     'streamgraph.R'
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.1

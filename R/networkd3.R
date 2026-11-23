@@ -62,7 +62,8 @@ networkD3.sankey = function(obj, key = NULL, label = NULL, tooltip = NULL, sourc
   L = a$labels
   A = a$aesthetics
 
-  obj$nodes %<>% prepare4Plot(A %>% list.extract('key', 'label', 'tooltip'), config) %>% distinct_(L$key, .keep_all = T)
+  obj$nodes %<>% prepare4Plot(A %>% list.extract('key', 'label', 'tooltip'), config)
+  obj$nodes = obj$nodes[!duplicated(obj$nodes[[L$key]]), , drop = FALSE]
   obj$links %<>% prepare4Plot(A %>% list.extract('source', 'target', 'linkWidth', 'linkTooltip'), config)
 
   assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'network.sankey')

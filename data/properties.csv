@@ -94,6 +94,7 @@ visNetwork,node.shape,character,rectangle,square delta curl icon triangleDown po
 diagramer,node.shape,character,rectangle,square delta icon triangle rectangle box dot point egg oval text bubble circle star ellipse cylinder diamond rhombus
 diagramer,shinyInput.click,character,,
 diagramer,shinyInput.click,character,,
+grviz,node.label.size,numeric integer,14,
 visNetwork,node.size.max,numeric integer,40,
 diagramer,node.size.ratio,numeric integer,0.6,0 1
 diagramer,node.size,numeric integer,3,
@@ -133,7 +134,7 @@ d3plus,xAxis.min,numeric integer Date,,
 d3plus,xAxis.max,numeric integer Date,,
 d3plus,label.format,character,,
 d3plus,currency.symbol,character,US$,
-d3plus,shape,character,line,line bar
+d3plus,shape,character,line,line bar area
 morrisjs,yAxis.tick.suffix,character,,
 morrisjs,yAxis.tick.prefix,character,,
 dygraphs,subchart.enabled,logical,T,T F

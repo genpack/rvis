@@ -189,7 +189,8 @@ googleVis.sankey = function(obj, key = NULL, source = NULL, target = NULL, linkW
   L = a$labels
   A = a$aesthetics
 
-  obj$nodes %<>% prepare4Plot(A %>% list.extract('key'), config) %>% distinct_(L$key, .keep_all = T)
+  obj$nodes %<>% prepare4Plot(A %>% list.extract('key'), config)
+  obj$nodes = obj$nodes[!duplicated(obj$nodes[[L$key]]), , drop = FALSE]
   obj$links %<>% prepare4Plot(A %>% list.extract('source', 'target', 'linkWidth'), config)
 
   assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a seubset of node IDs'", err_src = 'googleVis.sankey')

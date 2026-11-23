@@ -349,7 +349,8 @@ grviz.graph = function(obj,
   L = a$labels
   A = a$aesthetics
 
-  obj$nodes %<>% prepare4Plot(A %>% list.extract('key', 'label', 'shape', 'size', 'tooltip', 'color', 'borderColor', 'borderWidth', 'labelColor'), config) %>% distinct_(L$key, .keep_all = T)
+  obj$nodes %<>% prepare4Plot(A %>% list.extract('key', 'label', 'shape', 'size', 'tooltip', 'color', 'borderColor', 'borderWidth', 'labelColor'), config)
+  obj$nodes = obj$nodes[!duplicated(obj$nodes[[L$key]]), , drop = FALSE]
   obj$links %<>% prepare4Plot(A %>% list.extract('source', 'target', 'linkColor', 'linkLength', 'linkWidth', 'linkLabel', 'linkLabelColor', 'linkLabelSize', 'linkTooltip'), config)
 
   # if (is.empty(obj$nodes)){obj$nodes <- data.frame(id = nodeIDs)} else {obj$nodes$id = nodeIDs}
@@ -470,7 +471,7 @@ grviz.graph = function(obj,
   ## todo: pass additional arguments to grviz.createGraph() from config
   grviz.createGraph(nodes_df, edges_df) %>% grviz.applyConfig(config) %>%
     grviz.renderGraph(layout = config$layout %>% verify('character', default = 'dot'),
-                      title  = config$title %>% verify('character', lengths == 1),
+                      title  = config$title %>% verify('character', lengths = 1),
                       shinyInput.click = config$shinyInput.click %>% verify('character', lengths = 1, varname = 'config$shinyInput.click'),
                       ...)
 }
@@ -1262,9 +1263,7 @@ grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, 
       }
     }
     if (!("fontcolor" %in% colnames(graph$nodes_df)) & "fillcolor" %in% colnames(graph$nodes_df)) {
-      graph$nodes_df$fontcolor <- graph$nodes_df$fillcolor %>%
-        dplyr::as_data_frame() %>% dplyr::mutate(value_x = contrastColors(color = value)) %>%
-        dplyr::pull(value_x)
+      graph$nodes_df$fontcolor <- contrastColors(color = graph$nodes_df$fillcolor)
     }
     if (!is.null(layout)) {
       if (layout %in% c("circle", "tree", "kk", "fr", "nicely")) {

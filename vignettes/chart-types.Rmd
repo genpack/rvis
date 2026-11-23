@@ -61,7 +61,7 @@ example_sankey <- list(
 ## Common argument conventions
 
 | Argument | Common meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by the wrapper. |
 | `x`, `y`, `y2`, `z` | Axis or numeric dimensions. |
 | `label`, `theta`, `group`, `color`, `shape`, `size` | Category, measure, grouping, and visual mappings. |
@@ -78,7 +78,7 @@ chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.bar` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 | `billboarder` | `billboarder.bar` | `obj, x = NULL, y = NULL, group = NULL, color = NULL, config = NULL, ...` |
 | `plotly` | `plotly.bar` | `..., config = NULL` |
@@ -114,7 +114,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -139,7 +139,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.bar.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
 ### Example
@@ -165,7 +165,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -189,7 +189,7 @@ chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.pie` | `obj, label = NULL, theta = NULL, config = NULL, ...` |
 | `billboarder` | `billboarder.pie` | `obj, label = NULL, theta = NULL, config = NULL, ...` |
 | `plotly` | `plotly.pie` | `obj, label = NULL, theta = NULL, config = NULL, ...` |
@@ -220,7 +220,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `label` | Category or text label field. |
 | `theta` | Numeric measure for slice size, gauge value, or angular position. |
@@ -268,7 +268,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `group` | Series or category grouping field. |
 | `config` | Named list of settings supported by this wrapper. |
@@ -290,7 +290,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `billboarder` | `billboarder.scatter` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 | `plotly` | `plotly.scatter` | `obj, x, y, z = NULL, size = NULL, shape = NULL, color = NULL, label = NULL, tooltip = NULL, config = NULL, ...` |
 | `highcharter` | `highcharter.scatter` | `obj, x = NULL, y = NULL, size = NULL, color = NULL, shape = NULL, config = NULL, ...` |
@@ -326,7 +326,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -357,7 +357,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `c3` | `c3.scatter.molten` | `obj, x = NULL, y = NULL, shape = NULL, group = NULL, config = NULL, ...` |
 | `highcharter` | `highcharter.scatter.molten` | `obj, x = NULL, y = NULL, size = NULL, group = NULL, color = NULL, config = NULL, ...` |
 | `highcharts` | `highcharts.scatter.molten` | `obj, x = NULL, y = NULL, size = NULL, shape = NULL, group = NULL, config = NULL, ...` |
@@ -386,7 +386,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -413,7 +413,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `plotly` | `plotly.combo` | `obj, x = NULL, y = NULL, shape = NULL, color = NULL, config = NULL, tooltip = NULL, ...` |
 | `c3` | `c3.combo` | `obj, x = NULL, y = NULL, shape = NULL, config = NULL, ...` |
 | `highcharter` | `highcharter.combo` | `obj, x = NULL, y = NULL, size = NULL, low = NULL, high = NULL, color = NULL, linkColor = NULL, shape = NULL, config = NULL` |
@@ -445,7 +445,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -518,7 +518,7 @@ chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.box` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `plotly` | `plotly.box` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 | `bpexploder` | `bpexploder.box` | `obj, y = NULL, group = NULL, config = NULL, ...` |
@@ -551,7 +551,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -575,7 +575,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `c3` | `c3.line` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `highcharter` | `highcharter.line` | `obj, x = NULL, y = NULL, color = NULL, config = NULL` |
 | `googleVis` | `googleVis.line` | `obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...` |
@@ -602,7 +602,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -627,7 +627,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.line.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
 ### Example
@@ -653,7 +653,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -677,7 +677,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `c3` | `c3.area` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `highcharter` | `highcharter.area` | `obj, x = NULL, y = NULL, color = NULL, config = NULL` |
 | `googleVis` | `googleVis.area` | `obj, x = NULL, y = NULL, y2 = NULL, config = NULL, ...` |
@@ -704,7 +704,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -729,7 +729,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.area.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 | `xCharts` | `xCharts.area.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
@@ -756,7 +756,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -780,7 +780,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `highcharter` | `highcharter.area.range` | `obj, x = NULL, low = NULL, high = NULL, color = NULL, config = NULL` |
 
 ### Example
@@ -807,7 +807,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `low` | Lower bound for a range or interval. |
@@ -831,7 +831,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `grviz` | `grviz.graph` | `obj, key = NULL, label = NULL, shape = NULL, size = NULL, color = NULL, borderColor = NULL, tooltip = NULL, labelColor = NULL, source = NULL, target = NULL, linkColor = NULL, linkTooltip = NULL, linkWidth = NULL, linkLabel = NULL, linkLabelColor = NULL, linkLabelSize = NULL, config = NULL, ...` |
 | `visNetwork` | `visNetwork.graph` | `obj, key = NULL, label = NULL, shape = NULL, size = NULL, color = NULL, borderColor = NULL, tooltip = NULL, source = NULL, target = NULL, linkColor = NULL, linkLength = NULL, linkWidth = NULL, linkLabel = NULL, linkLabelColor = NULL, linkLabelSize = NULL, config = NULL, ...` |
 
@@ -861,7 +861,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `key` | Identifier field for rows or graph elements. |
 | `label` | Category or text label field. |
@@ -900,7 +900,7 @@ name, but it does not currently produce a chart.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `visNetwork` | `visNetwork.graphChart` | `nodes, links, size = NULL, sizeLegend = NULL, shape = NULL, shapeLegend = NULL, color = NULL, colorLegend = NULL, label = NULL, linkColor = NULL, linkLength = NULL, linkLengthLegend = NULL, linkSource = NULL, linkTarget = NULL, linkWidth = NULL, ...` |
 
 ### Arguments
@@ -908,7 +908,7 @@ name, but it does not currently produce a chart.
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `nodes` | Data frame of network nodes. |
 | `links` | Data frame of network links or edges. |
 | `size` | Mark or node size field or value. |
@@ -942,7 +942,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `highcharter` | `highcharter.bubble` | `obj, x = NULL, y = NULL, size = NULL, color = NULL, config = NULL` |
 | `d3plus` | `d3plus.bubble` | `obj, size = NULL, label = NULL, config = NULL, ...` |
 | `bubbles` | `bubbles.bubble` | `obj, size = NULL, color = NULL, label = NULL, labelColor = NULL, tooltip = NULL, config = bubbles.defset, ...` |
@@ -971,7 +971,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -999,7 +999,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.bubble.molten` | `obj, size = NULL, label = NULL, group = NULL, config = NULL, ...` |
 | `bubbleCloud` | `bubbleCloud.bubble.molten` | `obj, size = NULL, group = NULL, tooltip = NULL, config = bubbleCloud.bubble.molten.defset, ...` |
 
@@ -1026,7 +1026,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `size` | Mark or node size field or value. |
 | `label` | Category or text label field. |
@@ -1051,7 +1051,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.tree` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 | `sankeytree` | `sankeytree.tree` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 
@@ -1078,7 +1078,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `label` | Category or text label field. |
 | `size` | Mark or node size field or value. |
@@ -1102,7 +1102,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `highcharter` | `highcharter.treemap` | `obj, label = NULL, size = NULL, color = NULL, config = NULL` |
 | `d3plus` | `d3plus.treemap` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 
@@ -1129,7 +1129,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `label` | Category or text label field. |
 | `size` | Mark or node size field or value. |
@@ -1153,7 +1153,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `DT` | `DT.table` | `obj, label = NULL, config = NULL, sessionobj = NULL, ...` |
 | `D3TableFilter` | `D3TableFilter.table` | `obj, label = NULL, color = NULL, shape = NULL, config = NULL, ...` |
 | `pivot` | `pivot.table` | `obj, ...` |
@@ -1180,7 +1180,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `label` | Category or text label field. |
 | `config` | Named list of settings supported by this wrapper. |
@@ -1205,7 +1205,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `TFD3` | `TFD3.table.molten` | `obj, label = NULL, color = NULL, shape = NULL, group = NULL, config = NULL` |
 
 ### Example
@@ -1256,7 +1256,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `DT` | `DT.Table` | `x, links = NULL, session = NULL, options = list(), rownames = T` |
 
 ### Example
@@ -1278,7 +1278,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `links` | Data frame of network links or edges. |
 | `session` | Shiny session used for interactive table behavior. |
@@ -1325,7 +1325,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `config` | Named list of settings supported by this wrapper. |
@@ -1349,7 +1349,7 @@ current function name.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `leaflet` | `leaflet.map.plot` | `x, stores = rownames(sg$spec), tiles = F, icon = NULL` |
 
 ### Input requirement
@@ -1365,7 +1365,7 @@ repaired before it is used as a general `rvisPlot()` map example.
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `stores` | Store identifiers selected from a STORE.GROUP object. |
 | `tiles` | Whether to add a map tile layer. |
@@ -1387,7 +1387,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.tsline` | `obj, x = NULL, y = NULL, shape = NULL, size = NULL, color = NULL, high = NULL, low = NULL, config = NULL, ...` |
 | `billboarder` | `billboarder.tsline` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 | `plotly` | `plotly.tsline` | `obj, x = NULL, y = NULL, config = NULL, ...` |
@@ -1423,7 +1423,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1453,7 +1453,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `billboarder` | `billboarder.tsLineChart` | `obj, x = NULL, y = NULL, color = NULL, shape = "spline", config = NULL, ...` |
 
 ### Example
@@ -1480,7 +1480,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1505,7 +1505,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `highcharter` | `highcharter.tsline.stock` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 
 ### Example
@@ -1530,7 +1530,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1553,7 +1553,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `billboarder` | `billboarder.tsarea` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 | `c3` | `c3.tsarea` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `streamgraph` | `streamgraph.tsarea` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
@@ -1581,7 +1581,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1606,7 +1606,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.tsarea.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
 ### Example
@@ -1632,7 +1632,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1656,7 +1656,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `plotly` | `plotly.tsbar` | `obj, x = NULL, y = NULL, config = NULL, ...` |
 | `morrisjs` | `morrisjs.tsbar` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 
@@ -1682,7 +1682,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1706,7 +1706,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `d3plus` | `d3plus.tsbar.molten` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
 
 ### Example
@@ -1732,7 +1732,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -1756,7 +1756,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `googleVis` | `googleVis.sankey` | `obj, key = NULL, source = NULL, target = NULL, linkWidth = NULL, config = NULL` |
 | `networkD3` | `networkD3.sankey` | `obj, key = NULL, label = NULL, tooltip = NULL, source = NULL, target = NULL, linkWidth = NULL, linkTooltip = NULL, config = NULL` |
 
@@ -1811,7 +1811,7 @@ select this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `echarts` | `echarts.wordCloud` | `obj, label = NULL, size = NULL, color = NULL, config = NULL, ...` |
 
 ### Example
@@ -1837,7 +1837,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `label` | Category or text label field. |
 | `size` | Mark or node size field or value. |
@@ -1861,7 +1861,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.funnel` | `obj, y = NULL, label = NULL, config = NULL, ...` |
 | `highcharter` | `highcharter.funnel` | `obj, label = NULL, size = NULL, color = NULL, config = NULL` |
 | `echarts` | `echarts.funnel` | `obj, label = NULL, size = NULL, config = NULL, ...` |
@@ -1888,7 +1888,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `y` | Vertical measure or named series. |
 | `label` | Category or text label field. |
@@ -1913,7 +1913,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.gauge` | `obj = data.frame(), theta = NULL, config = NULL, ...` |
 | `c3` | `c3.gauge` | `theta, config = NULL, ...` |
 | `googleVis` | `googleVis.gauge` | `obj = data.frame(), theta = NULL, label = NULL, config = NULL, ...` |
@@ -1939,7 +1939,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `theta` | Numeric measure for slice size, gauge value, or angular position. |
 | `config` | Named list of settings supported by this wrapper. |
@@ -1962,7 +1962,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `amCharts` | `amCharts.bullet` | `obj = data.frame(), x = NULL, y = NULL, config = NULL, ...` |
 
 ### Example
@@ -1986,7 +1986,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `x` | Horizontal axis, time, or primary input; interpretation is wrapper-specific. |
 | `y` | Vertical measure or named series. |
@@ -2009,7 +2009,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `coffeewheel` | `coffeewheel.sunburst` | `obj, theta = NULL, label = NULL, color = NULL, config = NULL, ...` |
 
 ### Example
@@ -2035,7 +2035,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `theta` | Numeric measure for slice size, gauge value, or angular position. |
 | `label` | Category or text label field. |
@@ -2059,7 +2059,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `calheatmap` | `calheatmap.calendar` | `obj, t = NULL, color = NULL, config = NULL, ...` |
 
 ### Example
@@ -2084,7 +2084,7 @@ rvisPlot(
 Common meanings for the arguments on these methods:
 
 | Argument | Meaning |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `obj` | Input data frame or object accepted by this wrapper. |
 | `t` | Time or grouping field. |
 | `color` | Color mapping field or value. |
@@ -2107,7 +2107,7 @@ this chart method.
 ### Wrapper methods
 
 | `plotter` value | Function | Formal arguments |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `highcharter` | `highcharter.pyramid` | `obj, label = NULL, size = NULL, color = NULL, config = NULL` |
 
 ### Example
