@@ -89,6 +89,20 @@ rvisPlot(type = "pie", plotter = "plotly", obj = eyes, label = "Eye", theta = "F
 rvisPlot(type = "pie", plotter = "morrisjs", obj = hair, label = "Hair", theta = "Freq")
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "pie", plotter = "apexcharter", obj = hair, label = "Hair", theta = "Freq",
+         config = list(pie.donut = TRUE, title = "Students by hair colour"))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "pie", plotter = "echarts", obj = eyes, label = "Eye", theta = "Freq",
+         config = list(title = "Students by eye colour"))
+```
+
 ## Pie charts from a long table {#pie.molten}
 
 The chart counts the rows of each value of `group`: here one row per student.
@@ -156,6 +170,13 @@ rvisPlot(type = "gauge", plotter = "c3", obj = brown, theta = "percent")
 ```{r, eval=has_plotter("googleVis")}
 rvisPlot(type = "gauge", plotter = "googleVis", obj = brown, label = "label", theta = "percent",
          config = list(theta.min = 0, theta.max = 100))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "gauge", plotter = "echarts", obj = brown$percent,
+         config = list(title = "Brown eyes (%)"))
 ```
 
 ## Bullet charts {#bullet}

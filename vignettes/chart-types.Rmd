@@ -72,7 +72,8 @@ chart method.
 | `highcharter` | `highcharter.bar` | `obj, x = NULL, y = NULL, color = NULL, config = NULL` |
 | `d3plus` | `d3plus.bar` | `obj, x = NULL, y = NULL, group = NULL, color = NULL, config = NULL, ...` |
 | `googleVis` | `googleVis.bar` | `obj, x = NULL, y = NULL, config = NULL, ...` |
-| `echarts` | `echarts.bar` | `obj, x = NULL, y = NULL, config = NULL, ...` |
+| `echarts` | `echarts.bar` | `obj, x = NULL, y = NULL, group = NULL, config = NULL, ...` |
+| `apexcharter` | `apexcharter.bar` | `obj, x = NULL, y = NULL, group = NULL, color = NULL, config = NULL, ...` |
 | `nvd3` | `nvd3.bar` | `obj, x = NULL, y = NULL, group = NULL, color = NULL, config = NULL, ...` |
 | `candela` | `candela.bar` | `obj, x = NULL, y = NULL, color = NULL, config = NULL, ...` |
 | `dc` | `dc.bar` | `obj, x = NULL, y = NULL, config = NULL, ...` |
@@ -155,6 +156,8 @@ chart method.
 | `highcharter` | `highcharter.pie` | `obj, label = NULL, theta = NULL, color = NULL, config = NULL` |
 | `morrisjs` | `morrisjs.pie` | `obj = data.frame(), theta = NULL, label = NULL, color = NULL, config = NULL, ...` |
 | `nvd3` | `nvd3.pie` | `obj, theta = NULL, label = NULL, config = NULL, ...` |
+| `apexcharter` | `apexcharter.pie` | `obj, label = NULL, theta = NULL, color = NULL, config = NULL, ...` |
+| `echarts` | `echarts.pie` | `obj, label = NULL, theta = NULL, config = NULL, ...` |
 
 ### Examples
 
@@ -235,6 +238,8 @@ this chart method.
 | `dimple` | `dimple.scatter` | `obj, x = NULL, y = NULL, t = NULL, size = NULL, shape = NULL, color = NULL, config = NULL, ...` |
 | `rbokeh` | `rbokeh.scatter` | `obj, x = NULL, y = NULL, color = NULL, shape = NULL, config = NULL, ...` |
 | `rCharts` | `rCharts.scatter` | `obj, x = NULL, y = NULL, size = NULL, shape = NULL, color = NULL, config = NULL, ...` |
+| `apexcharter` | `apexcharter.scatter` | `obj, x = NULL, y = NULL, group = NULL, color = NULL, config = NULL, ...` |
+| `echarts` | `echarts.scatter` | `obj, x = NULL, y = NULL, size = NULL, group = NULL, config = NULL, ...` |
 
 ### Examples
 

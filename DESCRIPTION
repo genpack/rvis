@@ -1,7 +1,7 @@
 Package: rvis
 Type: Package
 Title: NIRASOFT R package for visualization
-Version: 5.13.0
+Version: 5.14.0
 Date: 2026-11-24
 Author: Nima Ramezani
 Maintainer: <nima.ramezani@gmail.com>
@@ -16,11 +16,12 @@ Imports:
     dplyr,
     stringr
 Remotes: genpack/rutils
-Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0)
+Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0), apexcharter, echarts4r
 VignetteBuilder: knitr
 Collate:
     'visgen.R'
     'amcharts.R'
+    'apexcharter.R'
     'jscripts.R'
     'billboarder.R'
     'bpexploder.R'

@@ -173,3 +173,29 @@ dc,legend.width,numeric,140,
 dc,legend.height,numeric,140,
 diagramer,link.label.size,numeric integer,30,
 diagramer,link.arrow.size,numeric integer,1.5,
+echarts,title,character,,
+echarts,subtitle,character,,
+echarts,legend.enabled,logical,T,T F
+echarts,legend.position,character,bottom,top bottom left right
+echarts,tooltip.enabled,logical,T,T F
+echarts,xAxis.label,character,,
+echarts,yAxis.label,character,,
+echarts,label.enabled,logical,F,T F
+echarts,stack.enabled,logical,F,T F
+echarts,zoom.enabled,logical,F,T F
+echarts,theme,character,,
+echarts,pie.donut,logical,F,T F
+echarts,graph.layout,character,force,force circular none
+apexcharter,title,character,,
+apexcharter,subtitle,character,,
+apexcharter,xAxis.label,character,,
+apexcharter,yAxis.label,character,,
+apexcharter,legend.enabled,logical,T,T F
+apexcharter,legend.position,character,bottom,top right bottom left
+apexcharter,label.enabled,logical,,T F
+apexcharter,stack.enabled,logical,F,T F
+apexcharter,theme,character,,light dark
+apexcharter,line.shape,character,,smooth straight stepline
+apexcharter,pie.donut,logical,F,T F
+apexcharter,color.max,character,,
+apexcharter,additionalColumns,character,,

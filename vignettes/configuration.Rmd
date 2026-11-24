@@ -50,7 +50,15 @@ key_meaning <- function(key) {
     "subchart.enabled" = "Whether to show a secondary overview or range selector.",
     "subchart.height" = "Height of the secondary overview or range selector.",
     "colorize" = "Whether the wrapper assigns colors automatically.",
-    "tooltip" = "Tooltip configuration or tooltip field, as supported by the wrapper."
+    "tooltip" = "Tooltip configuration or tooltip field, as supported by the wrapper.",
+    "tooltip.enabled" = "Whether to show a tooltip when hovering over the chart.",
+    "zoom.enabled" = "Whether to add a zoom slider to the axes.",
+    "label.enabled" = "Whether to show data labels on the chart.",
+    "theme" = "Name of the chart theme (for apexcharter: light or dark).",
+    "pie.donut" = "Whether a pie chart is drawn as a donut (a ring).",
+    "graph.layout" = "Layout of the nodes of a graph: force-directed, circular or none (positions given).",
+    "line.shape" = "Shape of the lines: smooth, straight or stepline.",
+    "color.max" = "Colour of the largest values of a heat map."
   )
   if (key %in% names(known)) return(unname(known[[key]]))
   parts <- strsplit(key, "\\.", fixed = FALSE)[[1]]

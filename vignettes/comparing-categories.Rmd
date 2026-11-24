@@ -129,6 +129,14 @@ rvisPlot(type = "bar", plotter = "candela", obj = deaths_long, x = "age", y = "r
 rvisPlot(type = "bar", plotter = "dc", obj = deaths, x = "age", y = "urban_male")
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "bar", plotter = "apexcharter", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"),
+         config = list(title = "Male death rates", yAxis.label = "per 1000", stack.enabled = TRUE))
+```
+
 ## Bar charts from a long table {#bar.molten}
 
 The series come from the values of a grouping column instead of separate columns.
@@ -165,6 +173,21 @@ rvisPlot(type = "line", plotter = "highcharter", obj = deaths, x = "age",
          y = list("rural_male", "rural_female", "urban_male", "urban_female"))
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "line", plotter = "apexcharter", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"), config = list(line.shape = "smooth"))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+# series from the values of a column with `group`:
+rvisPlot(type = "line", plotter = "echarts", obj = deaths_long, x = "age", y = "rate", group = "group",
+         config = list(title = "Death rates", yAxis.label = "per 1000"))
+```
+
 ## Line charts from a long table {#line.molten}
 
 ### d3plus
@@ -191,6 +214,20 @@ rvisPlot(type = "area", plotter = "googleVis", obj = deaths, x = "age", y = list
 
 ```{r, eval=has_plotter("highcharter")}
 rvisPlot(type = "area", plotter = "highcharter", obj = deaths, x = "age", y = list("rural_male", "urban_male"))
+```
+
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "area", plotter = "apexcharter", obj = deaths, x = "age",
+         y = list("rural_female", "urban_female"))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "area", plotter = "echarts", obj = deaths, x = "age",
+         y = list("rural_female", "urban_female"), config = list(stack.enabled = TRUE))
 ```
 
 ## Area charts from a long table {#area.molten}
@@ -260,3 +297,15 @@ rvisPlot(type = "combo", plotter = "dimple", obj = deaths, x = "age",
 rvisPlot(type = "combo", plotter = "dygraphs", obj = deaths, x = "age",
          y = list("rural_male", "urban_male"), y2 = "urban_female")
 ```
+
+## Radar charts {#radar}
+
+A radar chart shows one or more numeric columns (`y`) on axes arranged in a circle, one axis per category of `x`.
+
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "radar", plotter = "apexcharter", obj = deaths, x = "age",
+         y = list("rural_male", "urban_male"))
+```
+

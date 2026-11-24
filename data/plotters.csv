@@ -1,4 +1,5 @@
 Plotter,bar,bar.molten,pie,pie.molten,scatter,scatter.molten,combo,combo.molten,box,box.molten,line,area,area.molten,graph,bubble,bubble.molten,tree,treemap,table,histogram,map,tsline,tsarea,tsbar,sankey,wordCloud,funnel,heatmap
+apexcharter,x,,x,,x,,,,,,x,x,,,x,,,,,,,x,x,x,,,,x
 billboarder,x,x,x,,,x,,,,,,,,,,,,,,,,x,x,,,,,
 bpexploder,,,,,,,,,,x,,,,,,,,,,,,,,,,,,
 bubbles,,,,,,,,,,,,,,,x,,,,,,,,,,,,,
@@ -10,7 +11,7 @@ DiagrammeR,,,,,,,,,,,,,,x,,,,,,,,,,,,,,
 dimple,,,,,,,x,x,,,,,,,,,,,,,,,,,,,,
 DT,,,,,,,,,,,,,,,,,,,x,,,,,,,,,
 dygraphs,,,,,,,x,,,,,,,,,,,,,,,,,,,,,
-echarts,x,,,,,,,,,,,,,,,,,,,,,,,,,x,x,
+echarts,x,,x,,x,,,,x,,x,x,,x,x,,,x,,,,x,x,x,x,x,x,x
 ggvis,,,,,x,,,,,,,,,,,,,,,x,,,,,,,,
 googleVis,x,,,,,,,,,,x,x,,,,,,,,,,,,,,,,
 highcharter,,,x,,x,x,x,,,,,,,,,,,,,,,x,,,,,,

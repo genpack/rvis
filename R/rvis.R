@@ -276,5 +276,14 @@
 #                               20 apps of the Shiny gallery rebuilt from YAML, and two large showcase dashboards.
 #                             * Five dashboard vignettes: getting started, layouts, item reference, gallery, Shiny packages.
 #                             See the version history of each file for details.
+# 5.13.0 (24 November 2026) - Dashboard items and clothes of type 'package::function' (like shinyWidgets::pickerInput or
+#                             shinydashboard::box) call that function directly with the item fields as arguments; inputs,
+#                             outputs and containers are detected from the function arguments, outputs are rendered by the
+#                             package's renderFoo function and inputs updated by its updateFoo function (dashboard.R).
+# 5.14.0 (24 November 2026) - New plotter apexcharter (apexcharter.R, version 0.1.0): bar, line, area, scatter, bubble, pie,
+#                             tsline, tsarea, tsbar, heatmap and radar. echarts.R changed to version 0.2.0: line, area, tsline,
+#                             tsarea, tsbar, scatter, bubble, pie, box, heatmap, calendar, gauge, sankey, treemap, sunburst and
+#                             graph added; standard config properties (title, legend, tooltip, axis labels, stacking, zoom).
+#                             Examples in the chart guides; both plotters work as generic dashboard outputs.
 NULL
 #> NULL

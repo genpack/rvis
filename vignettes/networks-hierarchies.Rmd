@@ -65,6 +65,13 @@ rvisPlot(type = "graph", plotter = "grviz", obj = flows, key = "id", label = "la
                        title = "Titanic: class, sex and survival"))
 ```
 
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "graph", plotter = "echarts", obj = flows, key = "id", label = "label",
+         source = "source", target = "target", linkWidth = "value")
+```
+
 ## Sankey diagrams {#sankey}
 
 A sankey diagram draws links as bands whose width is proportional to `linkWidth`.
@@ -84,6 +91,13 @@ rvisPlot(type = "sankey", plotter = "googleVis", obj = flows, key = "id",
          source = "source", target = "target", linkWidth = "value")
 ```
 
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "sankey", plotter = "echarts", obj = flows$links,
+         source = "source", target = "target", linkWidth = "value")
+```
+
 ## Sunburst charts {#sunburst}
 
 A sunburst shows nested categories (`label`, from the inner to the outer ring) sized by
@@ -96,6 +110,13 @@ A sunburst shows nested categories (`label`, from the inner to the outer ring) s
 ```{r}
 rvisPlot(type = "sunburst", plotter = "coffeewheel", obj = titanic, theta = "Freq",
          label = list("Class", "Sex", "Survived"), config = list(width = 600, height = 600))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "sunburst", plotter = "echarts", obj = aggregate(Freq ~ Class + Sex, data = titanic, FUN = sum),
+         label = "Sex", size = "Freq", group = "Class")
 ```
 
 ## Trees {#tree}
@@ -130,3 +151,10 @@ rvisPlot(type = "treemap", plotter = "highcharter", obj = classes, label = "Clas
 ```{r, eval=has_plotter("D3plusR")}
 rvisPlot(type = "treemap", plotter = "d3plus", obj = titanic, label = list("Class", "Survived"), size = "Freq")
 ```
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "treemap", plotter = "echarts", obj = aggregate(Freq ~ Class + Age, data = titanic, FUN = sum),
+         label = "Age", size = "Freq", group = "Class")
+```
+

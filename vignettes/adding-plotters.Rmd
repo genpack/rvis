@@ -35,7 +35,8 @@ and how to add a plotter.
 | `dimple` | `combo`, `scatter` |
 | `DT` | `table` |
 | `dygraphs` | `combo`, `tsline` |
-| `echarts` | `bar`, `funnel`, `wordCloud` |
+| `apexcharter` | `area`, `bar`, `bubble`, `heatmap`, `line`, `pie`, `radar`, `scatter`, `tsarea`, `tsbar`, `tsline` |
+| `echarts` (package echarts4r) | `area`, `bar`, `box`, `bubble`, `calendar`, `funnel`, `gauge`, `graph`, `heatmap`, `line`, `pie`, `sankey`, `scatter`, `sunburst`, `treemap`, `tsarea`, `tsbar`, `tsline`, `wordCloud` |
 | `ggvis` | `histogram`, `scatter` |
 | `googleVis` | `area`, `bar`, `gauge`, `line`, `sankey` |
 | `grviz` | `graph` |
@@ -62,25 +63,25 @@ Examples of each are in the topic guides: [comparing categories](comparing-categ
 ## Plotters planned {#roadmap}
 
 These htmlwidgets packages are not wrapped yet. The table gives the chart types each would add and
-the guide its examples would go to. Packages marked *dashboard only* can already be used as
-dashboard outputs (see below), but have no `rvisPlot()` wrapper yet.
+the guide its examples would go to. Packages marked *dashboard only* already have dashboard output
+types, but have no `rvisPlot()` wrapper yet. (Any htmlwidget can be a dashboard output with a
+`package::fooOutput` item type, see step 4 below.) Packages marked *not on CRAN* were archived on CRAN,
+so a CRAN version of rvis cannot depend on them.
 
 | Package | Chart types it would add | Guide |
 |:---|:---|:---|
-| [apexcharter](https://dreamrs.github.io/apexcharter/) | `bar`, `line`, `area`, `pie`, `scatter`, `bubble`, `tsline`, `heatmap`, `radar` | several |
-| [echarts4r](https://echarts4r.john-coene.com/) (more types) | `line`, `area`, `pie`, `scatter`, `box`, `heatmap`, `sankey`, `sunburst`, `treemap`, `calendar`, `gauge`, `graph` | several |
-| [metricsgraphics](https://hrbrmstr.github.io/metricsgraphics/) | `tsline`, `scatter`, `histogram` | time series, relationships |
-| [taucharts](https://github.com/hrbrmstr/taucharts) | `scatter`, `line`, `bar` | relationships, categories |
+| [metricsgraphics](https://hrbrmstr.github.io/metricsgraphics/) (*not on CRAN*) | `tsline`, `scatter`, `histogram` | time series, relationships |
+| [taucharts](https://github.com/hrbrmstr/taucharts) (*not on CRAN*) | `scatter`, `line`, `bar` | relationships, categories |
 | [scatterD3](https://juba.github.io/scatterD3/) | `scatter` | relationships |
 | [threejs](https://bwlewis.github.io/rthreejs/) | `scatter3d`, `globe`, `graph` | relationships, networks |
-| [parcoords](https://github.com/timelyportfolio/parcoords) | `parallel` (parallel coordinates) | relationships |
-| [d3heatmap](https://github.com/talgalili/d3heatmap) / [heatmaply](https://talgalili.github.io/heatmaply/) | `heatmap` | relationships |
+| [parcoords](https://github.com/timelyportfolio/parcoords) (*not on CRAN*) | `parallel` (parallel coordinates) | relationships |
+| [d3heatmap](https://github.com/talgalili/d3heatmap) (*not on CRAN*) / [heatmaply](https://talgalili.github.io/heatmaply/) | `heatmap` | relationships |
 | [sparkline](https://github.com/htmlwidgets/sparkline) | `sparkline` (also as table cells) | time series, tables |
 | [timevis](https://daattali.com/shiny/timevis-demo/) | `timeline` | time series |
 | [wordcloud2](https://github.com/Lchiffon/wordcloud2) (*dashboard only*) | `wordCloud` | parts of a whole |
 | [sunburstR](https://github.com/timelyportfolio/sunburstR) (*dashboard only*) | `sunburst` | networks and hierarchies |
 | [collapsibleTree](https://adeelk93.github.io/collapsibleTree/) | `tree` | networks and hierarchies |
-| [chorddiag](https://github.com/mattflor/chorddiag) | `chord` | networks and hierarchies |
+| [chorddiag](https://github.com/mattflor/chorddiag) (*not on CRAN*) | `chord` | networks and hierarchies |
 | [upsetjs](https://upset.js.org/integrations/r/) (*dashboard only*) | `upset` (set intersections) | parts of a whole |
 | [reactable](https://glin.github.io/reactable/) | `table` | tables |
 | [rhandsontable](https://jrowen.github.io/rhandsontable/) (*dashboard only*) | `table` (editable) | tables |
@@ -96,7 +97,7 @@ Each new wrapper should come with examples in the guide named above, on that gui
 ## How to add a plotter
 
 A plotter is a set of wrapper functions `<plotter>.<type>()` in one file `R/<plotter>.R`. The steps
-below use a hypothetical `apexcharter` bar chart.
+below show a simplified version of the `apexcharter` bar chart (the full wrappers are in `R/apexcharter.R`).
 
 ### 1. Default settings
 
@@ -169,9 +170,18 @@ apexcharter,legend.position,character,bottom,top right bottom left
 
 ### 4. Dashboard output
 
-To use the plotter in a `DASHBOARD`, its output and render functions are added in `R/dashboard.R`:
-the output type (e.g. `"apexchartOutput"`) to `valid.output.types`, a branch that creates the output
-element, and a branch that sets `script.func = 'apexcharter::renderApexchart'`.
+Nothing needs to be added for dashboards: the output function of the package is used directly as a
+`package::function` item type, and its render function is found by name (`apexchartOutput` is
+rendered by `renderApexchart`):
+
+```yaml
+chart:
+  type: apexcharter::apexchartOutput
+  height: 300px
+  service: rvisPlot(type = "bar", plotter = "apexcharter", obj = deaths, x = "age", y = "rural_male")
+```
+
+If the render function does not follow the `fooOutput` / `renderFoo` naming, give it in field `render`.
 
 ### 5. Documentation
 

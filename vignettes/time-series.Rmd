@@ -88,6 +88,20 @@ rvisPlot(type = "tsline", plotter = "d3plus", obj = air, x = "date", y = list("T
 rvisPlot(type = "tsline", plotter = "morrisjs", obj = air, x = "date", y = list("Temp", "Wind"))
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "tsline", plotter = "apexcharter", obj = air, x = "date", y = list("Temp", "Wind"),
+         config = list(title = "Temperature and wind"))
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "tsline", plotter = "echarts", obj = air, x = "date", y = list("Temp", "Wind"),
+         config = list(zoom.enabled = TRUE))
+```
+
 ## Time series line charts from a long table {#tsline.molten}
 
 ### d3plus
@@ -138,6 +152,18 @@ rvisPlot(type = "tsarea", plotter = "c3", obj = air, x = "date", y = list("Temp"
 rvisPlot(type = "tsarea", plotter = "streamgraph", obj = air_long, x = "date", y = "value", group = "measure")
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "tsarea", plotter = "apexcharter", obj = weekly, x = "date", y = "Temp")
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "tsarea", plotter = "echarts", obj = weekly, x = "date", y = list("Temp", "Wind"))
+```
+
 ## Time series area charts from a long table {#tsarea.molten}
 
 ### d3plus
@@ -160,6 +186,18 @@ rvisPlot(type = "tsbar", plotter = "plotly", obj = weekly, x = "date", y = "Temp
 rvisPlot(type = "tsbar", plotter = "morrisjs", obj = weekly, x = "date", y = list("Temp", "Wind"))
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "tsbar", plotter = "apexcharter", obj = weekly, x = "date", y = "Wind")
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "tsbar", plotter = "echarts", obj = weekly, x = "date", y = "Wind")
+```
+
 ## Time series bar charts from a long table {#tsbar.molten}
 
 ### d3plus
@@ -178,3 +216,10 @@ A calendar heat map colours each day by a numeric column.
 ```{r, eval=has_plotter("rChartsCalmap")}
 rvisPlot(type = "calendar", plotter = "calheatmap", obj = air, t = "date", color = "Temp")
 ```
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+# `type` and `plotter` are named here: an argument `t` given after them by position would be taken as `type`
+rvisPlot(type = "calendar", plotter = "echarts", obj = air, t = "date", color = "Temp")
+```
+

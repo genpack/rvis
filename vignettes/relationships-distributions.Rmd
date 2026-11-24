@@ -117,6 +117,20 @@ rvisPlot(type = "scatter", plotter = "rbokeh", obj = flowers, x = "Sepal.Length"
          color = "Species")
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "scatter", plotter = "apexcharter", obj = flowers,
+         x = "Petal.Length", y = "Petal.Width", group = "Species")
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "scatter", plotter = "echarts", obj = flowers,
+         x = "Sepal.Length", y = "Sepal.Width", group = "Species", config = list(zoom.enabled = TRUE))
+```
+
 ## Scatter charts from a long table {#scatter.molten}
 
 The series come from the values of `group` (here the species).
@@ -168,6 +182,20 @@ rvisPlot(type = "bubble", plotter = "d3plus", obj = species,
 rvisPlot(type = "bubble", plotter = "bubbles", obj = species, size = "Petal.Length", label = "Species")
 ```
 
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "bubble", plotter = "apexcharter", obj = species,
+         x = "Sepal.Length", y = "Petal.Length", size = "Petal.Width", group = "Species")
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "bubble", plotter = "echarts", obj = flowers,
+         x = "Sepal.Length", y = "Petal.Length", size = "Petal.Width", group = "Species")
+```
+
 ## Bubble charts from a long table {#bubble.molten}
 
 ### d3plus
@@ -213,3 +241,35 @@ rvisPlot(type = "box", plotter = "plotly", obj = flowers, x = "Species", y = "Se
 ```{r, eval=has_plotter("bpexploder")}
 rvisPlot(type = "box", plotter = "bpexploder", obj = flowers, x = "Species", y = "Petal.Width")
 ```
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "box", plotter = "echarts", obj = flowers,
+         y = list("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))
+```
+
+## Heat maps {#heatmap}
+
+A heat map colours the cells of a grid of two categorical columns (`x` and `y`) by a numeric column (`z`).
+
+```{r}
+# mean measurements per species in a long table
+species_long <- data.frame(Species = rep(species$Species, 4),
+                           measure = rep(names(species)[-1], each = nrow(species)),
+                           value   = unlist(species[, -1], use.names = FALSE))
+```
+
+### apexcharter
+
+```{r, eval=has_plotter("apexcharter")}
+rvisPlot(type = "heatmap", plotter = "apexcharter", obj = species_long,
+         x = "measure", y = "Species", z = "value")
+```
+
+### echarts
+
+```{r, eval=has_plotter("echarts4r")}
+rvisPlot(type = "heatmap", plotter = "echarts", obj = species_long,
+         x = "measure", y = "Species", z = "value")
+```
+
