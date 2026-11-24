@@ -1,0 +1,43 @@
+# Clicks on chart items as shiny inputs.
+# An output with 'click.events: true' sends clicks on the items of its chart (nodes, links, bars, points, ...)
+# to input <output name>_item_click: a list with the type, id, label, series, value, ... of the clicked item.
+# This works for Graphviz diagrams (rvis grviz and DiagrammeR), networkD3, echarts4r, apexcharter, plotly and
+# highcharter charts; see ?rvisClickEvents for other widgets.
+name: Click events
+layout: page
+
+objects:
+  network:
+    nodes: !expr data.frame(id = c('raw', 'clean', 'model', 'report'), label = c('Raw data', 'Cleaning', 'Model', 'Report'))
+    links: !expr data.frame(source = c('raw', 'clean', 'model', 'clean'), target = c('clean', 'model', 'report', 'report'))
+
+items:
+  page:
+    type: fluidPage
+    title: Click a node, a link or a bar
+    # a row of two columns (graph and bars), then a row with the clicked items
+    layout: [[[graph], [bars]], [clicked]]
+
+  graph:
+    type: grvizOutput
+    height: 350px
+    weight: 6
+    click.events: true
+    service: |
+      rvisPlot(type = 'graph', plotter = 'grviz', obj = session$userData$network,
+               key = 'id', label = 'label', source = 'source', target = 'target')
+
+  bars:
+    type: echarts4r::echarts4rOutput
+    height: 350px
+    weight: 6
+    click.events: true
+    service: |
+      deaths <- data.frame(age = rownames(VADeaths), VADeaths, check.names = FALSE)
+      rvisPlot(type = 'bar', plotter = 'echarts', obj = deaths, x = 'age', y = list('Rural Male', 'Urban Male'))
+
+  clicked:
+    type: verbatimTextOutput
+    service: |
+      cat('Graph:\n'); str(input$graph_item_click)
+      cat('\nBars:\n'); str(input$bars_item_click)

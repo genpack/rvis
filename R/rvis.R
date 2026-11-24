@@ -286,5 +286,14 @@
 #                             graph added (graph nodes with shapes, including oval, and sizes from config node.size, node.size.min and
 #                             node.size.max); standard config properties (title, legend, tooltip, axis labels, stacking, zoom).
 #                             Examples in the chart guides; both plotters work as generic dashboard outputs.
+# 5.15.0 (24 November 2026) - Clicks on chart items as shiny inputs: new function rvisClickEvents() (clickevents.R, version 0.1.0)
+#                             adds javascript to an htmlwidget with htmlwidgets::onRender(), without copying the widget's own
+#                             javascript. Supported: Graphviz (DiagrammeR, rvis grviz), networkD3, echarts4r, apexcharter, plotly,
+#                             highcharter, and any widget with a CSS selector. Input <outputId>_item_click. Dashboard outputs
+#                             with field click.events: true; example dashboard 'click-events'.
+#                             grviz.R changed to version 0.2.0: grviz uses the grViz widget of DiagrammeR (the copied widget
+#                             javascript and libraries, 2.1 MB, removed from inst).
+#                             Dashboard items of generic type get the layout fields weight and offset only if their function has
+#                             such an argument.
 NULL
 #> NULL

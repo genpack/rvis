@@ -1,7 +1,7 @@
 Package: rvis
 Type: Package
 Title: NIRASOFT R package for visualization
-Version: 5.14.0
+Version: 5.15.0
 Date: 2026-11-24
 Author: Nima Ramezani
 Maintainer: <nima.ramezani@gmail.com>
@@ -16,7 +16,7 @@ Imports:
     dplyr,
     stringr
 Remotes: genpack/rutils
-Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0), apexcharter, echarts4r
+Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0), apexcharter, echarts4r, DiagrammeR
 VignetteBuilder: knitr
 Collate:
     'visgen.R'
@@ -30,6 +30,7 @@ Collate:
     'c3.R'
     'calheatmap.R'
     'candela.R'
+    'clickevents.R'
     'coffeewheel.R'
     'csscripts.R'
     'd3plus.R'

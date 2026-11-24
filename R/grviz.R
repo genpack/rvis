@@ -6,8 +6,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     28 April 2018
-# Last Revision:  23 November 2026
-# Version:        0.1.9
+# Last Revision:  24 November 2026
+# Version:        0.2.0
 #
 
 # Version History:
@@ -24,6 +24,10 @@
 # 0.1.9     23 November 2026   DiagrammeR functions namespaced (to_igraph, and internals x11_hex, save_graph_as_rds were not found).
 #                              Duplicated functions grviz.addActions()/addAction2Log() and is.grviz.graph()/is.graph.valid() merged.
 #                              Unused debugging object grviz.task.js and commented code removed.
+# 0.2.0     24 November 2026   grviz() makes the grViz widget of package DiagrammeR: the copy of its javascript (inst/htmlwidgets/grviz.js,
+#                              viz.js and styles) is removed, so new DiagrammeR versions are used. grvizOutput() and renderGrviz() call
+#                              DiagrammeR::grVizOutput() and renderGrViz(). Clicks on nodes and edges are sent to shiny by
+#                              rvisClickEvents() (config$shinyInput.click: an input name or TRUE); nodes are reported by their key.
 
 #' @include visgen.R
 
@@ -355,6 +359,8 @@ grviz.graph = function(obj,
   rutils::assert(obj$links[, L$source] %<% obj$nodes[, L$key], "Value in column '" %++% L$source %++% "' must be a subset of node IDs'", err_src = 'grviz.graph')
   rutils::assert(obj$links[, L$target] %<% obj$nodes[, L$key], "Value in column '" %++% L$target %++% "' must be a subset of node IDs'", err_src = 'grviz.graph')
 
+  # node keys (before they are replaced by row numbers): reported by clicks on the nodes
+  node.keys = chif(nrow(obj$nodes) == 0, NULL, stats::setNames(as.character(obj$nodes[, L$key]), sequence(nrow(obj$nodes))))
   if(!inherits(obj$nodes[, L$key], 'integer')){
     nodemap = sequence(nrow(obj$nodes))
     names(nodemap) <- obj$nodes[, L$key]
@@ -469,7 +475,9 @@ grviz.graph = function(obj,
   grviz.createGraph(nodes_df, edges_df) %>% grviz.applyConfig(config) %>%
     grviz.renderGraph(layout = config$layout %>% verify('character', default = 'dot'),
                       title  = config$title %>% verify('character', lengths = 1),
-                      shinyInput.click = config$shinyInput.click %>% verify('character', lengths = 1, varname = 'config$shinyInput.click'),
+                      shinyInput.click = config$shinyInput.click %>% verify(c('character', 'logical'), lengths = 1, varname = 'config$shinyInput.click'),
+                      # node n of the diagram is row n of obj$nodes: clicks report its key
+                      click.ids = node.keys,
                       ...)
 }
 
@@ -1208,7 +1216,7 @@ grviz.generateDot <- function(graph) {
   dot_code
 }
 
-grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, height = NULL, shinyInput.click = NULL)
+grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, height = NULL, shinyInput.click = NULL, click.ids = NULL)
 {
   if(nrow(graph$nodes_df) == 0){dotstr = ""} else {
     fcn_name <- getCallingFunctionName()
@@ -1278,40 +1286,35 @@ grviz.renderGraph = function (graph, layout = NULL, title = NULL, width = NULL, 
     }
     dotstr = graph %>% grviz.generateDot}
 
-  dotstr %>% grviz(width = width, height = height, shinyInput.click = shinyInput.click)
+  dotstr %>% grviz(width = width, height = height, shinyInput.click = shinyInput.click, click.ids = click.ids)
 }
 
 
 
 
+# Graphviz diagram widget: DiagrammeR::grViz() (rvis no longer keeps its own copy of the widget javascript).
+# shinyInput.click: name of a shiny input set by clicks on nodes and edges (see rvisClickEvents());
+# TRUE uses the default name <outputId>_item_click. click.ids: node keys reported instead of the node numbers of the diagram.
 grviz = function(diagram = "", engine = "dot", allow_subst = TRUE,
-                 options = NULL, width = NULL, height = NULL, shinyInput.click = NULL)
+                 options = NULL, width = NULL, height = NULL, shinyInput.click = NULL, click.ids = NULL)
 {
-  # Clicking a node link sends its label to shiny input 'shinyInput.click':
-  if(!is.null(shinyInput.click)){
-    task.js = JS('$(document).on("click", "a", function(e){e.preventDefault();
-                 Shiny.onInputChange("' %++% shinyInput.click %++% '", Math.random() + " --> " + $(this)[0].childNodes[3].firstChild.data)})')
-  } else {task.js = NULL}
-  if (inherits(diagram, "connection") || file.exists(diagram)) {
-    diagram <- readLines(diagram, encoding = "UTF-8", warn = FALSE)
-    diagram <- paste0(diagram, collapse = "\n")
+  assert(requireNamespace('DiagrammeR', quietly = TRUE), "Package 'DiagrammeR' is not installed!", err_src = 'grviz')
+  if (inherits(diagram, "connection") || (length(diagram) == 1 && file.exists(diagram))) {
+    diagram <- paste0(readLines(diagram, encoding = "UTF-8", warn = FALSE), collapse = "\n")
   }
-  else {
-    if (length(diagram) > 1) {diagram <- paste0(diagram, collapse = "\n")}
-  }
-  if (allow_subst == TRUE) {diagram <- replaceInSpec(diagram)}
-  diagram <- gsub(x = diagram, "'", "\"")
-  x <- list(diagram = diagram, config = list(engine = engine, options = options, tasks = task.js))
-  viewer.suppress <- rstudioapi::isAvailable() && !rstudioapi::isAvailable("0.99.120")
-  htmlwidgets::createWidget(name = "grviz", x = x, width = width,
-                            height = height, package = "rvis", htmlwidgets::sizingPolicy(viewer.suppress = viewer.suppress))
+  widget = DiagrammeR::grViz(diagram, engine = engine, allow_subst = allow_subst, options = options, width = width, height = height)
+  # kept for rvisClickEvents() called later (for example by dashboard outputs with click.events: true)
+  if(!is.null(click.ids)){attr(widget, 'rvis.click.ids') <- click.ids}
+  if(isTRUE(shinyInput.click)){widget %<>% rvisClickEvents(ids = click.ids)}
+  else if(inherits(shinyInput.click, 'character')){widget %<>% rvisClickEvents(inputId = shinyInput.click, ids = click.ids)}
+  widget
 }
 
 grvizOutput <- function(outputId, width = '100%', height = '400px') {
-  shinyWidgetOutput(outputId = outputId, 'grviz', width, height, package = 'rvis')
+  DiagrammeR::grVizOutput(outputId, width = width, height = height)
 }
 
 renderGrviz <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) expr <- substitute(expr)
-  shinyRenderWidget(expr, grvizOutput, env, quoted = TRUE)
+  DiagrammeR::renderGrViz(expr, env = env, quoted = TRUE)
 }
