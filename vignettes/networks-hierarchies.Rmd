@@ -56,7 +56,9 @@ rvisPlot(type = "graph", plotter = "visNetwork", obj = flows, key = "id", label 
 
 ### grviz (Graphviz)
 
-`grviz` is embedded in rvis and draws the graph with Graphviz.
+`grviz` draws the graph with Graphviz (the `grViz` widget of package DiagrammeR). In shiny, clicks on
+its nodes and links can be sent to an input with `rvisClickEvents()` (nodes are reported by their key),
+see [clicks on chart items](dashboard-reference.html#clicks).
 
 ```{r}
 rvisPlot(type = "graph", plotter = "grviz", obj = flows, key = "id", label = "label",

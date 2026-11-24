@@ -27,7 +27,7 @@ and the ones that could be supported by new item types, with what that would tak
 | [rintrojs](https://carlganz.github.io/rintrojs/) | guided tours: `tutor.lesson` of any item, `tutorBox` |
 | [DT](https://rstudio.github.io/DT/) | `dataTableOutput` with DataTables options |
 | [bcrypt](https://github.com/jeroen/bcrypt) | encrypted passwords of the login table |
-| htmlwidgets | 23 output types: highcharter, plotly, dygraphs, leaflet, rAmCharts, billboarder, c3, morrisjs, d3plus, bubbles, networkD3, sankeytreeR, wordcloud2, sunburstR, upsetjs, rpivotTable, rhandsontable, googleVis, rCharts and the widgets embedded in rvis (TFD3, coffeewheel, grviz); see the [item reference](dashboard-reference.html#widgets) |
+| htmlwidgets | 23 output types: highcharter, plotly, dygraphs, leaflet, rAmCharts, billboarder, c3, morrisjs, d3plus, bubbles, networkD3, sankeytreeR, wordcloud2, sunburstR, upsetjs, rpivotTable, rhandsontable, googleVis, rCharts and the widgets embedded in rvis (TFD3, coffeewheel); any other htmlwidget as a `package::fooOutput` item; clicks on chart items as inputs (`click.events`); see the [item reference](dashboard-reference.html#widgets) |
 
 ## Packages usable without changes
 

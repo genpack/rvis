@@ -112,7 +112,7 @@ They have `width` and `height` settings (defaults in brackets).
 | `sankeyNetworkOutput` | networkD3 | 100%, 500px |
 | `sankeytreeOutput` | sankeytreeR | 100%, 400px |
 | `coffeewheelOutput` | rvis (embedded) | 400, 400 |
-| `grvizOutput` | rvis (DiagrammeR graphs) | 100%, 400px |
+| `grvizOutput` | DiagrammeR (rvis grviz graphs) | 100%, 400px |
 | `wordcloud2Output` | wordcloud2 | 100%, 400px |
 | `sunburstOutput` | sunburstR | 100%, 400px |
 | `upsetjsOutput` | upsetjs | 100%, 500px |
@@ -129,6 +129,29 @@ show_yaml("charts")
 
 ```{r, echo=FALSE}
 show_shot("charts")
+```
+
+Any other htmlwidget can be an output with a `package::function` type, like
+`type: echarts4r::echarts4rOutput` or `type: apexcharter::apexchartOutput`: the item fields are the
+arguments of the output function and the service is rendered by the package's render function.
+
+### Clicks on chart items {#clicks}
+
+An htmlwidget output with `click.events: true` sends clicks on the items of its chart to the input
+`<item name>_item_click`, which services and observers can use like any input. Its value is a list
+with the `type` of the clicked item (`node`, `link`, `point` or `element`) and, as available, its
+`id`, `label`, `series`, `index`, `value`, `x`, `y`, and the `source` and `target` of a link. Nodes of
+rvis `grviz` graphs are reported by their key.
+
+This works for Graphviz diagrams (rvis `grviz` and DiagrammeR), networkD3, echarts4r, apexcharter,
+plotly and highcharter charts. The click javascript is added to the chart with
+`htmlwidgets::onRender()` by `rvisClickEvents()`: the plotting packages are used as they are, so their
+new versions keep working. For other widgets, call `rvisClickEvents()` in the service with a CSS
+`selector` of the clickable elements, for example
+`rvisClickEvents(sunburstR::sunburst(data), selector = "path")`.
+
+```{r, echo=FALSE}
+show_yaml("click-events")
 ```
 
 ## Reactive values, objects and observers {#reactive}

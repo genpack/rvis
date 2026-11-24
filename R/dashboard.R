@@ -233,7 +233,7 @@ asChoices = function(x, varname){
 
 # Item fields used by rvis itself and not passed to the function of a generic item
 generic.reserved.fields = c('type', 'role', 'args', 'service', 'layout', 'cloth', 'container', 'object', 'isolate',
-                            'render', 'render.args', 'update', 'page.extras', 'filename',
+                            'render', 'render.args', 'update', 'page.extras', 'filename', 'click.events',
                             'tooltip', 'tooltip.placement', 'tooltip.trigger', 'tooltip.options',
                             'popover', 'popover.title', 'popover.placement', 'popover.trigger', 'popover.options',
                             'tutor.lesson', 'tutor.step', 'tutor.hint')
@@ -273,9 +273,14 @@ genericRole = function(item){
 }
 
 # Arguments of the function of a generic item: the item fields except the rvis fields
+# Layout fields (weight and offset of an item in a row/column layout) are passed only to functions which have
+# an argument of that name (like the offset of shiny::column).
 genericArguments = function(item){
-  item[setdiff(names(item), generic.reserved.fields)]
+  layout.fields = setdiff(generic.layout.fields, genericFormals(item$type))
+  item[setdiff(names(item), c(generic.reserved.fields, layout.fields))]
 }
+
+generic.layout.fields = c('weight', 'offset')
 
 # Finds the exported function of package pkg named prefix + name (case insensitive), or NULL
 findExported = function(pkg, name, prefix){
@@ -321,6 +326,13 @@ genericUpdate = function(item, i, session, ...){
   args[[idarg]] = i
   if('session' %in% fml){args$session = session}
   do.call(update, args)
+}
+
+# Service code of an output item: with field click.events = TRUE, the widget returned by the service sends
+# clicks on its items to input <item name>_item_click (see rvisClickEvents())
+clickService = function(item){
+  if(!isTRUE(item[['click.events']])){return(item$service)}
+  paste0('rvisClickEvents({', item$service, '})')
 }
 
 # Text of R code giving the arguments of a list: "a = 1, b = 'x'"
@@ -1066,7 +1078,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              if(isGenericType(item$type)){
                                render    = genericRenderFunction(item, i)
                                arguments = argumentsScript(verify(item[['render.args']], 'list', default = list(), varname = itemVarname(i, 'render.args')))
-                               return(paste0("output[['", i, "']] <- ", render, '({', item$service, '}', chif(arguments == '', '', ', '), arguments, ')'))
+                               return(paste0("output[['", i, "']] <- ", render, '({', clickService(item), '}', chif(arguments == '', '', ', '), arguments, ')'))
                              }
                              render = switch(item$type,
                                     "dynamicInput"     = gndcd(1,9, 14, 20, 9,  1, 35, 42),
@@ -1106,7 +1118,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                     "rChartsdPlotOutput" = 'rCharts::renderChart2')
                              if(is.null(render)){return(character())}
                              arguments = chif(item$type %in% names(output.render.arguments), list2Script(item, fields = output.render.arguments[[item$type]]), '')
-                             script = paste0("output[['", i, "']] <- ", render, '({', item$service, '}', chif(arguments == '', '', ', '), arguments, ')')
+                             script = paste0("output[['", i, "']] <- ", render, '({', clickService(item), '}', chif(arguments == '', '', ', '), arguments, ')')
                              if(item$type == "loginInput"){script %<>% paste('\n', loginUIExtraService, '\n')}
                              return(script)
                            },
