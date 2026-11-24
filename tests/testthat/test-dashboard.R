@@ -114,6 +114,72 @@ test_that("fixed bugs stay fixed", {
   expect_match(ui, "shinyBS.addTooltip('a'", fixed = TRUE)
 })
 
+test_that("namespaced types call the package function directly", {
+  dash <- rvisDashboard(list(layout = "page", items = list(
+    page  = list(type = "shiny::fluidPage", title = "Generic", layout = list("head", "row")),
+    head  = list(type = "shiny::h3", args = list("Generic heading")),
+    row   = list(type = "shiny::fluidRow", layout = c("k", "go", "out", "tabs")),
+    k     = list(type = "shiny::numericInput", label = "K", value = 2, min = 0),
+    go    = list(type = "shiny::actionButton", label = "Go", service = "sync$clicked <- TRUE"),
+    out   = list(type = "shiny::textOutput", service = "input$k * 3",
+                 cloth = list(type = "shiny::column", width = 6)),
+    tabs  = list(type = "shiny::tabsetPanel", layout = c("t1", "t2")),
+    t1    = list(type = "shiny::tabPanel", title = "One", value = "one", layout = "p1"),
+    t2    = list(type = "shiny::tabPanel", title = "Two", value = "two"),
+    p1    = list(type = "shiny::p", args = "first tab"))))
+  expect_equal(dash$itemRole("k"), "input")
+  expect_equal(dash$itemRole("out"), "output")
+  expect_equal(dash$itemRole("row"), "container")
+  ui <- html(dash$dashboard.ui())
+  expect_match(ui, "<h3>Generic heading</h3>", fixed = TRUE)
+  expect_match(ui, 'id="k"', fixed = TRUE)
+  expect_match(ui, 'min="0"', fixed = TRUE)
+  expect_match(ui, 'class="col-sm-6"', fixed = TRUE)
+  expect_match(ui, 'id="tabs"', fixed = TRUE)     # the item name is passed as id
+  expect_match(ui, "first tab", fixed = TRUE)
+  shiny::testServer(dash$dashboard.server(), {
+    session$setInputs(k = 5)
+    expect_equal(output$out, "15")
+    session$setInputs(go = 1)
+    expect_true(sync$clicked)
+  })
+})
+
+test_that("generic render, update and role overrides work", {
+  item <- list(type = "shiny::uiOutput")
+  expect_equal(genericRenderFunction(item, "x"), "shiny::renderUI")
+  expect_equal(genericRenderFunction(list(type = "shiny::plotOutput"), "x"), "shiny::renderPlot")
+  expect_equal(genericRenderFunction(list(type = "shiny::plotOutput", render = "my::fun"), "x"), "my::fun")
+  expect_identical(genericUpdateFunction(list(type = "shiny::selectInput"), "x"), shiny::updateSelectInput)
+  expect_error(genericRenderFunction(list(type = "shiny::fluidPage"), "x"), "render")
+  expect_error(genericFunction("shiny::notAFunction"), "not a function")
+  expect_false(isGenericType("selectInput"))
+  expect_true(isGenericType("shinyWidgets::pickerInput"))
+  expect_equal(genericRole(list(type = "shiny::fluidRow", role = "output")), "output")
+
+  dash <- rvisDashboard(list(layout = "page", items = list(
+    page = list(type = "shiny::fluidPage", layout = "out"),
+    out  = list(type = "shiny::tableOutput", service = "head(cars, 2)", render.args = list(digits = 0)))))
+  dash$dashboard.ui()
+  shiny::testServer(dash$dashboard.server(), {
+    expect_match(output$out, "<table", fixed = TRUE)
+  })
+})
+
+test_that("generic items from other packages work", {
+  skip_if_not_installed("shinyWidgets")
+  dash <- rvisDashboard(list(layout = "page", items = list(
+    page = list(type = "shiny::fluidPage", layout = c("pk", "sw")),
+    pk   = list(type = "shinyWidgets::pickerInput", label = "Pick", choices = c("a", "b"), multiple = TRUE),
+    sw   = list(type = "shinyWidgets::materialSwitch", label = "Switch", value = TRUE,
+                cloth = list(type = "shinydashboard::box", title = "In a box", width = 4)))))
+  ui <- html(dash$dashboard.ui())
+  expect_match(ui, 'id="pk"', fixed = TRUE)
+  expect_match(ui, "In a box", fixed = TRUE)
+  expect_equal(dash$itemRole("sw"), "input")
+  expect_identical(genericUpdateFunction(dash$items$pk, "pk"), shinyWidgets::updatePickerInput)
+})
+
 test_that("all example dashboards are built", {
   ex <- rvisDashboardExample()
   expect_gt(nrow(ex), 30)

@@ -114,6 +114,19 @@ dashboardFields = function(config){
 #'   \item{observers}{R code (one text per observer) run in \code{observe()} in each session.}
 #'   \item{settings, messages, loginTable}{Settings, messages and users of dashboards with a login item.}
 #' }
+#' The \code{type} of an item (or of its \code{cloth}) can also be any function of any package, written as
+#' \code{package::function}, like \code{shinyWidgets::pickerInput} or \code{shinydashboard::box}. The item fields
+#' are then passed to that function as they are, with the argument names of the package documentation.
+#' Functions with argument \code{inputId} make inputs and functions with argument \code{outputId} make outputs
+#' (the item name is passed as the id); all other functions are containers and get the items of their
+#' \code{layout} as unnamed arguments. A few fields are used by rvis and not passed to the function:
+#' \code{args} (unnamed arguments passed first, like the text of \code{shiny::h3}), \code{service},
+#' \code{layout}, \code{cloth}, \code{role} (\code{input}, \code{output} or \code{container}, if the detected
+#' role is wrong), \code{render} (render function of an output, by default the package's \code{renderFoo} for
+#' output \code{fooOutput}), \code{render.args} (arguments of the render function), \code{update} (function
+#' used by \code{updateItem()}, by default the package's \code{updateFoo} for input \code{foo}) and the
+#' tooltip, popover and tutor fields. See \code{rvisDashboardExample("generic-types")}.
+#'
 #' In YAML files, values tagged \code{!expr} are R expressions evaluated when the file is read
 #' (for example \code{choices: !expr names(mtcars)}). Only \code{true} and \code{false} are read as
 #' logical values (words like \code{yes}, \code{no}, \code{y} or \code{n} stay text).

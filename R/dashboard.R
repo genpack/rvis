@@ -218,6 +218,118 @@ asChoices = function(x, varname){
   return(x)
 }
 
+# Generic item types ---------------------------------------------------------------------------------------------
+# An item (or cloth) whose type is a namespaced function name like 'shinyWidgets::pickerInput' or 'shinydashboard::box'
+# is built by calling that function directly. All fields of the item, except the rvis fields below, are passed to it
+# as named arguments (no renaming and no verification), so every current and future function of any package works.
+#   - inputs     (function has argument 'inputId'):  called with inputId = item name
+#   - outputs    (function has argument 'outputId'): called with outputId = item name; the service is rendered by
+#                field 'render' or the package's render function matching the output function (fooOutput -> renderFoo)
+#   - containers (anything else): items of field 'layout' are passed as unnamed arguments (and the item name as 'id',
+#                if the function has an argument 'id' and the item has none)
+# Field 'args' gives unnamed arguments passed first (for example the text of shiny::h3), field 'role' overrides the
+# detected role (input, output or container), 'render.args' are passed to the render function of an output and
+# 'update' names the function used by updateItem() (by default the package's updateFoo function of input fooInput).
+
+# Item fields used by rvis itself and not passed to the function of a generic item
+generic.reserved.fields = c('type', 'role', 'args', 'service', 'layout', 'cloth', 'container', 'object', 'isolate',
+                            'render', 'render.args', 'update', 'page.extras', 'filename',
+                            'tooltip', 'tooltip.placement', 'tooltip.trigger', 'tooltip.options',
+                            'popover', 'popover.title', 'popover.placement', 'popover.trigger', 'popover.options',
+                            'tutor.lesson', 'tutor.step', 'tutor.hint')
+
+valid.generic.roles = c('input', 'output', 'container')
+
+# TRUE if type is a namespaced function name like 'pkg::fun'
+isGenericType = function(type){
+  is.character(type) && length(type) == 1 && grepl('^[A-Za-z][A-Za-z0-9.]*::[A-Za-z._][A-Za-z0-9._]*$', type)
+}
+
+# Splits 'pkg::fun' into c(package = 'pkg', name = 'fun')
+splitGenericType = function(type){
+  parts = strsplit(type, '::', fixed = TRUE)[[1]]
+  c(package = parts[1], name = parts[2])
+}
+
+# Returns the function named by a generic type (the package must be installed)
+genericFunction = function(type){
+  p = splitGenericType(type)
+  if(!requireNamespace(p[['package']], quietly = TRUE)){
+    stop("Package '", p[['package']], "' is needed for items of type '", type, "'. Please install it.", call. = FALSE)
+  }
+  fun = tryCatch(getExportedValue(p[['package']], p[['name']]), error = function(e) NULL)
+  if(!is.function(fun)){stop("'", type, "' is not a function exported by package '", p[['package']], "'!", call. = FALSE)}
+  fun
+}
+
+# Argument names of the function of a generic type
+genericFormals = function(type){names(formals(args(genericFunction(type))))}
+
+# Role of an item of generic type: given by field 'role', otherwise detected from the arguments of its function
+genericRole = function(item){
+  if(!is.null(item[['role']])){return(verify(item[['role']], 'character', lengths = 1, domain = valid.generic.roles, varname = 'role'))}
+  fml = genericFormals(item$type)
+  if('outputId' %in% fml){'output'} else if('inputId' %in% fml){'input'} else {'container'}
+}
+
+# Arguments of the function of a generic item: the item fields except the rvis fields
+genericArguments = function(item){
+  item[setdiff(names(item), generic.reserved.fields)]
+}
+
+# Finds the exported function of package pkg named prefix + name (case insensitive), or NULL
+findExported = function(pkg, name, prefix){
+  exps = getNamespaceExports(pkg)
+  hit  = exps[tolower(exps) == tolower(paste0(prefix, name))]
+  chif(length(hit) == 0, NULL, paste0(pkg, '::', sort(hit)[1]))
+}
+
+# Name of the render function of a generic output item: field 'render' or the render function of the package
+# matching the output function: fooOutput -> renderFoo (htmlOutput and uiOutput -> renderUI)
+genericRenderFunction = function(item, i){
+  if(!is.null(item[['render']])){return(verify(item[['render']], 'character', lengths = 1, varname = itemVarname(i, 'render')))}
+  p    = splitGenericType(item$type)
+  base = sub('Output$', '', p[['name']])
+  if(base %in% c('html', 'ui')){return('shiny::renderUI')}
+  if(p[['package']] == 'shiny' && base == 'verbatimText'){return('shiny::renderPrint')}
+  fn = findExported(p[['package']], base, 'render')
+  if(is.null(fn)){
+    stop("No render function found for output '", i, "' of type '", item$type, "'. Please give it in field 'render'.", call. = FALSE)
+  }
+  fn
+}
+
+# Update function of a generic input item: field 'update' or the update function of the package matching the
+# input function: fooInput -> updateFooInput, foo -> updateFoo
+genericUpdateFunction = function(item, i){
+  if(!is.null(item[['update']])){
+    return(genericFunction(verify(item[['update']], 'character', lengths = 1, varname = itemVarname(i, 'update'))))
+  }
+  p  = splitGenericType(item$type)
+  fn = findExported(p[['package']], p[['name']], 'update')
+  if(is.null(fn)){stop("Items of type '", item$type, "' cannot be updated! Give an update function in field 'update'.", call. = FALSE)}
+  genericFunction(fn)
+}
+
+# Calls the update function of a generic input item in the given session
+genericUpdate = function(item, i, session, ...){
+  update = genericUpdateFunction(item, i)
+  fml    = names(formals(args(update)))
+  idarg  = chif('inputId' %in% fml, 'inputId', chif('id' %in% fml, 'id', NULL))
+  if(is.null(idarg)){return(update(session, i, ...))}
+  args = list(...)
+  args[[idarg]] = i
+  if('session' %in% fml){args$session = session}
+  do.call(update, args)
+}
+
+# Text of R code giving the arguments of a list: "a = 1, b = 'x'"
+argumentsScript = function(lst){
+  if(length(lst) == 0){return('')}
+  paste(vapply(names(lst), function(n) paste0('`', n, '` = ', paste(deparse(lst[[n]], width.cutoff = 500L), collapse = ' ')), character(1)),
+        collapse = ', ')
+}
+
 # Verifies a username and password against table logtable (rownames: usernames, column 'password').
 # encryption: 'none' (plain passwords) or 'bcrypt' (passwords encrypted by bcrypt::hashpw()).
 # Returns the username if verified, 1 if username and password do not match, 2 if the username does not exist.
@@ -278,8 +390,28 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              verify(items,  'list', varname = 'items')
                              for (i in names(items)){
                                verify(items[[i]], 'list', names_include = c('type'), varname = "items['" %++% i %++% "']")
-                               verify(items[[i]]$type, 'character', domain = c(valid.input.types, valid.container.types, valid.output.types), varname = "items['" %++% i %++% "']$type")
+                               if(!isGenericType(items[[i]]$type)){
+                                 verify(items[[i]]$type, 'character', domain = c(valid.input.types, valid.container.types, valid.output.types), varname = "items['" %++% i %++% "']$type")
+                               }
                              }
+                           },
+
+                           # Role of item i: 'input', 'output' or 'container' (the role of a generic item is detected once and kept in field 'role')
+                           itemRole = function(i){
+                             type = items[[i]]$type
+                             if(isGenericType(type)){
+                               if(is.null(items[[i]][['role']])){items[[i]][['role']] <<- genericRole(items[[i]])}
+                               return(items[[i]][['role']])
+                             }
+                             if(type %in% valid.input.types){'input'}
+                             else if(type %in% valid.output.types){'output'}
+                             else if(type %in% valid.container.types){'container'}
+                             else {NA_character_}
+                           },
+
+                           # Names of the items with the given role(s)
+                           itemsOfRole = function(roles){
+                             names(items)[vapply(names(items), function(i) itemRole(i) %in% roles, logical(1))]
                            },
 
                            # Verifies field 'field' of item 'i' (arguments are passed to function verify())
@@ -290,6 +422,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                            # Updates input item 'item' in the given session. Arguments are passed to the shiny update function of the item type.
                            updateItem4Session = function(item, session, ...){
                              verify(item, 'character', domain = names(items), varname = 'item', err_src = 'DASHBOARD Method updateItem4Session')
+                             if(isGenericType(items[[item]]$type)){return(invisible(genericUpdate(items[[item]], item, session, ...)))}
                              update = switch(items[[item]]$type,
                                     'selectInput'        = shiny::updateSelectInput,
                                     'textInput'          = shiny::updateTextInput,
@@ -340,10 +473,9 @@ DASHBOARD <- setRefClass("DASHBOARD",
                            # dashboard.ui(), inputs and containers are built (once) by getItemObject().
                            itemObject = function(i){
                              assert(i %in% names(items), "Element '" %++% i %++% "' has been mentioned but doesn't exist in the list of elements!", err_src = 'itemObject')
-                             type = items[[i]]$type
-                             if (type %in% valid.output.types){
+                             if (itemRole(i) %in% 'output'){
                                items[[i]]$object
-                             } else if (type %in% c(valid.input.types, valid.container.types)) {
+                             } else {
                                getItemObject(i)
                              }
                            },
@@ -357,6 +489,11 @@ DASHBOARD <- setRefClass("DASHBOARD",
                                cloth$title = items[[i]]$title
                              }
                              verify(cloth, "list")
+                             if(isGenericType(cloth$type)){
+                               # generic cloth: the cloth fields are the arguments, the clothed object is passed last
+                               fun = genericFunction(cloth$type)
+                               return(do.call(fun, c(unname(as.list(cloth[['args']])), genericArguments(cloth), list(obj))))
+                             }
                              verify(cloth$type, "character", domain = valid.cloth.types)
 
                              switch(cloth$type,
@@ -497,6 +634,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              item = items[[i]]
                              if (is.null(item$type)){return(NULL)}
                              vn = function(field){itemVarname(i, field)}
+                             if (isGenericType(item$type)){return(genericObject(i))}
 
                              if(item$type %in% valid.input.types){
                                lbl = item$title %>% verify('character', default = "", varname = vn('title'))
@@ -718,6 +856,29 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              return(obj)
                            },
 
+                           # Builds the user interface object of item i of generic type by calling its function with the item fields
+                           genericObject = function(i){
+                             item = items[[i]]
+                             role = itemRole(i)
+                             fun  = genericFunction(item$type)
+                             args = genericArguments(item)
+                             positional = unname(as.list(item[['args']]))
+                             if(role == 'input'){
+                               args$inputId = i
+                             } else if(role == 'output'){
+                               args$outputId = i
+                             } else {
+                               if(is.null(args[['id']]) && 'id' %in% genericFormals(item$type)){args$id = i}
+                               positional = c(positional, layoutContent(i))
+                             }
+                             obj = do.call(fun, c(positional, args))
+                             if(!is.null(item$tutor.lesson)){
+                               settings$tutorMode <<- T
+                               obj %<>% addTutorLesson(i)
+                             }
+                             return(obj)
+                           },
+
                            # Wraps the object of item i in a rintrojs box with the tutor lesson, hint and step of the item
                            addTutorLesson = function(obj, i){
                              support('rintrojs')
@@ -732,6 +893,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              item = items[[i]]
                              type = item$type
                              vn   = function(field){itemVarname(i, field)}
+                             if (isGenericType(type)){return(genericObject(i))}
                              if (type == 'static'){
                                if(is.null(item$object) & !is.null(item$html)){return(HTML(item$html %>% verify('character') %>% paste(collapse = '\n')))}
                                return(item$object)
@@ -814,7 +976,7 @@ DASHBOARD <- setRefClass("DASHBOARD",
                            # Sets field 'container' of each item: the name of the container item whose layout includes it
                            setContainers = function(){
                              for (i in names(items)){
-                               if (items[[i]]$type %in% valid.container.types){
+                               if (itemRole(i) %in% 'container'){
                                  item = items[[i]]
                                  members = c(item$layout.head, item$layout.side, item$layout.main, item$layout.body) %^% names(items)
                                  if(!is.null(item$layout)){
@@ -877,18 +1039,14 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              }
 
                              # Create output objects:
-                             for (i in names(items)){
-                               if (items[[i]]$type %in% valid.output.types){
-                                 obj = outputObject(i)
-                                 if(!is.null(obj)){items[[i]]$object <<- obj}
-                               }
+                             for (i in itemsOfRole('output')){
+                               obj = outputObject(i)
+                               if(!is.null(obj)){items[[i]]$object <<- obj}
                              }
 
                              # Create input and container objects:
-                             for (i in names(items)){
-                               if (items[[i]]$type %in% c(valid.input.types, valid.container.types)){
-                                 items[[i]]$object <<- getItemObject(i)
-                               }
+                             for (i in itemsOfRole(c('input', 'container'))){
+                               items[[i]]$object <<- getItemObject(i)
                              }
 
                              ui = layoutItems(king)
@@ -899,13 +1057,19 @@ DASHBOARD <- setRefClass("DASHBOARD",
                            # R code (text) defining output i in the server function
                            outputScript = function(i){
                              item = items[[i]]
-                             if(item$type %in% c("downloadButton", "downloadLink")){
+                             if(item$type %in% c("downloadButton", "downloadLink") ||
+                                (isGenericType(item$type) && splitGenericType(item$type)[['name']] %in% c("downloadButton", "downloadLink"))){
                                fn = item$filename %>% verify('character', lengths = 1, default = paste0("'", i, "'"), varname = 'filename')
                                return(paste0("output[['", i, "']] <- downloadHandler(filename = function(){", fn, "}",
                                              ", content = function(file){ \n", item$service, '\n })'))
                              }
+                             if(isGenericType(item$type)){
+                               render    = genericRenderFunction(item, i)
+                               arguments = argumentsScript(verify(item[['render.args']], 'list', default = list(), varname = itemVarname(i, 'render.args')))
+                               return(paste0("output[['", i, "']] <- ", render, '({', item$service, '}', chif(arguments == '', '', ', '), arguments, ')'))
+                             }
                              render = switch(item$type,
-                                    "dynamicInput"       = gndcd(1,9, 14, 20, 9,  1, 35, 42),
+                                    "dynamicInput"     = gndcd(1,9, 14, 20, 9,  1, 35, 42),
                                     "loginInput"         = gndcd(1,9, 14, 20, 9,  1, 35, 42),
                                     "uiOutput"           = gndcd(31,29, 14, 20, 29, 31, 47, 9, 50, 25),
                                     "plotOutput"         = gndcd(31,29, 14, 20, 9, 31, 32, 55, 60, 21),
@@ -986,9 +1150,9 @@ DASHBOARD <- setRefClass("DASHBOARD",
                              for (i in names(items)){
                                if(items[[i]]$type == 'loginInput'){items[[i]]$service <<- loginUIService}
                              }
-                             itemsOfType = function(types){names(items)[vapply(items, function(x) x$type %in% types, logical(1))]}
-                             .rvis.outputs   = parse(text = as.character(unlist(lapply(itemsOfType(setdiff(valid.output.types, "static")), function(v) outputScript(v)))))
-                             .rvis.inputs    = parse(text = as.character(unlist(lapply(itemsOfType(valid.input.types), function(v) inputScript(v)))))
+                             outs = setdiff(itemsOfRole('output'), names(items)[vapply(items, function(x) identical(x$type, 'static'), logical(1))])
+                             .rvis.outputs   = parse(text = as.character(unlist(lapply(outs, function(v) outputScript(v)))))
+                             .rvis.inputs    = parse(text = as.character(unlist(lapply(itemsOfRole('input'), function(v) inputScript(v)))))
                              .rvis.observers = parse(text = chif(length(observers) == 0, character(), paste0(gndcd(12,142,112,130,31,100,94), "({", observers, "})")))
                              .rvis.prescript = parse(text = chif(is.null(prescript), character(), prescript))
                              .rvis.synced    = synced

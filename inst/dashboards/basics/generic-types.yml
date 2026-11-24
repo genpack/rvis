@@ -1,0 +1,64 @@
+# Any function of any package can be an item type: write the type as package::function.
+# The item fields are passed to the function as they are (same argument names as in the package documentation).
+#  - inputs  (functions with argument inputId) get the item name as inputId; their service runs when the input changes
+#  - outputs (functions with argument outputId) get the item name as outputId; their service is rendered by the
+#    matching render function of the package (fooOutput -> renderFoo) or by the function given in field 'render'
+#  - containers (all other functions) get the items of their layout as unnamed arguments; field 'args' gives
+#    unnamed arguments passed first, like the text of a heading
+name: Generic item types
+layout: page
+
+items:
+  page:
+    type: shiny::fluidPage
+    title: Generic item types
+    layout: [heading, row]
+
+  heading:
+    type: shiny::h3
+    args: [Items built by calling package functions directly]
+
+  row:
+    type: shiny::fluidRow
+    layout: [side, main]
+
+  side:
+    type: shiny::column
+    width: 4
+    layout: [dist, n, go]
+
+  main:
+    type: shiny::column
+    width: 8
+    layout: [hist, summary]
+
+  dist:
+    type: shiny::selectInput
+    label: Distribution
+    choices: {Normal: norm, Uniform: unif, Exponential: exp}
+
+  n:
+    type: shiny::sliderInput
+    label: Number of observations
+    min: 10
+    max: 1000
+    value: 200
+
+  go:
+    type: shiny::actionButton
+    label: Reset
+    icon: !expr shiny::icon('rotate-left')
+    service: updateItem4Session('n', session, value = 200)
+
+  hist:
+    type: shiny::plotOutput
+    height: 300px
+    # a generic cloth: the output is passed (last) to the cloth function, with the other cloth fields as arguments
+    cloth: {type: shiny::wellPanel}
+    service: |
+      x <- switch(input$dist, norm = rnorm(input$n), unif = runif(input$n), exp = rexp(input$n))
+      hist(x, col = '#75AADB', border = 'white', main = paste(input$n, input$dist, 'values'))
+
+  summary:
+    type: shiny::verbatimTextOutput
+    service: summary(switch(input$dist, norm = rnorm(input$n), unif = runif(input$n), exp = rexp(input$n)))
