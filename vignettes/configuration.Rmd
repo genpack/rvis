@@ -58,7 +58,10 @@ key_meaning <- function(key) {
     "pie.donut" = "Whether a pie chart is drawn as a donut (a ring).",
     "graph.layout" = "Layout of the nodes of a graph: force-directed, circular or none (positions given).",
     "line.shape" = "Shape of the lines: smooth, straight or stepline.",
-    "color.max" = "Colour of the largest values of a heat map."
+    "color.max" = "Colour of the largest values of a heat map.",
+    "node.size" = "Size of the nodes of a graph (pixels), when no size column is given.",
+    "node.size.min" = "Size of the smallest nodes of a graph (pixels), when a size column is given.",
+    "node.size.max" = "Size of the largest nodes of a graph (pixels), when a size column is given."
   )
   if (key %in% names(known)) return(unname(known[[key]]))
   parts <- strsplit(key, "\\.", fixed = FALSE)[[1]]

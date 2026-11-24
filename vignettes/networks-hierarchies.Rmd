@@ -68,8 +68,13 @@ rvisPlot(type = "graph", plotter = "grviz", obj = flows, key = "id", label = "la
 ### echarts
 
 ```{r, eval=has_plotter("echarts4r")}
-rvisPlot(type = "graph", plotter = "echarts", obj = flows, key = "id", label = "label",
-         source = "source", target = "target", linkWidth = "value")
+# oval nodes sized by their number of passengers (the larger of the flows into and out of the node)
+net <- flows
+flow_in  <- tapply(net$links$value, net$links$target, sum)[net$nodes$id]
+flow_out <- tapply(net$links$value, net$links$source, sum)[net$nodes$id]
+net$nodes$passengers <- pmax(flow_in, flow_out, na.rm = TRUE)
+rvisPlot(type = "graph", plotter = "echarts", obj = net, key = "id", label = "label", size = "passengers", shape = "oval",
+         source = "source", target = "target", linkWidth = "value", config = list(node.size.min = 30, node.size.max = 70))
 ```
 
 ## Sankey diagrams {#sankey}

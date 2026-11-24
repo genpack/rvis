@@ -199,3 +199,6 @@ apexcharter,line.shape,character,,smooth straight stepline
 apexcharter,pie.donut,logical,F,T F
 apexcharter,color.max,character,,
 apexcharter,additionalColumns,character,,
+echarts,node.size,numeric integer,15,0 Inf
+echarts,node.size.min,numeric integer,10,0 Inf
+echarts,node.size.max,numeric integer,40,0 Inf

@@ -28,6 +28,8 @@
 #                              gauge, sankey, treemap, sunburst and graph. echarts.bar() accepts a group column and applies the
 #                              standard config properties (title, subtitle, legend, tooltip, axis labels, labels, stacking, zoom,
 #                              theme) through echartsApplyConfig().
+#                              echarts.graph(): node shapes (argument shape: a column or one shape, including oval) and node
+#                              sizes (config properties node.size, node.size.min and node.size.max).
 
 #' @include visgen.R
 
@@ -319,6 +321,7 @@ echarts.graph.defset = defset %<==>% list(
     key       = c('character', 'factor', 'integer', 'numeric'),
     label     = c('character', 'factor'),
     size      = c('numeric', 'integer'),
+    shape     = c('character', 'factor'),
     group     = c('character', 'factor'),
     source    = c('character', 'factor', 'integer', 'numeric'),
     target    = c('character', 'factor', 'integer', 'numeric'),
@@ -560,9 +563,42 @@ echarts.sunburst = function(obj, label = NULL, size = NULL, group = NULL, config
   echartsHierarchy(obj, label, size, group, config, 'e_sunburst', match.call()[[1]], ...)
 }
 
+# Node shapes of graphs: rvis shape names (also used by grviz and visNetwork) -> echarts symbols.
+# echarts has no oval symbol: ovals are circles drawn with a height of echarts.oval.ratio times their width.
+echarts.shape = c(circle = 'circle', dot = 'circle', point = 'circle', bubble = 'circle',
+                  oval = 'oval', ellipse = 'oval', egg = 'oval',
+                  square = 'rect', rect = 'rect', rectangle = 'rect', box = 'rect',
+                  roundRect = 'roundRect', round.rect = 'roundRect',
+                  triangle = 'triangle', delta = 'triangle', diamond = 'diamond', rhombus = 'diamond',
+                  pin = 'pin', arrow = 'arrow')
+valid.echarts.shapes = names(echarts.shape)
+echarts.oval.ratio = 0.6
+
+# echarts symbols of the given shapes; svg paths ('path://...') and images ('image://...') are kept as they are
+echartsSymbol = function(shape){
+  shape = as.character(shape)
+  own = grepl('^(path|image)://', shape)
+  bad = unique(shape[!own & !(shape %in% valid.echarts.shapes)])
+  assert(length(bad) == 0, paste0("Invalid node shape(s): ", paste(bad, collapse = ', '), ". Valid shapes: ",
+                                  paste(valid.echarts.shapes, collapse = ', '), ", or 'path://...' / 'image://...'."),
+         err_src = 'echarts.graph')
+  out = shape
+  out[!own] = unname(echarts.shape[shape[!own]])
+  out
+}
+
+# Node sizes (pixels): config$node.size for all nodes, or the size column scaled to node.size.min - node.size.max
+echartsNodeSize = function(values, config){
+  if(is.null(values)){return(config$node.size)}
+  rng = range(values, na.rm = TRUE)
+  if(!all(is.finite(rng)) || rng[1] == rng[2]){return(rep((config$node.size.min + config$node.size.max)/2, length(values)))}
+  config$node.size.min + (config$node.size.max - config$node.size.min)*(values - rng[1])/(rng[2] - rng[1])
+}
+
 # Network graph of obj = list(nodes = <data.frame>, links = <data.frame>), like visNetwork.graph().
-# Nodes have a key (default: label), size and group (category); links have source, target and width.
-echarts.graph = function(obj, key = NULL, label = NULL, size = NULL, group = NULL,
+# Nodes have a key (default: label), size, shape and group (category); links have source, target and width.
+# shape: a column of node shapes, or one shape for all nodes (see valid.echarts.shapes; 'oval' draws ellipses).
+echarts.graph = function(obj, key = NULL, label = NULL, size = NULL, shape = NULL, group = NULL,
                          source = NULL, target = NULL, linkWidth = NULL, config = NULL, ...){
   obj %>% verify('list', names_include = c('nodes', 'links'), varname = 'obj', null_allowed = F, err_src = 'echarts.graph')
   obj$nodes %>% verify('data.frame', varname = 'obj$nodes', null_allowed = F, err_src = 'echarts.graph')
@@ -572,16 +608,18 @@ echarts.graph = function(obj, key = NULL, label = NULL, size = NULL, group = NUL
 
   if(is.null(key)){key = label}
   assert(!is.null(key), "Nodes need a key or label column!", err_src = 'echarts.graph')
-  an = prepareAesthetics(key = key, label = label, size = size, group = group)
+  an = prepareAesthetics(key = key, label = label, size = size, shape = shape, group = group)
   al = prepareAesthetics(source = source, target = target, linkWidth = linkWidth)
   Ln = an$labels; Ll = al$labels
   nodes = obj$nodes %>% prepare4Plot(an$aesthetics, config = config)
   links = obj$links %>% prepare4Plot(al$aesthetics, config = config)
 
-  labels = chif(is.null(Ln$label), NULL, as.character(nodes[[Ln$label]]))
+  labels  = chif(is.null(Ln$label), NULL, as.character(nodes[[Ln$label]]))
+  symbols = echartsSymbol(chif(is.null(Ln$shape), 'circle', nodes[[Ln$shape]]))
   nodes = data.frame(name     = as.character(nodes[[Ln$key]]),
                      value    = chif(is.null(Ln$size), 1, nodes[[Ln$size]]),
-                     size     = chif(is.null(Ln$size), 15, 10 + 30*vect.normalize(nodes[[Ln$size]])),
+                     size     = echartsNodeSize(chif(is.null(Ln$size), NULL, nodes[[Ln$size]]), config),
+                     symbol   = rep(symbols, length.out = nrow(nodes)),
                      category = chif(is.null(Ln$group), 'nodes', as.character(nodes[[Ln$group]])),
                      stringsAsFactors = FALSE)
   keys  = nodes$name
@@ -608,5 +646,14 @@ echarts.graph = function(obj, key = NULL, label = NULL, size = NULL, group = NUL
   e = do.call(echarts4r::e_graph_nodes, list(e, nodes, as.name('name'), as.name('value'), as.name('size'), as.name('category'),
                                               legend = !is.null(Ln$group)))
   e = do.call(echarts4r::e_graph_edges, list(e, edges, as.name('source'), as.name('target'), as.name('value')))
+
+  # symbol and size of each node (ovals: circles with a [width, height] size); node data are in the order of 'nodes'
+  data = e$x$opts$series[[1]]$data
+  for (i in seq_along(data)){
+    oval = nodes$symbol[i] == 'oval'
+    data[[i]]$symbol     = chif(oval, 'circle', nodes$symbol[i])
+    data[[i]]$symbolSize = chif(oval, c(nodes$size[i], nodes$size[i]*echarts.oval.ratio), nodes$size[i])
+  }
+  e$x$opts$series[[1]]$data = data
   e %>% echartsApplyConfig(config, axes = FALSE)
 }

@@ -283,7 +283,8 @@
 # 5.14.0 (24 November 2026) - New plotter apexcharter (apexcharter.R, version 0.1.0): bar, line, area, scatter, bubble, pie,
 #                             tsline, tsarea, tsbar, heatmap and radar. echarts.R changed to version 0.2.0: line, area, tsline,
 #                             tsarea, tsbar, scatter, bubble, pie, box, heatmap, calendar, gauge, sankey, treemap, sunburst and
-#                             graph added; standard config properties (title, legend, tooltip, axis labels, stacking, zoom).
+#                             graph added (graph nodes with shapes, including oval, and sizes from config node.size, node.size.min and
+#                             node.size.max); standard config properties (title, legend, tooltip, axis labels, stacking, zoom).
 #                             Examples in the chart guides; both plotters work as generic dashboard outputs.
 NULL
 #> NULL

@@ -78,6 +78,24 @@ test_that("echarts wrappers return charts", {
   g <- rvisPlot("graph", "echarts", obj = graph, key = "id", size = "weight", group = "team", source = "from", target = "to")
   expect_equal(length(g$x$opts$series[[1]]$data), 3)
   expect_equal(length(g$x$opts$series[[1]]$links), 2)
+  # node shapes (a column or one shape for all) and sizes
+  shaped <- list(nodes = data.frame(id = c("a", "b", "c"), w = c(1, 5, 9), kind = c("oval", "square", "diamond")),
+                 links = graph$links)
+  node_data <- function(w) w$x$opts$series[[1]]$data
+  g <- rvisPlot("graph", "echarts", obj = shaped, key = "id", size = "w", shape = "kind", source = "from", target = "to",
+                config = list(node.size.min = 20, node.size.max = 60))
+  d <- node_data(g)
+  expect_equal(vapply(d, `[[`, "", "name"), c("a", "b", "c"))
+  expect_equal(vapply(d, `[[`, "", "symbol"), c("circle", "rect", "diamond"))
+  expect_equal(d[[1]]$symbolSize, c(20, 12))            # an oval: 0.6 times as high as wide
+  expect_equal(d[[2]]$symbolSize, 40)
+  expect_equal(d[[3]]$symbolSize, 60)
+  g <- rvisPlot("graph", "echarts", obj = shaped, key = "id", shape = "ellipse", source = "from", target = "to",
+                config = list(node.size = 50))
+  expect_true(all(vapply(node_data(g), function(n) identical(n$symbolSize, c(50, 30)), logical(1))))
+  expect_equal(node_data(rvisPlot("graph", "echarts", obj = shaped, key = "id", source = "from", target = "to"))[[1]]$symbolSize, 15)
+  expect_error(rvisPlot("graph", "echarts", obj = shaped, key = "id", shape = "star", source = "from", target = "to"), "Invalid node shape")
+
   # the older echarts types still work
   expect_widget(rvisPlot("funnel", "echarts", obj = deaths, label = "age", size = "Rural Male"), "echarts4r")
 })
