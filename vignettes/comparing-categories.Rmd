@@ -137,7 +137,7 @@ rvisPlot(type = "bar", plotter = "apexcharter", obj = deaths, x = "age",
          config = list(title = "Male death rates", yAxis.label = "per 1000", stack.enabled = TRUE))
 ```
 
-## Bar charts from a long table {#bar.molten}
+## Bar charts from a long table {#bar-molten}
 
 The series come from the values of a grouping column instead of separate columns.
 
@@ -188,7 +188,7 @@ rvisPlot(type = "line", plotter = "echarts", obj = deaths_long, x = "age", y = "
          config = list(title = "Death rates", yAxis.label = "per 1000"))
 ```
 
-## Line charts from a long table {#line.molten}
+## Line charts from a long table {#line-molten}
 
 ### d3plus
 
@@ -230,7 +230,7 @@ rvisPlot(type = "area", plotter = "echarts", obj = deaths, x = "age",
          y = list("rural_female", "urban_female"), config = list(stack.enabled = TRUE))
 ```
 
-## Area charts from a long table {#area.molten}
+## Area charts from a long table {#area-molten}
 
 ### d3plus
 
@@ -244,7 +244,7 @@ rvisPlot(type = "area.molten", plotter = "d3plus", obj = deaths_long, x = "age",
 rvisPlot(type = "area.molten", plotter = "xCharts", obj = deaths_long, x = "age", y = "rate", group = "group")
 ```
 
-## Area range charts {#area.range}
+## Area range charts {#area-range}
 
 An area range chart shows an interval per category: here the lowest and highest death rate
 of the four population groups.

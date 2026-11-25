@@ -19,26 +19,33 @@
 # 0.1.1     01 June 2018        Argument containerType added, specifying container type
 
 
-# This functions builds a rvis container for a dialog box in order to get a CSV table and issue out a table with desired column names and classes.
-# The returned container includes all service functions for reading and modifying the input table as well as error handling.
-# todo: add Excel tables should be added
-# the function returns a list of items that needs to be appended to any UI(dashboard) on which the dialog box is going to appear.
-# name: name or ID of the container element
-# classes: a named list containing acceptable classes of each column. list names should refer to the desired name of each column.
-# outputvar: specifies the name of the final output variable. This can refer to a reactive or non-reactive global
-# variable which can be defined anywhere in global.R and is accessible in all service functions of the UI.
-# There are two error (fail) messages. The error messages are '<name>.failmsg' and '<name>.failmsg2' will appear in list 'temp' which is an element of the 'userData' property of the session:
-# For example, if the name of the dialogbox is 'my_dialog', error messages will be found at:
-# session$userData$temp$failmsg & session$userData$temp$failmsg2
-# failmsg is NULL if no file has been specified yet or the dialogbox is reset.
-# failmsg is 'Ok' if table CSV file is read with no problem (No checking or verification on the contents yet)
-# failmsg is 'One and only one file must be selected!' if more than one file is selected by the user
-# failmsg is 'Please choose a CSV file.' if a file with extention other than .csv is selected.
-# failmsg is 'Selected table has no column names' if the selected table has no column labels.
-# failmsg is 'File read failed for some reason!' if the selected file is corrupt and cannot be read.
-# failmsg2 is 'Ok' if all the columns inherit desired classes or have been successfully coerced to the first desired class.
-# failmsg2 is 'Column x cannot be coerced to class y!' if any of the columns does not inherit desired classes and cannot be coerced to the first desired class for that column.
-# arguments ... will be passes to the container list
+#' Dashboard items of a dialog reading a CSV table
+#'
+#' Builds the items of a dashboard dialog which reads a CSV file chosen by the user and maps its
+#' columns to the columns a dashboard needs, with the classes it needs: a file input, one select
+#' input per needed column (filled with the column names of the file), and \emph{Load} and
+#' \emph{Cancel} buttons, with the services reading, checking and converting the table.
+#'
+#' Messages are kept in \code{session$userData$temp}: \code{<name>.failmsg} about reading the file
+#' (\code{"Ok"}, \code{"Please choose a CSV file."}, \code{"Selected table has no column names"} or
+#' \code{"File read failed for some reason!"}) and \code{<name>.failmsg2} about the column classes
+#' (\code{"Ok"} or \code{"Column x cannot be coerced to y!"}).
+#'
+#' @param name Name of the dialog container item; the other items are named after it.
+#' @param classes Named list: the names of the columns the dashboard needs and, for each, the accepted
+#'   classes (columns of other classes are converted to the first one).
+#' @param outputvar Name of the variable receiving the table (kept for backward compatibility).
+#' @param fileSelectTitle,loadButtonTitle Labels of the file input and of the load button.
+#' @param containerType Type of the dialog container item, like \code{"fluidPage"} or \code{"wellPanel"}.
+#' @param ... Other fields of the container item.
+#' @return A named list of dashboard items, to add to the \code{items} of a dashboard configuration.
+#' @seealso \code{\link{rvisDashboard}}, and the \href{../articles/dashboards.html}{dashboards guide}.
+#' @examples
+#' \dontrun{
+#' classes <- list(caseID = c("character", "factor"), timestamp = "POSIXct")
+#' items <- build.container.get.table("my_dialog", classes = classes, containerType = "wellPanel")
+#' runDashboard(list(layout = "my_dialog", items = items))
+#' }
 #' @export
 build.container.get.table = function(name, classes, outputvar = name %>% paste('out', sep = '.') , fileSelectTitle = 'Select input CSV file', loadButtonTitle = 'Load selected file', containerType = 'fluidPage', ...){
   colns = names(classes)

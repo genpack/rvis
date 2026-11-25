@@ -103,7 +103,7 @@ rvisPlot(type = "pie", plotter = "echarts", obj = eyes, label = "Eye", theta = "
          config = list(title = "Students by eye colour"))
 ```
 
-## Pie charts from a long table {#pie.molten}
+## Pie charts from a long table {#pie-molten}
 
 The chart counts the rows of each value of `group`: here one row per student.
 

@@ -102,7 +102,7 @@ rvisPlot(type = "tsline", plotter = "echarts", obj = air, x = "date", y = list("
          config = list(zoom.enabled = TRUE))
 ```
 
-## Time series line charts from a long table {#tsline.molten}
+## Time series line charts from a long table {#tsline-molten}
 
 ### d3plus
 
@@ -122,7 +122,7 @@ rvisPlot(type = "tsLineChart", plotter = "billboarder", obj = air, x = "date", y
          shape = "step", color = "firebrick")
 ```
 
-## Stock chart {#tsline.stock}
+## Stock chart {#tsline-stock}
 
 A Highcharts stock chart adds a navigator and a range selector.
 
@@ -164,7 +164,7 @@ rvisPlot(type = "tsarea", plotter = "apexcharter", obj = weekly, x = "date", y =
 rvisPlot(type = "tsarea", plotter = "echarts", obj = weekly, x = "date", y = list("Temp", "Wind"))
 ```
 
-## Time series area charts from a long table {#tsarea.molten}
+## Time series area charts from a long table {#tsarea-molten}
 
 ### d3plus
 
@@ -198,7 +198,7 @@ rvisPlot(type = "tsbar", plotter = "apexcharter", obj = weekly, x = "date", y = 
 rvisPlot(type = "tsbar", plotter = "echarts", obj = weekly, x = "date", y = "Wind")
 ```
 
-## Time series bar charts from a long table {#tsbar.molten}
+## Time series bar charts from a long table {#tsbar-molten}
 
 ### d3plus
 

@@ -18,7 +18,9 @@ example_section <- function(name, title, source = NULL, notes = NULL) {
                                     title, source[1], source[2]))
   cat(sprintf("Run it: `runDashboard(rvisDashboardExample(\"%s\"))`\n\n", name))
   if (!is.null(notes)) cat(notes, "\n\n")
-  cat(sprintf("![](figures/dash-%s.png){width=100%%}\n\n", name))
+  # (the image link is built from pieces: rmarkdown scans the source for image links, and would read
+  # the template with %s as a broken link when the article is built with an intermediates folder, as by pkgdown)
+  cat(paste0("!", "[Screenshot of the ", title, " dashboard](figures/dash-", name, ".png){width=100%}\n\n"))
   cat("<details><summary>YAML configuration</summary>\n\n```yaml\n", paste(x, collapse = "\n"), "\n```\n\n</details>\n\n", sep = "")
 }
 ```

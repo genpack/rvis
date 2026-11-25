@@ -1,28 +1,45 @@
 # rvis
 
-`rvis` provides a common dispatch function for chart wrappers from several R
-visualization packages. Call `rvisPlot()` with a chart `type`, a wrapper
-`plotter`, the input data, and the dimension mappings required by that chart.
+**Interactive charts with one calling convention, and shiny dashboards from a configuration file.**
+
+- **Charts**: `rvisPlot()` draws interactive charts with about 30 plotting packages (echarts4r,
+  highcharter, plotly, apexcharter, amCharts, billboarder, c3, dygraphs, visNetwork, networkD3, DT, ...)
+  using the same arguments: the data, the columns to show and a list of settings. Changing the package
+  that draws a chart is changing one word.
+- **Dashboards**: `rvisDashboard()` builds a complete shiny app from a YAML or JSON file (or an R list)
+  naming its inputs, outputs, containers and layout, with the R code of its outputs. Any function of
+  any package can be a dashboard item.
+- **Interactive charts**: clicks on nodes, links, bars, points, table cells or map markers become shiny
+  inputs: directly for 13 plotting packages, and for any other htmlwidget with a CSS selector, without
+  changing the javascript of the packages.
+
+## Installation
 
 ```r
-species <- aggregate(Petal.Length ~ Species, data = iris, FUN = mean)
-
-rvisPlot(
-  type = "bar", plotter = "amCharts", obj = species,
-  x = "Species", y = "Petal.Length",
-  config = list(title = "Mean petal length by species")
-)
+# install.packages("remotes")
+remotes::install_github("genpack/rvis")
 ```
 
-The chart method is dispatched using the exact function name
-`paste0(plotter, ".", type)`. For example, `plotter = "amCharts"` and
-`type = "bar"` call `amCharts.bar()`. Wrapper dependencies are optional; install
-the plotting package for the wrapper you want to use.
+The plotting packages are optional: install those whose charts you use, for example
+`install.packages(c("echarts4r", "highcharter", "plotly"))`. See
+[Get started](articles/rvis.html#installation) for the full list.
 
-## Dashboards
+## A chart
 
-rvis also builds complete shiny dashboards from a YAML (or JSON) configuration listing their
-inputs, outputs, containers and layout, with the R code of their services:
+```r
+library(rvis)
+deaths <- data.frame(age = rownames(VADeaths), VADeaths, check.names = FALSE)
+
+rvisPlot(type = "bar", plotter = "echarts", obj = deaths,
+         x = "age", y = list("Rural Male", "Urban Male"),
+         config = list(title = "Death rates in Virginia", yAxis.label = "per 1000"))
+
+# the same chart drawn by another package:
+rvisPlot(type = "bar", plotter = "highcharter", obj = deaths,
+         x = "age", y = list("Rural Male", "Urban Male"))
+```
+
+## A dashboard
 
 ```yaml
 name: Hello rvis
@@ -37,30 +54,24 @@ items:
 
 ```r
 runDashboard("hello.yml")
-rvisDashboardExample()      # 38 example dashboards, including apps of the Shiny gallery
+rvisDashboardExample()      # 40 example dashboards, including the apps of the Shiny gallery
 ```
 
-## User guides
+## Learn rvis
 
-- [Getting started with `rvisPlot`](articles/getting-started.html)
-- Chart guides, with examples of every chart type and plotter:
-  - [Comparing categories: bar, line, area and combo charts](articles/comparing-categories.html)
-  - [Parts of a whole: pie, funnel, pyramid, gauge, bullet and word cloud charts](articles/parts-of-a-whole.html)
-  - [Relationships and distributions: scatter, bubble, histogram and box plots](articles/relationships-distributions.html)
-  - [Time series: line, area, bar and calendar charts over time](articles/time-series.html)
-  - [Networks, flows and hierarchies: graph, sankey, sunburst, tree and treemap charts](articles/networks-hierarchies.html)
-  - [Tables: interactive, filterable and pivot tables](articles/tables.html)
-- [Chart type and plotter reference](articles/chart-types.html)
-- [Configuration reference](articles/configuration.html)
-- [Plotters: what is covered and how to add more](articles/adding-plotters.html)
-- Dashboard guides:
-  - [Dashboards: getting started](articles/dashboards.html)
-  - [Dashboards: layouts](articles/dashboard-layouts.html)
-  - [Dashboards: item reference](articles/dashboard-reference.html)
-  - [Dashboards: gallery](articles/dashboard-gallery.html)
-  - [Dashboards: Shiny packages](articles/dashboard-extensions.html)
-
-## Main functions
-
-- [`rvisPlot()`](reference/rvisPlot.html)
-- [`rvisDashboard()`](reference/rvisDashboard.html), [`runDashboard()`](reference/runDashboard.html), [`rvisDashboardExample()`](reference/rvisDashboardExample.html)
+1. [Get started](articles/rvis.html): installation, a first chart, a first dashboard.
+2. Charts: [plotting basics](articles/getting-started.html), then the chart guides with an example of
+   every chart type drawn by every plotter:
+   [comparing categories](articles/comparing-categories.html),
+   [parts of a whole](articles/parts-of-a-whole.html),
+   [relationships and distributions](articles/relationships-distributions.html),
+   [time series](articles/time-series.html),
+   [networks and hierarchies](articles/networks-hierarchies.html) and
+   [tables](articles/tables.html); the [configuration reference](articles/configuration.html) and
+   [interactive charts](articles/click-events.html).
+3. Dashboards: [getting started](articles/dashboards.html), [layouts](articles/dashboard-layouts.html),
+   [item reference](articles/dashboard-reference.html), [Shiny packages](articles/dashboard-extensions.html)
+   and the [gallery](articles/dashboard-gallery.html).
+4. [Examples and galleries](articles/examples.html): all chart examples and example dashboards in one place.
+5. Reference: [functions](reference/index.html), [chart types and plotters](articles/chart-types.html),
+   [plotters covered and planned](articles/adding-plotters.html), [changes](news/index.html).

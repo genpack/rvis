@@ -1,18 +1,43 @@
+url: https://genpack.github.io/rvis/
+
 template:
   bootstrap: 5
+  bslib:
+    primary: "#2c5f8a"
+
+home:
+  title: "rvis: interactive charts and shiny dashboards"
+  description: >
+    Interactive charts with about 30 plotting packages using one calling convention,
+    and shiny dashboards built from YAML or JSON configurations.
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+  links:
+    - text: Examples and galleries
+      href: articles/examples.html
+    - text: Dashboard gallery
+      href: articles/dashboard-gallery.html
+
 navbar:
   structure:
-    left: [intro, reference, manuals, dashboards, configuration]
+    left: [intro, charts, dashboards, examples, reference, news]
     right: [search, github]
   components:
-    manuals:
-      text: Chart guides
+    intro:
+      text: Get started
+      href: articles/rvis.html
+    charts:
+      text: Charts
       menu:
-        - text: "Comparing categories: bar, line, area, combo"
+        - text: "Plotting basics with rvisPlot"
+          href: articles/getting-started.html
+        - text: "---"
+        - text: "Chart guides"
+        - text: "Comparing categories: bar, line, area, radar, combo"
           href: articles/comparing-categories.html
         - text: "Parts of a whole: pie, funnel, pyramid, gauge, bullet, word cloud"
           href: articles/parts-of-a-whole.html
-        - text: "Relationships and distributions: scatter, bubble, histogram, box"
+        - text: "Relationships and distributions: scatter, bubble, histogram, box, heat map"
           href: articles/relationships-distributions.html
         - text: "Time series: line, area, bar, stock, calendar"
           href: articles/time-series.html
@@ -21,6 +46,10 @@ navbar:
         - text: "Tables: interactive, filterable, pivot"
           href: articles/tables.html
         - text: "---"
+        - text: "Interactive charts: clicks in shiny"
+          href: articles/click-events.html
+        - text: "Configuration reference"
+          href: articles/configuration.html
         - text: "Chart type and plotter reference"
           href: articles/chart-types.html
         - text: "Plotters: covered and planned"
@@ -34,19 +63,41 @@ navbar:
           href: articles/dashboard-layouts.html
         - text: "Item reference"
           href: articles/dashboard-reference.html
-        - text: "Gallery: Shiny apps from YAML"
-          href: articles/dashboard-gallery.html
+        - text: "Any function as an item"
+          href: articles/dashboard-reference.html#generic
+        - text: "Clicks on charts as inputs"
+          href: articles/dashboard-reference.html#clicks
         - text: "Shiny packages"
           href: articles/dashboard-extensions.html
-    configuration:
-      text: Configuration
-      href: articles/configuration.html
+        - text: "---"
+        - text: "Gallery: Shiny apps from YAML"
+          href: articles/dashboard-gallery.html
+    examples:
+      text: Examples
+      menu:
+        - text: "All examples and galleries"
+          href: articles/examples.html
+        - text: "---"
+        - text: "Chart examples by type and plotter"
+          href: articles/examples.html#chart-examples
+        - text: "Example dashboards"
+          href: articles/examples.html#example-dashboards
+        - text: "Dashboard gallery"
+          href: articles/dashboard-gallery.html
+    news:
+      text: Changelog
+      href: news/index.html
+
 articles:
-  - title: User guides
+  - title: Get started
+    navbar: ~
     contents:
+      - rvis
       - getting-started
-      - configuration
+      - examples
   - title: Chart guides
+    desc: >
+      Every chart type drawn by every plotter, each guide on one R data set.
     contents:
       - comparing-categories
       - parts-of-a-whole
@@ -54,23 +105,51 @@ articles:
       - time-series
       - networks-hierarchies
       - tables
+      - click-events
   - title: Dashboards
+    desc: >
+      Shiny dashboards built from YAML or JSON configurations.
     contents:
       - dashboards
       - dashboard-layouts
       - dashboard-reference
-      - dashboard-gallery
       - dashboard-extensions
+      - dashboard-gallery
   - title: Reference
     contents:
+      - configuration
       - chart-types
       - adding-plotters
+
 reference:
-  - title: Main entry point
+  - title: Charts
+    desc: Draw a chart with any plotter, and send clicks on its items to shiny.
     contents:
       - rvisPlot
+      - rvisClickEvents
+      - df2Network
+      - plotHtml
   - title: Dashboards
+    desc: Build and run shiny dashboards from YAML, JSON or R list configurations.
     contents:
       - rvisDashboard
       - runDashboard
       - rvisDashboardExample
+      - DASHBOARD-class
+      - build.container.get.table
+      - style.css
+  - title: Settings and data
+    desc: Settings of the plotters, chart types and shared defaults.
+    contents:
+      - properties
+      - plotters
+      - rvis-constants
+  - title: Package
+    contents:
+      - rvis
+  - title: Legacy functions
+    desc: Older functions kept for existing code.
+    contents:
+      - DT.Table
+      - leaflet.map.plot
+

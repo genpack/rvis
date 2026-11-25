@@ -91,7 +91,16 @@ skin.style.css = function(skin = 'blue', font = NULL, font.weight = NULL, font.s
   return(scr)
 }
 
-# Converts named arguments into an inline CSS style string. Example: style.css(color = 'red', width = '10px')
+#' Inline CSS style
+#'
+#' Converts named arguments into an inline CSS style text, for the \code{style} argument of html
+#' tags or of dashboard items.
+#'
+#' @param ... Named CSS properties and their values.
+#' @return A character string like \code{"color: red; width: 10px"}.
+#' @examples
+#' style.css(color = "red", width = "10px")
+#' shiny::div(style = style.css(`background-color` = "#eee", padding = "8px"), "Some text")
 #' @export
 style.css = function(...){
   arglist = list(...)

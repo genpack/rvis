@@ -1,9 +1,8 @@
 ---
-title: "Getting started with rvisPlot"
-author: "rvis authors"
+title: "Plotting basics with rvisPlot"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with rvisPlot}
+  %\VignetteIndexEntry{Plotting basics with rvisPlot}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -83,3 +82,13 @@ The wrappers are optional dependencies. Install the plotting package for the
 wrapper you plan to use. Then change `plotter` while keeping the chart type,
 data, and mappings when both wrappers implement the same chart. The package's
 chart type index shows which exact methods are available.
+
+## Next steps
+
+- Pick a chart in the chart guides, which show every chart type drawn by every plotter:
+  [comparing categories](comparing-categories.html), [parts of a whole](parts-of-a-whole.html),
+  [relationships and distributions](relationships-distributions.html), [time series](time-series.html),
+  [networks and hierarchies](networks-hierarchies.html) and [tables](tables.html).
+- [Examples and galleries](examples.html) lists all examples, by chart type and plotter.
+- [Interactive charts](click-events.html): clicks on chart items as inputs of shiny apps and dashboards.
+- [Dashboards](dashboards.html): put the charts in a shiny dashboard built from a YAML file.

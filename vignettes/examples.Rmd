@@ -1,0 +1,120 @@
+---
+title: "Examples and galleries"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Examples and galleries}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+source("rvis-setup.R")
+
+# Sections of a guide: level-2 headings with an anchor {#id}, and the level-3 headings (plotters) under each
+guide_sections <- function(file) {
+  x <- readLines(file, warn = FALSE, encoding = "UTF-8")
+  out <- list(); current <- NULL
+  for (line in x) {
+    if (grepl("^## ", line) && !grepl("^## Data", line)) {
+      # a heading with an anchor {#id}, or without (pkgdown makes its id from the title)
+      title <- trimws(sub("\\{#.*$", "", sub("^## ", "", line)))
+      id <- if (grepl("\\{#[^}]+\\}\\s*$", line)) sub("^.*\\{#([^}]+)\\}\\s*$", "\\1", line) else anchor(title)
+      current <- list(title = title, id = id, plotters = character())
+      out[[length(out) + 1]] <- current
+    } else if (grepl("^## ", line)) {
+      current <- NULL
+    } else if (!is.null(current) && grepl("^### ", line)) {
+      out[[length(out)]]$plotters <- c(out[[length(out)]]$plotters, trimws(sub("^### ", "", line)))
+    }
+  }
+  out
+}
+
+# pkgdown anchors of level-3 headings: lower case, spaces and punctuation as dashes
+anchor <- function(x) gsub("^-+|-+$", "", gsub("[^a-z0-9]+", "-", tolower(x)))
+
+guides <- c("comparing-categories" = "Comparing categories", "parts-of-a-whole" = "Parts of a whole",
+            "relationships-distributions" = "Relationships and distributions", "time-series" = "Time series",
+            "networks-hierarchies" = "Networks and hierarchies", "tables" = "Tables")
+```
+
+All examples of rvis in one place: the examples of every chart type, drawn by every plotter, in the
+chart guides; and the example dashboards that come with the package.
+
+## Chart examples
+
+Each chart guide shows its chart types on one R data set, with an example for each plotter drawing
+that type. The examples need the plotting package of their plotter; with the package installed, you
+can copy and run them as they are.
+
+```{r chart-index, echo=FALSE, results="asis"}
+for (g in names(guides)) {
+  secs <- guide_sections(paste0(g, ".Rmd"))
+  secs <- Filter(function(s) length(s$plotters) > 0, secs)
+  cat(sprintf("\n### [%s](%s.html)\n\n", guides[[g]], g))
+  cat("| Chart | Examples by plotter |\n|:--|:--|\n")
+  for (s in secs) {
+    links <- sprintf("[%s](%s.html#%s)", s$plotters, g, anchor(s$plotters))
+    cat(sprintf("| [%s](%s.html#%s) | %s |\n", s$title, g, s$id, paste(links, collapse = ", ")))
+  }
+}
+```
+
+The [chart type and plotter reference](chart-types.html) lists the wrapper functions of each chart
+type with their arguments, and the [configuration reference](configuration.html) the settings of each
+plotter. [Interactive charts](click-events.html) shows how clicks on charts become shiny inputs.
+
+## Example dashboards
+
+rvis comes with `r nrow(rvisDashboardExample())` example dashboards (YAML files in folder
+`dashboards` of the package). List them with `rvisDashboardExample()`, and run one with
+`runDashboard(rvisDashboardExample("<name>"))`:
+
+```{r, eval=FALSE}
+rvisDashboardExample()                              # name, group, title and file of each example
+runDashboard(rvisDashboardExample("faithful"))      # runs one
+file.edit(rvisDashboardExample("faithful"))         # opens its configuration, to copy and change it
+```
+
+They are in three groups:
+
+- **[Gallery](dashboard-gallery.html)**: 20 apps of the [Shiny gallery](https://shiny.posit.co/r/gallery/)
+  rebuilt from YAML, with a screenshot of each.
+- **[Showcase](dashboard-gallery.html#showcase-dashboards)**: two large dashboards combining most features.
+- **Basics**: small dashboards showing one feature each, explained in the dashboard guides.
+
+```{r dashboard-index, echo=FALSE, results="asis"}
+ex <- rvisDashboardExample()
+
+# Where each example is shown: the guide (and section) whose code shows its YAML or screenshot
+shown_in <- function(name) {
+  for (f in list.files(".", pattern = "\\.Rmd$")) {
+    x <- readLines(f, warn = FALSE, encoding = "UTF-8")
+    hit <- grep(sprintf("(show_yaml|show_shot|example_section|rvisDashboardExample)\\(\"%s\"", name), x)
+    if (length(hit) == 0) hit <- grep(sprintf("list\\(\"%s\",", name), x)
+    if (length(hit) == 0 || f == "examples.Rmd") next
+    heads <- grep("^## .*\\{#[^}]+\\}", x)
+    heads <- heads[heads < hit[1]]
+    page <- sub("\\.Rmd$", ".html", f)
+    if (f == "dashboard-gallery.Rmd") return(sprintf("%s#%s", page, name))
+    if (length(heads) == 0) return(page)
+    return(sprintf("%s#%s", page, sub("^.*\\{#([^}]+)\\}.*$", "\\1", x[max(heads)])))
+  }
+  NA_character_
+}
+pages <- c("dashboard-gallery.html" = "gallery", "dashboard-reference.html" = "item reference",
+           "dashboard-layouts.html" = "layouts", "dashboards.html" = "getting started",
+           "dashboard-extensions.html" = "Shiny packages", "click-events.html" = "interactive charts")
+
+for (grp in c("basics", "gallery", "showcase")) {
+  e <- ex[ex$group == grp, ]
+  cat(sprintf("\n### %s\n\n", c(basics = "Basics", gallery = "Gallery", showcase = "Showcase")[[grp]]))
+  cat("| Example | Title | Shown in | Run it |\n|:--|:--|:--|:--|\n")
+  for (k in seq_len(nrow(e))) {
+    where <- shown_in(e$name[k])
+    shown <- if (is.na(where)) "" else sprintf("[%s](%s)", pages[[sub("#.*$", "", where)]], where)
+    cat(sprintf("| `%s` | %s | %s | `runDashboard(rvisDashboardExample(\"%s\"))` |\n",
+                e$name[k], e$title[k], shown, e$name[k]))
+  }
+}
+```

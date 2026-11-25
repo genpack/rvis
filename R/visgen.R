@@ -58,6 +58,26 @@ support('magrittr', 'shiny', 'shinydashboard', 'htmlwidgets')
 
 # Global variables ---------------------------------------------------------
 
+#' Names, chart types and settings shared by the plotters
+#'
+#' \code{valid.dim.names} lists the dimension arguments of the wrappers (like \code{x}, \code{y},
+#' \code{color}, \code{size}, \code{label}, \code{source} or \code{linkWidth}): the columns of the data
+#' a wrapper maps to its chart. \code{valid.plot.types} and \code{valid.plotters} are short lists kept
+#' for backward compatibility; the complete list of chart types and plotters is in the
+#' \href{../articles/chart-types.html}{chart type and plotter reference} and in the \code{plotters}
+#' data set. \code{defset} holds the default settings that every wrapper's own defaults are built on:
+#' the colour and shape palettes, \code{withRowNames} and \code{colorize}.
+#'
+#' @format Character vectors (\code{valid.dim.names}, \code{valid.plot.types}, \code{valid.plotters})
+#'   and a list (\code{defset}).
+#' @seealso \code{\link{rvisPlot}}, \code{\link{plotters}}, \code{\link{properties}}.
+#' @examples
+#' valid.dim.names
+#' defset$palette$color
+#' @name rvis-constants
+#' @aliases valid.dim.names valid.plot.types valid.plotters defset
+NULL
+
 #' @export
 valid.dim.names  = c('key', 'x', 'y', 'y2', 'z', 't', 'high', 'low', 'color', 'size', 'shape', 'label', 'tooltip', 'labelColor',
                      'borderColor', 'linkColor','theta', 'ySide', 'group', 'source', 'target',
@@ -206,7 +226,22 @@ prepare4Plot = function(obj, aesthetics, config){
   return(tbl)
 }
 
-# Deprecated: replaced by prepare4Plot() in version 1.2.2. Kept only for backward compatibility of the exported name.
+#' Defunct functions
+#'
+#' These functions are no longer supported and only stop with an error naming their replacement.
+#' They are kept so that old code calling them gets a clear message.
+#' \itemize{
+#'   \item \code{verifyPlotInputs()}: replaced by the internal functions \code{prepareAesthetics()} and
+#'     \code{prepare4Plot()} used by all wrappers.
+#'   \item \code{visNetwork.graphChart()}: replaced by \code{rvisPlot("graph", "visNetwork", ...)}.
+#' }
+#' @param obj,x,y,z,t,color,size,shape,label,labelColor,theta,linkSource,linkTarget,tooltip,palette.color,palette.labelColor,nodes,links,sizeLegend,shapeLegend,colorLegend,linkColor,linkLength,linkLengthLegend,linkWidth,...
+#'   Ignored.
+#' @name rvis-defunct
+#' @aliases verifyPlotInputs visNetwork.graphChart
+#' @keywords internal
+NULL
+
 #' @export
 verifyPlotInputs = function(obj, x = NULL, y = NULL, z = NULL, t = NULL, color = NULL, size = NULL,
                             shape = NULL, label = NULL, labelColor = NULL, theta = NULL,
@@ -379,8 +414,33 @@ isHorizontal = function(obj, Lx, Ly){
 
 # Networks -------------------------------------------------------------------
 
-# Converts a dataframe into a network containing a nodes and links table
-# id_cols: columns defining the consecutive levels of the network, value_col: numeric column summed over links
+#' Build a network from the levels of a table
+#'
+#' Converts a table into the \code{nodes} and \code{links} tables used by the graph and sankey
+#' wrappers (for example \code{visNetwork}, \code{grviz}, \code{echarts}, \code{networkD3} and
+#' \code{googleVis}). The columns \code{id_cols} are consecutive levels of a flow: each value of
+#' a level is a node, and a link joins each value of a level to each value of the next level it
+#' occurs with, with the sum of \code{value_col} over the rows as its value.
+#'
+#' @param df A data frame.
+#' @param id_cols Names of the columns giving the consecutive levels of the network.
+#' @param value_col Name of the numeric column summed over the links.
+#' @param percentage If \code{TRUE}, adds column \code{pathratio} to the links: the share (percent)
+#'   of the flow through the link along the whole path.
+#' @return A list with two data frames: \code{nodes} (columns \code{id} and \code{label}, like
+#'   \code{"Class=1st"}) and \code{links} (columns \code{source}, \code{target}, \code{value},
+#'   \code{svname}, \code{tvname}, \code{hovertext}, \code{sumval} and \code{ratio}: the percent
+#'   of the flow of the source going through the link).
+#' @seealso The \href{../articles/networks-hierarchies.html}{networks and hierarchies} guide.
+#' @examples
+#' titanic <- as.data.frame(Titanic, stringsAsFactors = FALSE)
+#' flows <- df2Network(titanic, id_cols = c("Class", "Sex", "Survived"), value_col = "Freq")
+#' head(flows$nodes)
+#' head(flows$links[, c("source", "target", "value", "ratio")])
+#' \dontrun{
+#' rvisPlot("sankey", "networkD3", obj = flows, key = "id", label = "label",
+#'          source = "source", target = "target", linkWidth = "value")
+#' }
 #' @export
 df2Network = function(df, id_cols = names(df), value_col, percentage = F){
   links = NULL

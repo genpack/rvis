@@ -133,7 +133,8 @@ show_shot("charts")
 
 Any other htmlwidget can be an output with a `package::function` type, like
 `type: echarts4r::echarts4rOutput` or `type: apexcharter::apexchartOutput`: the item fields are the
-arguments of the output function and the service is rendered by the package's render function.
+arguments of the output function and the service is rendered by the package's render function
+(see [any function as an item](#generic)).
 
 ### Clicks on chart items {#clicks}
 
@@ -154,6 +155,48 @@ new versions keep working. For other widgets, call `rvisClickEvents()` in the se
 
 ```{r, echo=FALSE}
 show_yaml("click-events")
+```
+
+The [interactive charts](click-events.html) guide describes the value of the input for each plotter.
+
+## Any function as an item {#generic}
+
+The `type` of an item (or of its `cloth`) can be any function of any package, written as
+`package::function`, like `shinyWidgets::pickerInput`, `shinydashboard::box` or
+`apexcharter::apexchartOutput`. The function is called with the fields of the item as its arguments,
+as they are: use the argument names of the package documentation (for example `label`, not `title`, for
+the label of `shiny::selectInput`). So every function of every package, including functions added in
+their future versions, can be a dashboard item without changes to rvis.
+
+The role of the item is found from the arguments of its function:
+
+- **inputs**: functions with argument `inputId` get the item name as `inputId`. Their `service` runs when
+  the input changes, and `updateItem4Session()` / `updateItem()` call the package's update function
+  (`fooInput` is updated by `updateFooInput`).
+- **outputs**: functions with argument `outputId` get the item name as `outputId`. Their `service` is
+  rendered by the package's render function matching the output function (`fooOutput` by `renderFoo`).
+- **containers**: all other functions get the items of their `layout` as unnamed arguments (and the item
+  name as `id`, if they have an argument `id` and the item has none).
+
+A few fields are used by rvis and not passed to the function:
+
+| Field | Use |
+|:--|:--|
+| `args` | unnamed arguments passed first, like the text of `shiny::h3` |
+| `service`, `layout`, `cloth` | as for all items |
+| `role` | `input`, `output` or `container`, if the role found from the arguments is wrong |
+| `render` | render function of an output, like `my.package::renderThing`, if it is not named `renderFoo` |
+| `render.args` | list of arguments of the render function |
+| `update` | function updating an input, if it is not named `updateFoo` |
+| `click.events` | for htmlwidget outputs: [clicks on chart items](#clicks) as an input |
+| `weight`, `offset` | width and offset of the item in a [row/column layout](dashboard-layouts.html#grid); passed to the function only if it has such an argument (like `shiny::column`) |
+| tooltip, popover and tutor fields | as for all items |
+
+The short type names of the other sections (like `selectInput` or `box`) keep their own settings, like
+`title` for the label of an input.
+
+```{r, echo=FALSE}
+show_yaml("generic-types")
 ```
 
 ## Reactive values, objects and observers {#reactive}

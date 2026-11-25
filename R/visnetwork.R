@@ -205,7 +205,8 @@ visNetwork.graph = function(obj,
   visNetwork(obj$nodes, obj$links, ...)  %>% visNetwork.applyConfig(config)
 }
 
-# Deprecated: replaced by visNetwork.graph(). Kept only for backward compatibility of the exported name.
+# Defunct: replaced by visNetwork.graph(). Kept only for backward compatibility of the exported name.
+#' @rdname rvis-defunct
 #' @export
 visNetwork.graphChart = function(nodes, links, size = NULL, sizeLegend = NULL, shape = NULL, shapeLegend = NULL, color = NULL, colorLegend = NULL, label = NULL, linkColor = NULL, linkLength = NULL, linkLengthLegend = NULL, linkSource = NULL, linkTarget = NULL, linkWidth = NULL, ...){
   stop("Function visNetwork.graphChart() is no longer supported. Use visNetwork.graph() instead.")

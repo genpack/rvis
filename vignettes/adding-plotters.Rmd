@@ -42,7 +42,7 @@ and how to add a plotter.
 | `grviz` | `graph` |
 | `highcharter` | `area`, `area.range`, `bar`, `bubble`, `combo`, `funnel`, `line`, `pie`, `pyramid`, `scatter`, `scatter.molten`, `treemap`, `tsline.stock` |
 | `highcharts` | `scatter.molten` |
-| `leaflet` | `map.plot` (legacy, see the [reference](chart-types.html#map.plot)) |
+| `leaflet` | `map.plot` (legacy, see the [reference](chart-types.html#map-plot)) |
 | `morrisjs` | `pie`, `tsbar`, `tsline` |
 | `networkD3` | `sankey` |
 | `nvd3` | `bar`, `pie`, `pie.molten`, `scatter` |

@@ -4,14 +4,31 @@
 \name{rvis}
 \alias{rvis-package}
 \alias{rvis}
-\title{rvis: This package is a tool-box for visualization in R and making word-class and elegant shiny dashboards.}
+\title{rvis: interactive charts and shiny dashboards}
 \description{
-A toolbox for generating of more elegant visualizations and easier built of shiny applications
+rvis draws interactive charts with about 30 plotting packages using one calling convention,
+\code{\link{rvisPlot}()}, and builds shiny dashboards from a YAML or JSON configuration with
+\code{\link{rvisDashboard}()}. Clicks on chart items can be shiny inputs (\code{\link{rvisClickEvents}()}).
 }
+\section{Learn rvis}{
+
+Start with the \href{../articles/rvis.html}{Get started} article, then the chart guides and the
+dashboard guides of the package website (also available as vignettes: \code{browseVignettes("rvis")}).
+\href{../articles/examples.html}{Examples and galleries} lists all examples.
+}
+
 \section{Class DASHBOARD}{
 
-rvis provides a Reference class named as DASHBOARD.
-You can design your interactive dashboard layout and assign multiple R objects into your dashboard.
-It supports various visualization engines like graphics, ggplot2, ggvis, googlevis, amCharts, rCharts, dygraphs and many other plotter engines.
+Dashboards are objects of the reference class \code{\link[=DASHBOARD-class]{DASHBOARD}}: their items
+(inputs, outputs and containers), layout and services. They are made by \code{\link{rvisDashboard}()}
+and run by their \code{run()} method or \code{\link{runDashboard}()}.
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/genpack/rvis}
+  \item Report bugs at \url{https://github.com/genpack/rvis/issues}
+}
+
+}

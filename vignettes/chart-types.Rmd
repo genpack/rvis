@@ -104,7 +104,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `bar.molten` charts {#bar.molten}
+## `bar.molten` charts {#bar-molten}
 
 Call `rvisPlot(type = "bar.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -117,7 +117,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#bar.molten).
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#bar-molten).
 
 ### Arguments
 
@@ -184,7 +184,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `pie.molten` charts {#pie.molten}
+## `pie.molten` charts {#pie-molten}
 
 Call `rvisPlot(type = "pie.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -197,7 +197,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#pie.molten).
+Examples for every plotter of this chart type are in [Parts of a whole](parts-of-a-whole.html#pie-molten).
 
 ### Arguments
 
@@ -273,7 +273,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `scatter.molten` charts {#scatter.molten}
+## `scatter.molten` charts {#scatter-molten}
 
 Call `rvisPlot(type = "scatter.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -288,7 +288,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#scatter.molten).
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#scatter-molten).
 
 ### Arguments
 
@@ -371,7 +371,7 @@ chart method for the `calheatmap` wrapper.
 
 No wrapper method with the `motion` suffix is currently defined.
 
-### `combo.molten` {#combo.molten}
+### `combo.molten` {#combo-molten}
 
 There is no current function named `dimple.combo.molten`. Use a
 non-molten `combo` method that appears in the chart table, or reshape
@@ -388,7 +388,7 @@ a wrapper today.
 
 The capability table calls the Leaflet method `map`, while the function
 is `leaflet.map.plot`. Use the exact wrapper dispatch shown in the
-[`map.plot` section](#map.plot).
+[`map.plot` section](#map-plot).
 
 ## `box` charts {#box}
 
@@ -473,7 +473,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `line.molten` charts {#line.molten}
+## `line.molten` charts {#line-molten}
 
 Call `rvisPlot(type = "line.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -486,7 +486,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#line.molten).
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#line-molten).
 
 ### Arguments
 
@@ -548,7 +548,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `area.molten` charts {#area.molten}
+## `area.molten` charts {#area-molten}
 
 Call `rvisPlot(type = "area.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -562,7 +562,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area.molten).
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area-molten).
 
 ### Arguments
 
@@ -585,7 +585,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `area.range` charts {#area.range}
+## `area.range` charts {#area-range}
 
 Call `rvisPlot(type = "area.range", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -598,7 +598,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area.range).
+Examples for every plotter of this chart type are in [Comparing categories](comparing-categories.html#area-range).
 
 ### Arguments
 
@@ -757,7 +757,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `bubble.molten` charts {#bubble.molten}
+## `bubble.molten` charts {#bubble-molten}
 
 Call `rvisPlot(type = "bubble.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -771,7 +771,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#bubble.molten).
+Examples for every plotter of this chart type are in [Relationships and distributions](relationships-distributions.html#bubble-molten).
 
 ### Arguments
 
@@ -909,7 +909,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `table.molten` charts {#table.molten}
+## `table.molten` charts {#table-molten}
 
 Call `rvisPlot(type = "table.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -922,7 +922,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Tables](tables.html#table.molten).
+Examples for every plotter of this chart type are in [Tables](tables.html#table-molten).
 
 ### Arguments
 
@@ -1014,7 +1014,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `map.plot` charts {#map.plot}
+## `map.plot` charts {#map-plot}
 
 The Leaflet function is named `leaflet.map.plot`, so it dispatches as
 `type = "map.plot"`. The legacy compatibility matrix labels it `map`,
@@ -1102,7 +1102,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `tsline.molten` charts {#tsline.molten}
+## `tsline.molten` charts {#tsline-molten}
 
 Call `rvisPlot(type = "tsline.molten", plotter = "<wrapper>", ...)` to
 select this chart method. The series come from the values of `group`.
@@ -1115,7 +1115,7 @@ select this chart method. The series come from the values of `group`.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Time series](time-series.html#tsline.molten).
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsline-molten).
 
 ### Arguments
 
@@ -1165,7 +1165,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `tsline.stock` charts {#tsline.stock}
+## `tsline.stock` charts {#tsline-stock}
 
 Call `rvisPlot(type = "tsline.stock", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -1178,7 +1178,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Time series](time-series.html#tsline.stock).
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsline-stock).
 
 ### Arguments
 
@@ -1239,7 +1239,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `tsarea.molten` charts {#tsarea.molten}
+## `tsarea.molten` charts {#tsarea-molten}
 
 Call `rvisPlot(type = "tsarea.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -1252,7 +1252,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Time series](time-series.html#tsarea.molten).
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsarea-molten).
 
 ### Arguments
 
@@ -1312,7 +1312,7 @@ rejected by another. See the [configuration
 reference](configuration.html) for key types, defaults, allowed values,
 and a plain-language description.
 
-## `tsbar.molten` charts {#tsbar.molten}
+## `tsbar.molten` charts {#tsbar-molten}
 
 Call `rvisPlot(type = "tsbar.molten", plotter = "<wrapper>", ...)` to
 select this chart method.
@@ -1325,7 +1325,7 @@ select this chart method.
 
 ### Examples
 
-Examples for every plotter of this chart type are in [Time series](time-series.html#tsbar.molten).
+Examples for every plotter of this chart type are in [Time series](time-series.html#tsbar-molten).
 
 ### Arguments
 

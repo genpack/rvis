@@ -131,7 +131,7 @@ rvisPlot(type = "scatter", plotter = "echarts", obj = flowers,
          x = "Sepal.Length", y = "Sepal.Width", group = "Species", config = list(zoom.enabled = TRUE))
 ```
 
-## Scatter charts from a long table {#scatter.molten}
+## Scatter charts from a long table {#scatter-molten}
 
 The series come from the values of `group` (here the species).
 
@@ -196,7 +196,7 @@ rvisPlot(type = "bubble", plotter = "echarts", obj = flowers,
          x = "Sepal.Length", y = "Petal.Length", size = "Petal.Width", group = "Species")
 ```
 
-## Bubble charts from a long table {#bubble.molten}
+## Bubble charts from a long table {#bubble-molten}
 
 ### d3plus
 

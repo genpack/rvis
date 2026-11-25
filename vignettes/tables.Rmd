@@ -62,7 +62,7 @@ rvisPlot(type = "table", plotter = "D3TableFilter", obj = arrests,
          config = list(column.shape = list(Murder = "bubble")))
 ```
 
-## Tables from a long table {#table.molten}
+## Tables from a long table {#table-molten}
 
 ### TFD3
 

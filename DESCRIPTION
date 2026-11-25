@@ -4,9 +4,11 @@ Title: NIRASOFT R package for visualization
 Version: 5.16.0
 Date: 2026-11-24
 Author: Nima Ramezani
-Maintainer: <nima.ramezani@gmail.com>
+Maintainer: Nima Ramezani <nima.ramezani@gmail.com>
 Description: A toolbox for generating of more elegant visualizations and easier built of shiny applications
 License: MIT
+URL: https://genpack.github.io/rvis/, https://github.com/genpack/rvis
+BugReports: https://github.com/genpack/rvis/issues
 Encoding: UTF-8
 Imports:
     rutils,
@@ -39,6 +41,7 @@ Collate:
     'dashboard.R'
     'dashconfig.R'
     'dashtools.R'
+    'data.R'
     'dc.R'
     'dfvis.R'
     'dialogs.R'

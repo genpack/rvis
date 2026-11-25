@@ -119,7 +119,30 @@ DT.options = function(config, df, sessionobj = NULL){
   return(opt)
 }
 
-# Old functions
+#' Legacy DT table functions
+#'
+#' Older functions for DT tables, kept for existing code. For new code, use
+#' \code{rvisPlot("table", "DT", ...)} (see the \href{../articles/tables.html}{tables guide}).
+#'
+#' \code{DT.Table()} makes a DT table of \code{x} without escaping html. A list \code{options$header}
+#' gives CSS properties of the header row. \code{links} adds action links to cells (they need the shiny
+#' \code{session}). \code{DT.Table.Classify.bold()} makes the rows bold whose value in column
+#' \code{classColumn} is one of \code{boldValues}.
+#'
+#' @param x A data frame (\code{DT.Table()}) or a DT table (\code{DT.Table.Classify.bold()}).
+#' @param links Optional list of links added to the cells.
+#' @param session Shiny session, needed with \code{links}.
+#' @param options List of DataTables options, passed to \code{DT::datatable()}.
+#' @param rownames Whether to show the row names.
+#' @param classColumn Name of the column deciding which rows are bold.
+#' @param boldValues Values of \code{classColumn} whose rows are bold.
+#' @return A DT table (htmlwidget).
+#' @examples
+#' \dontrun{
+#' tbl <- DT.Table(head(mtcars), options = list(header = list(`background-color` = "#ddd")))
+#' DT.Table.Classify.bold(DT.Table(data.frame(a = 1:3, big = c(FALSE, TRUE, FALSE))), "big")
+#' }
+#' @name DT.Table
 #' @export
 DT.Table = function(x, links = NULL, session = NULL, options = list(), rownames = T){
   TBL = x
@@ -139,7 +162,7 @@ DT.Table = function(x, links = NULL, session = NULL, options = list(), rownames 
   return(DT::datatable(TBL, escape = FALSE, options = opt, rownames = rownames))
 }
 
-# Functions for customized modifications: (Old Function)
+#' @rdname DT.Table
 #' @export
 DT.Table.Classify.bold = function(x, classColumn, boldValues = 'TRUE'){
   assert(inherits(x, 'datatables'), "Class verification failed! Argument 'x' must be of class 'datatables'!")
