@@ -19,7 +19,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rvis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.16.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.16.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,58 @@
 <script src="tables_files/datatables-binding-0.34.0/datatables.js"></script><link href="tables_files/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
 <link href="tables_files/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
 <script src="tables_files/dt-core-1.13.6/js/jquery.dataTables.min.js"></script><link href="tables_files/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
-<script src="tables_files/crosstalk-1.2.2/js/crosstalk.min.js"></script><link href="tables_files/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet">
+<script src="tables_files/crosstalk-1.2.2/js/crosstalk.min.js"></script><script src="tables_files/d3v3-3.5.15/d3.min.js"></script><script src="tables_files/d3v3-3.5.15/d3v3-alias.js"></script><script src="tables_files/d3tf-4.7.4/d3_d3tf.min.js"></script><script src="tables_files/colorbrewer-1/colorbrewer.js"></script><link href="tables_files/tablefilter-0.4.15/style/colsVisibility.css" rel="stylesheet">
+<link href="tables_files/tablefilter-0.4.15/style/filtersVisibility.css" rel="stylesheet">
+<link href="tables_files/tablefilter-0.4.15/style/tablefilter.css" rel="stylesheet">
+<script src="tables_files/tablefilter-0.4.15/tablefilter.js"></script><script src="tables_files/tablefilter-0.4.15/tf-0-9f35c43ee2b90b920298.js"></script><link id="tablefilter-1-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/blank.png">
+<link id="tablefilter-2-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/btn_clear_filters.png">
+<link id="tablefilter-3-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/btn_filter.png">
+<link id="tablefilter-4-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/btn_first_page.gif">
+<link id="tablefilter-5-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/btn_last_page.gif">
+<link id="tablefilter-6-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/btn_next_page.gif">
+<link id="tablefilter-7-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/btn_previous_page.gif">
+<link id="tablefilter-8-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/downsimple.png">
+<link id="tablefilter-9-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/upsimple.png">
+<link id="tablefilter-10-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/icn_clp.png">
+<link id="tablefilter-11-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/icn_exp.png">
+<link id="tablefilter-12-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/icn_filterActive.gif">
+<link id="tablefilter-13-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/icn_filter.gif">
+<link id="tablefilter-14-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/default.css">
+<link id="tablefilter-15-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/bg_infDiv.jpg">
+<link id="tablefilter-16-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/bg_th.jpg">
+<link id="tablefilter-17-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_eraser.gif">
+<link id="tablefilter-18-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_first_page.gif">
+<link id="tablefilter-19-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_last_page.gif">
+<link id="tablefilter-20-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_next_page.gif">
+<link id="tablefilter-21-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_over_eraser.gif">
+<link id="tablefilter-22-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_over_first_page.gif">
+<link id="tablefilter-23-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_over_last_page.gif">
+<link id="tablefilter-24-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_over_next_page.gif">
+<link id="tablefilter-25-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_over_previous_page.gif">
+<link id="tablefilter-26-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/btn_previous_page.gif">
+<link id="tablefilter-27-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/default/images/img_loading.gif">
+<link id="tablefilter-28-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/bg_headers.jpg">
+<link id="tablefilter-29-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/bg_infDiv.jpg">
+<link id="tablefilter-30-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/btn_filter.png">
+<link id="tablefilter-31-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/btn_first_page.gif">
+<link id="tablefilter-32-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/btn_last_page.gif">
+<link id="tablefilter-33-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/btn_next_page.gif">
+<link id="tablefilter-34-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/btn_previous_page.gif">
+<link id="tablefilter-35-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/images/img_loading.gif">
+<link id="tablefilter-36-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/mytheme/mytheme.css">
+<link id="tablefilter-37-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/bg_skyblue.gif">
+<link id="tablefilter-38-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/btn_first_page.gif">
+<link id="tablefilter-39-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/btn_last_page.gif">
+<link id="tablefilter-40-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/btn_next_page.gif">
+<link id="tablefilter-41-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/btn_prev_page.gif">
+<link id="tablefilter-42-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/icn_clear_filters.png">
+<link id="tablefilter-43-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/images/img_loading.gif">
+<link id="tablefilter-44-attachment" rel="attachment" href="tables_files/tablefilter-0.4.15/style/themes/skyblue/skyblue.css">
+<link href="tables_files/sparklines-2.1.2/tooltip.css" rel="stylesheet">
+<script src="tables_files/sparklines-2.1.2/jquery.sparkline.min.js"></script><link href="tables_files/colsresizable-1.6/colsResizable.css" rel="stylesheet">
+<script src="tables_files/colsresizable-1.6/colResizable-1.6.min.js"></script><link id="colsresizable-1-attachment" rel="attachment" href="tables_files/colsresizable-1.6/grip.png">
+<link id="colsresizable-2-attachment" rel="attachment" href="tables_files/colsresizable-1.6/slider.png">
+<script src="tables_files/TFD3-binding-5.16.1/TFD3.js"></script><link href="tables_files/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet">
 <script src="tables_files/jquery-ui-1.11.4/jquery-ui.min.js"></script><script src="tables_files/jquery-ui-1.11.4/jquery.ui.touch-punch.min.js"></script><link href="tables_files/c3-0.4.11/c3.min.css" rel="stylesheet">
 <script src="tables_files/c3-0.4.11/c3.min.js"></script><script src="tables_files/d3-3.5.5/d3.v3.min.js"></script><link href="tables_files/pivottable-2.19.0/pivot.min.css" rel="stylesheet">
 <script src="tables_files/pivottable-2.19.0/pivot.min.js"></script><script src="tables_files/pivottable-2.19.0/d3_renderers.min.js"></script><script src="tables_files/pivottable-2.19.0/c3_renderers.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.cs.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.da.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.de.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.es.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.fr.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.it.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.nl.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.pl.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.pt.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.ru.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.sq.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.tr.min.js"></script><script src="tables_files/pivottable-2.19.0/pivot.zh.min.js"></script><link href="tables_files/subtotal-1.10.0/subtotal.min.css" rel="stylesheet">

@@ -1,5 +1,13 @@
 # Changelog
 
+## rvis 5.16.1
+
+- TFD3 tables were empty on Linux and macOS: the widget files are
+  renamed to `TFD3.js` and `TFD3.yaml` to match the widget name (file
+  names are case-sensitive there).
+- The CRAN packages used by the wrappers are declared in `Suggests`.
+- Documentation website: <https://genpack.github.io/rvis/>.
+
 ## rvis 5.16.0
 
 - Click events for eight more plotters: rAmCharts, c3, billboarder,
