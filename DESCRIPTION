@@ -1,7 +1,7 @@
 Package: rvis
 Type: Package
 Title: NIRASOFT R package for visualization
-Version: 5.16.0
+Version: 5.16.1
 Date: 2026-11-24
 Author: Nima Ramezani
 Maintainer: Nima Ramezani <nima.ramezani@gmail.com>

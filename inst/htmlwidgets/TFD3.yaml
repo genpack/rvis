@@ -1,4 +1,4 @@
-# /htmlwidgets/tfd3.yaml -----------------------------------------------------------------------------
+# /htmlwidgets/TFD3.yaml (the file names must match the widget name TFD3 exactly: file systems on Linux and macOS are case-sensitive) -----------------------------------------------------------------------------
 
 dependencies:
   # tfd3.js and the colour/cell functions generated in R (jscripts.R) use the global d3 version 3 API

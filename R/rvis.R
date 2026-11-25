@@ -307,5 +307,7 @@
 # 5.16.0 (25 November 2026) - Click events for more plotters (clickevents.R version 0.2.0): rAmCharts, c3, billboarder,
 #                             visNetwork, DT (cells), dygraphs, leaflet (markers and shapes) and rvis coffeewheel, each
 #                             checked by clicking in a running shiny app.
+# 5.16.1 (25 November 2026) - TFD3 widget files renamed to TFD3.js / TFD3.yaml (tfd3.R 0.1.4): tables were empty on Linux and macOS.
+#                             CRAN packages used by the wrappers declared in Suggests. Documentation website published.
 NULL
 #> NULL

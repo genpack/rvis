@@ -7,8 +7,8 @@
 # Author:         Nicolas Berta
 # Email :         nicolas.berta@gmail.com
 # Start Date:     26 April 2017
-# Last Revision:  23 November 2026
-# Version:        0.1.3
+# Last Revision:  25 November 2026
+# Version:        0.1.4
 #
 
 # Version History:
@@ -40,6 +40,8 @@
 # 0.1.3     23 November 2026    tfd3.js: in self-contained pages (R Markdown) TableFilter tried to load its stylesheet from a data: URI and
 #                               stopped initialising (no filter row); the embedded stylesheet is used instead. Tables scroll within
 #                               the widget (TableFilter 0.6 has no fixed-height grid any more), so they no longer overflow it.
+# 0.1.4     25 November 2026    Widget files renamed tfd3.js / tfd3.yaml -> TFD3.js / TFD3.yaml to match the widget name "TFD3": on
+#                               case-sensitive file systems (Linux, macOS) the widget javascript was not found and tables were empty.
 
 #' @include visgen.R
 
