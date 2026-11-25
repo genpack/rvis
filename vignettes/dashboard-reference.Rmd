@@ -144,7 +144,9 @@ with the `type` of the clicked item (`node`, `link`, `point` or `element`) and, 
 rvis `grviz` graphs are reported by their key.
 
 This works for Graphviz diagrams (rvis `grviz` and DiagrammeR), networkD3, echarts4r, apexcharter,
-plotly and highcharter charts. The click javascript is added to the chart with
+plotly, highcharter, rAmCharts, c3, billboarder, visNetwork, dygraphs and leaflet charts, DT tables
+(a click on a cell gives its `row`, `column` and `value`) and rvis coffeewheel sunbursts. The click
+javascript is added to the chart with
 `htmlwidgets::onRender()` by `rvisClickEvents()`: the plotting packages are used as they are, so their
 new versions keep working. For other widgets, call `rvisClickEvents()` in the service with a CSS
 `selector` of the clickable elements, for example

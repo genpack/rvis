@@ -7,9 +7,11 @@
 rvisClickEvents(widget, inputId = NULL, selector = NULL, ids = NULL)
 }
 \arguments{
-\item{widget}{An htmlwidget, for example a chart returned by \code{\link{rvisPlot}()}.}
+\item{widget}{An htmlwidget, for example a chart returned by \code{\link{rvisPlot}()} (rAmCharts charts,
+which are not htmlwidgets until they are plotted, are converted).}
 
-\item{inputId}{Name of the shiny input. If \code{NULL}, the id of the output followed by \code{_click}.}
+\item{inputId}{Name of the shiny input. If \code{NULL}, the id of the output followed by \code{_item_click}
+(some widgets, like DiagrammeR and billboarder charts, set their own input \code{<outputId>_click}).}
 
 \item{selector}{CSS selector of the clickable elements, for widgets which are not supported directly.}
 
@@ -34,7 +36,12 @@ or \code{"element"}) and, as available, \code{id}, \code{label}, \code{series}, 
 \code{data}. It is set again on every click, also when the same item is clicked twice.
 
 Supported widgets: Graphviz diagrams (\code{DiagrammeR::grViz()} and the \code{grviz} charts of rvis),
-networkD3 networks, echarts4r, apexcharter, plotly and highcharter charts. For any other widget,
+networkD3 networks, echarts4r, apexcharter, plotly, highcharter, rAmCharts, c3, billboarder, visNetwork,
+dygraphs and leaflet charts, DT tables (clicks on cells: type \code{"cell"}, with \code{row},
+\code{column} and \code{value}) and rvis coffeewheel sunbursts (type \code{"node"}, with \code{depth}
+and \code{parent}). Leaflet markers and shapes (type \code{"marker"} or \code{"shape"}) report their
+\code{layerId} as \code{id}, their \code{group} and the clicked \code{lat} and \code{lng}.
+For any other widget,
 give a CSS \code{selector} of its clickable elements: the input then gets the element's id (its
 \code{data-id} attribute, svg title or id), its text and its d3 data, if any.
 

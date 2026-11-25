@@ -8,8 +8,8 @@
 # Author:         Nima Ramezani
 # Email :         nima.ramezani@gmail.com
 # Start Date:     24 November 2026
-# Last Revision:  24 November 2026
-# Version:        0.1.0
+# Last Revision:  25 November 2026
+# Version:        0.2.0
 
 # Version History:
 
@@ -17,6 +17,10 @@
 # ----------------------------------
 # 0.1.0     24 November 2026    Initial issue: rvisClickEvents() for Graphviz (DiagrammeR), networkD3, echarts4r,
 #                               apexcharter, plotly and highcharter widgets, and any widget with a CSS selector
+# 0.2.0     25 November 2026    Handlers for rAmCharts, c3, billboarder, visNetwork, DT (cells), dygraphs, leaflet (markers and
+#                               shapes) and rvis coffeewheel. rAmCharts charts (S4 objects) are converted to htmlwidgets.
+#                               Clicks on shapes under a transparent event layer are found (selector mode too). The click
+#                               javascript never stops a widget from being shown: failures are logged as console warnings.
 
 #' @include visgen.R
 
@@ -25,7 +29,9 @@ click.handlers = c(grViz = 'graphviz', grviz = 'graphviz',
                    sankeyNetwork = 'd3data', forceNetwork = 'd3data', simpleNetwork = 'd3data',
                    diagonalNetwork = 'd3data', radialNetwork = 'd3data', dendroNetwork = 'd3data',
                    echarts4r = 'echarts', apexcharter = 'apex', plotly = 'plotly',
-                   highchart = 'highcharts', highchart2 = 'highcharts', highchartzero = 'highcharts')
+                   highchart = 'highcharts', highchart2 = 'highcharts', highchartzero = 'highcharts',
+                   ramcharts_base = 'amcharts', c3 = 'c3', billboarder = 'c3', visNetwork = 'visnetwork',
+                   datatables = 'datatable', dygraphs = 'dygraphs', leaflet = 'leaflet', coffeewheel = 'hierarchy')
 
 # Javascript function passed to htmlwidgets::onRender() (read once from inst/js/click-events.js)
 clickEventsJS = function(){
@@ -51,7 +57,12 @@ clickEventsJS = function(){
 #' \code{data}. It is set again on every click, also when the same item is clicked twice.
 #'
 #' Supported widgets: Graphviz diagrams (\code{DiagrammeR::grViz()} and the \code{grviz} charts of rvis),
-#' networkD3 networks, echarts4r, apexcharter, plotly and highcharter charts. For any other widget,
+#' networkD3 networks, echarts4r, apexcharter, plotly, highcharter, rAmCharts, c3, billboarder, visNetwork,
+#' dygraphs and leaflet charts, DT tables (clicks on cells: type \code{"cell"}, with \code{row},
+#' \code{column} and \code{value}) and rvis coffeewheel sunbursts (type \code{"node"}, with \code{depth}
+#' and \code{parent}). Leaflet markers and shapes (type \code{"marker"} or \code{"shape"}) report their
+#' \code{layerId} as \code{id}, their \code{group} and the clicked \code{lat} and \code{lng}.
+#' For any other widget,
 #' give a CSS \code{selector} of its clickable elements: the input then gets the element's id (its
 #' \code{data-id} attribute, svg title or id), its text and its d3 data, if any.
 #'
@@ -60,8 +71,10 @@ clickEventsJS = function(){
 #' In a dashboard, give an output item the field \code{click.events: true} to add this to the chart
 #' returned by its service.
 #'
-#' @param widget An htmlwidget, for example a chart returned by \code{\link{rvisPlot}()}.
-#' @param inputId Name of the shiny input. If \code{NULL}, the id of the output followed by \code{_click}.
+#' @param widget An htmlwidget, for example a chart returned by \code{\link{rvisPlot}()} (rAmCharts charts,
+#'   which are not htmlwidgets until they are plotted, are converted).
+#' @param inputId Name of the shiny input. If \code{NULL}, the id of the output followed by \code{_item_click}
+#'   (some widgets, like DiagrammeR and billboarder charts, set their own input \code{<outputId>_click}).
 #' @param selector CSS selector of the clickable elements, for widgets which are not supported directly.
 #' @param ids Optional named vector: ids reported instead of the ids found in the widget (names), for example
 #'   the keys of graph nodes whose diagram uses internal node numbers. Charts made by rvis (like grviz graphs)
@@ -80,6 +93,8 @@ clickEventsJS = function(){
 #' }
 #' @export
 rvisClickEvents = function(widget, inputId = NULL, selector = NULL, ids = NULL){
+  # rAmCharts charts are S4 objects until they are plotted: their htmlwidget is made here
+  if(methods::is(widget, 'AmChart')){widget = rAmCharts::plot(widget)}
   verify(widget, 'htmlwidget', varname = 'widget', null_allowed = F, err_src = 'rvisClickEvents')
   verify(inputId, 'character', lengths = 1, varname = 'inputId', err_src = 'rvisClickEvents')
   verify(selector, 'character', lengths = 1, varname = 'selector', err_src = 'rvisClickEvents')

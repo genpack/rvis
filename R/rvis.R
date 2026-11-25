@@ -295,5 +295,8 @@
 #                             javascript and libraries, 2.1 MB, removed from inst).
 #                             Dashboard items of generic type get the layout fields weight and offset only if their function has
 #                             such an argument.
+# 5.16.0 (25 November 2026) - Click events for more plotters (clickevents.R version 0.2.0): rAmCharts, c3, billboarder,
+#                             visNetwork, DT (cells), dygraphs, leaflet (markers and shapes) and rvis coffeewheel, each
+#                             checked by clicking in a running shiny app.
 NULL
 #> NULL

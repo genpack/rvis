@@ -32,6 +32,43 @@ test_that("each widget class gets its handler", {
   expect_equal(click_hook(rvisClickEvents(sk))$data$handler, "d3data")
 })
 
+test_that("more plotters get their handlers", {
+  deaths <- data.frame(age = rownames(VADeaths), VADeaths, check.names = FALSE)
+  handler_of <- function(w) click_hook(rvisClickEvents(w))$data$handler
+  if (requireNamespace("rAmCharts", quietly = TRUE)) {
+    # rAmCharts charts are S4 objects: rvisClickEvents() makes their htmlwidget
+    am <- rvisPlot("bar", "amCharts", obj = deaths, x = "age", y = "Rural Male")
+    expect_true(methods::is(am, "AmChart"))
+    expect_equal(handler_of(am), "amcharts")
+  }
+  if (requireNamespace("c3", quietly = TRUE)) {
+    expect_equal(handler_of(rvisPlot("bar", "c3", obj = deaths, x = "age", y = "Rural Male")), "c3")
+  }
+  if (requireNamespace("billboarder", quietly = TRUE)) {
+    # (two series: billboarder.bar() fails for a single y column whose name has a space)
+    expect_equal(handler_of(rvisPlot("bar", "billboarder", obj = deaths, x = "age", y = list("Rural Male", "Urban Male"))), "c3")
+  }
+  if (requireNamespace("visNetwork", quietly = TRUE)) {
+    net <- list(nodes = data.frame(id = c("a", "b"), label = c("A", "B")), links = data.frame(source = "a", target = "b"))
+    expect_equal(handler_of(rvisPlot("graph", "visNetwork", obj = net, key = "id", label = "label", source = "source", target = "target")),
+                 "visnetwork")
+  }
+  if (requireNamespace("DT", quietly = TRUE)) {
+    expect_equal(handler_of(rvisPlot("table", "DT", obj = head(mtcars))), "datatable")
+  }
+  if (requireNamespace("dygraphs", quietly = TRUE)) {
+    ts <- data.frame(date = seq(as.Date("2024-01-01"), by = "month", length.out = 6), v = 1:6)
+    expect_equal(handler_of(rvisPlot("tsline", "dygraphs", obj = ts, x = "date", y = "v")), "dygraphs")
+  }
+  if (requireNamespace("leaflet", quietly = TRUE)) {
+    expect_equal(handler_of(leaflet::addMarkers(leaflet::leaflet(), lng = 151, lat = -34, layerId = "a")), "leaflet")
+  }
+  expect_equal(handler_of(rvisPlot("sunburst", "coffeewheel", obj = data.frame(label = c("a", "b"), theta = 1:2),
+                                   label = "label", theta = "theta")), "hierarchy")
+  # the click javascript never stops a widget from being shown
+  expect_match(clickEventsJS(), "console.warn", fixed = TRUE)
+})
+
 test_that("other widgets need a selector", {
   skip_if_not_installed("sunburstR")
   sb <- sunburstR::sunburst(data.frame(seq = c("a-b", "c"), n = 1:2))
