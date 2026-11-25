@@ -18,7 +18,8 @@ Imports:
     dplyr,
     stringr
 Remotes: genpack/rutils
-Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0), apexcharter, echarts4r, DiagrammeR
+Suggests: knitr, rmarkdown, pkgdown, yaml, jsonlite, testthat (>= 3.0.0), apexcharter, echarts4r, DiagrammeR,
+    bcrypt, d3r, gtools, igraph, lubridate, plyr, purrr, reshape2, rhandsontable, tidyr, treemap, upsetjs, xts, zoo
 VignetteBuilder: knitr
 Collate:
     'visgen.R'
