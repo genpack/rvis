@@ -1,0 +1,14 @@
+# /htmlwidgets/coffeewheel.yaml -----------------------------------------------------------------------------
+# coffeewheel needs d3 version 3. It is named 'd3v3' (not 'd3') so that htmltools does not replace it by another
+# widget's newer d3 on the same page; d3-coffeewheel.js captures this d3 when it loads.
+dependencies:
+  - name: d3v3
+    version: 3.5.15
+    src: lib/d3v3
+    script:
+      - d3.min.js
+      - d3v3-alias.js
+  - name: coffee-wheel
+    version: 0.1.2
+    src: htmlwidgets/
+    script: d3-coffeewheel.js

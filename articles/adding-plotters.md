@@ -1,0 +1,208 @@
+# Plotters: what is covered and how to add more
+
+rvis gives many htmlwidgets plotting packages one calling convention:
+`rvisPlot(type, plotter, ...)` calls the wrapper function named
+`<plotter>.<type>()`. This page lists the plotters rvis covers today,
+the packages planned next (mainly from the [htmlwidgets
+gallery](https://gallery.htmlwidgets.org/)), and how to add a plotter.
+
+## Plotters covered
+
+| `plotter` | Chart types (`type`) |
+|:---|:---|
+| `amCharts` | `bar`, `box`, `bullet`, `funnel`, `gauge`, `pie`, `tsline` |
+| `billboarder` | `bar`, `pie`, `scatter`, `tsarea`, `tsline`, `tsLineChart` |
+| `bpexploder` | `box` |
+| `bubbleCloud` | `bubble.molten` |
+| `bubbles` | `bubble` |
+| `c3` | `area`, `bar`, `combo`, `gauge`, `line`, `pie`, `scatter.molten`, `tsarea`, `tsline` |
+| `calheatmap` | `calendar` |
+| `candela` | `bar`, `scatter` |
+| `coffeewheel` | `sunburst` |
+| `d3plus` | `area.molten`, `bar`, `bar.molten`, `bubble`, `bubble.molten`, `line.molten`, `scatter`, `tree`, `treemap`, `tsarea.molten`, `tsbar.molten`, `tsline`, `tsline.molten` |
+| `D3TableFilter` | `table` |
+| `dc` | `bar`, `scatter` |
+| `dimple` | `combo`, `scatter` |
+| `DT` | `table` |
+| `dygraphs` | `combo`, `tsline` |
+| `apexcharter` | `area`, `bar`, `bubble`, `heatmap`, `line`, `pie`, `radar`, `scatter`, `tsarea`, `tsbar`, `tsline` |
+| `echarts` (package echarts4r) | `area`, `bar`, `box`, `bubble`, `calendar`, `funnel`, `gauge`, `graph`, `heatmap`, `line`, `pie`, `sankey`, `scatter`, `sunburst`, `treemap`, `tsarea`, `tsbar`, `tsline`, `wordCloud` |
+| `ggvis` | `histogram`, `scatter` |
+| `googleVis` | `area`, `bar`, `gauge`, `line`, `sankey` |
+| `grviz` | `graph` |
+| `highcharter` | `area`, `area.range`, `bar`, `bubble`, `combo`, `funnel`, `line`, `pie`, `pyramid`, `scatter`, `scatter.molten`, `treemap`, `tsline.stock` |
+| `highcharts` | `scatter.molten` |
+| `leaflet` | `map.plot` (legacy, see the [reference](https://genpack.github.io/rvis/articles/chart-types.html#map-plot)) |
+| `morrisjs` | `pie`, `tsbar`, `tsline` |
+| `networkD3` | `sankey` |
+| `nvd3` | `bar`, `pie`, `pie.molten`, `scatter` |
+| `pivot` | `table` |
+| `plotly` | `bar`, `box`, `combo`, `pie`, `scatter`, `tsbar`, `tsline` |
+| `rbokeh` | `scatter` |
+| `rCharts` | `scatter` |
+| `sankeytree` | `tree` |
+| `streamgraph` | `tsarea` |
+| `TFD3` | `table`, `table.molten` |
+| `visNetwork` | `graph` |
+| `xCharts` | `area.molten` |
+
+Examples of each are in the topic guides: [comparing
+categories](https://genpack.github.io/rvis/articles/comparing-categories.md),
+[parts of a
+whole](https://genpack.github.io/rvis/articles/parts-of-a-whole.md),
+[relationships and
+distributions](https://genpack.github.io/rvis/articles/relationships-distributions.md),
+[time series](https://genpack.github.io/rvis/articles/time-series.md),
+[networks and
+hierarchies](https://genpack.github.io/rvis/articles/networks-hierarchies.md)
+and [tables](https://genpack.github.io/rvis/articles/tables.md).
+
+## Plotters planned
+
+These htmlwidgets packages are not wrapped yet. The table gives the
+chart types each would add and the guide its examples would go to.
+Packages marked *dashboard only* already have dashboard output types,
+but have no
+[`rvisPlot()`](https://genpack.github.io/rvis/reference/rvisPlot.md)
+wrapper yet. (Any htmlwidget can be a dashboard output with a
+`package::fooOutput` item type, see step 4 below.) Packages marked *not
+on CRAN* were archived on CRAN, so a CRAN version of rvis cannot depend
+on them.
+
+| Package | Chart types it would add | Guide |
+|:---|:---|:---|
+| [metricsgraphics](https://hrbrmstr.github.io/metricsgraphics/) (*not on CRAN*) | `tsline`, `scatter`, `histogram` | time series, relationships |
+| [taucharts](https://github.com/hrbrmstr/taucharts) (*not on CRAN*) | `scatter`, `line`, `bar` | relationships, categories |
+| [scatterD3](https://juba.github.io/scatterD3/) | `scatter` | relationships |
+| [threejs](https://bwlewis.github.io/rthreejs/) | `scatter3d`, `globe`, `graph` | relationships, networks |
+| [parcoords](https://github.com/timelyportfolio/parcoords) (*not on CRAN*) | `parallel` (parallel coordinates) | relationships |
+| [d3heatmap](https://github.com/talgalili/d3heatmap) (*not on CRAN*) / [heatmaply](https://talgalili.github.io/heatmaply/) | `heatmap` | relationships |
+| [sparkline](https://github.com/htmlwidgets/sparkline) | `sparkline` (also as table cells) | time series, tables |
+| [timevis](https://daattali.com/shiny/timevis-demo/) | `timeline` | time series |
+| [wordcloud2](https://github.com/Lchiffon/wordcloud2) (*dashboard only*) | `wordCloud` | parts of a whole |
+| [sunburstR](https://github.com/timelyportfolio/sunburstR) (*dashboard only*) | `sunburst` | networks and hierarchies |
+| [collapsibleTree](https://adeelk93.github.io/collapsibleTree/) | `tree` | networks and hierarchies |
+| [chorddiag](https://github.com/mattflor/chorddiag) (*not on CRAN*) | `chord` | networks and hierarchies |
+| [upsetjs](https://upset.js.org/integrations/r/) (*dashboard only*) | `upset` (set intersections) | parts of a whole |
+| [reactable](https://glin.github.io/reactable/) | `table` | tables |
+| [rhandsontable](https://jrowen.github.io/rhandsontable/) (*dashboard only*) | `table` (editable) | tables |
+| [formattable](https://renkun-ken.github.io/formattable/) | `table` | tables |
+| [leaflet](https://rstudio.github.io/leaflet/) (data frame input) | `map` (markers, bubbles, choropleth) | a new maps guide |
+| [mapview](https://r-spatial.github.io/mapview/) / [mapdeck](https://symbolixau.github.io/mapdeck/) | `map` | a new maps guide |
+| [vegawidget](https://vegawidget.github.io/vegawidget/) | any Vega-Lite chart | several |
+| [r2d3](https://rstudio.github.io/r2d3/) | custom d3 charts | several |
+| [ggiraph](https://davidgohel.github.io/ggiraph/) | interactive ggplot2 charts | several |
+
+Each new wrapper should come with examples in the guide named above, on
+that guide’s dataset.
+
+## How to add a plotter
+
+A plotter is a set of wrapper functions `<plotter>.<type>()` in one file
+`R/<plotter>.R`. The steps below show a simplified version of the
+`apexcharter` bar chart (the full wrappers are in `R/apexcharter.R`).
+
+### 1. Default settings
+
+Each wrapper has a list of default settings, built on the package-wide
+`defset` with `%<==>%` (which merges two lists, the right one winning).
+`dimclass` gives the valid classes of each dimension, `multiples` the
+dimensions that accept several columns (series) and `essentials` the
+dimensions that must be given.
+
+``` r
+
+apexcharter.bar.defset = defset %<==>% list(
+  dimclass   = list(x = valid.nominal.classes, y = valid.numeric.classes, color = valid.classes),
+  multiples  = c('y', 'color'),
+  essentials = c('x', 'y')
+)
+```
+
+### 2. The wrapper
+
+A wrapper takes the data, the dimensions (column names or lists of them)
+and `config`, and returns the htmlwidget. The common steps are:
+
+- return `NULL` for empty data, and stop with a clear message if the
+  plotting package is not installed;
+- merge `config` over the defaults and check it with `verifyConfig()`
+  (which reads the valid settings of the plotter from the properties
+  table, see step 3);
+- `prepareAesthetics()` turns the dimensions into column labels (`L`)
+  and aesthetics;
+- `prepare4Plot()` builds the table to plot: it selects and renames
+  columns, checks their classes and adds colours;
+- the plotting package is called with the prepared table and the
+  settings.
+
+``` r
+
+apexcharter.bar = function(obj, x = NULL, y = NULL, color = NULL, config = NULL, ...){
+  # Verifications:
+  if (is.empty(obj)){return(NULL)}
+  assert(requireNamespace('apexcharter', quietly = TRUE), "Package apexcharter is not installed!", err_src = match.call()[[1]])
+  config = apexcharter.bar.defset %<==>% (config %>% verify('list', default = list(), varname = 'config')) %>%
+    verifyConfig(plotter = 'apexcharter')
+
+  # Preparing Aesthetics:
+  a = prepareAesthetics(x = x, y = y, color = color)
+  L = a$labels
+
+  # Preparing Table:
+  obj %<>% prepare4Plot(a$aesthetics, config = config)
+
+  # One row per category and series:
+  long = data.frame(category = rep(obj[, L$x], length(L$y)),
+                    value    = unlist(obj[, unlist(L$y)], use.names = FALSE),
+                    series   = rep(unlist(L$y), each = nrow(obj)))
+
+  apexcharter::apex(long, apexcharter::aes(x = category, y = value, fill = series), type = 'column', ...) %>%
+    apexcharter::ax_title(text = config$title)
+}
+```
+
+`rvisPlot(type = "bar", plotter = "apexcharter", obj = deaths, x = "age", y = list("Rural Male", "Urban Male"))`
+then calls it. A helper function of the file must not be named
+`<plotter>.<something>`, or it would be callable as a chart type: name
+it `<plotter>Something` instead.
+
+### 3. Settings in the properties table
+
+The settings a plotter accepts, with their class, default and valid
+values, are rows of `data/properties.csv` (columns `plotters`,
+`Property`, `Class`, `Default`, `Domain`), which is also saved as
+`data/properties.RData` and documented in the [configuration
+reference](https://genpack.github.io/rvis/articles/configuration.md):
+
+    plotters,Property,Class,Default,Domain
+    apexcharter,title,character,,
+    apexcharter,legend.position,character,bottom,top right bottom left
+
+### 4. Dashboard output
+
+Nothing needs to be added for dashboards: the output function of the
+package is used directly as a `package::function` item type, and its
+render function is found by name (`apexchartOutput` is rendered by
+`renderApexchart`):
+
+``` yaml
+chart:
+  type: apexcharter::apexchartOutput
+  height: 300px
+  service: rvisPlot(type = "bar", plotter = "apexcharter", obj = deaths, x = "age", y = "rural_male")
+```
+
+If the render function does not follow the `fooOutput` / `renderFoo`
+naming, give it in field `render`.
+
+### 5. Documentation
+
+- a version history line in the header of `R/<plotter>.R` and in
+  `R/rvis.R`;
+- the wrapper in the chart-type tables of the
+  [reference](https://genpack.github.io/rvis/articles/chart-types.md);
+- examples in the topic guide of each chart type, evaluated only if the
+  package is installed:
+  ```` ```{r, eval=has_plotter("apexcharter")} ````;
+- the package under `Suggests` in `DESCRIPTION`.

@@ -1,0 +1,26 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  adding-plotters: adding-plotters.html
+  chart-types: chart-types.html
+  click-events: click-events.html
+  comparing-categories: comparing-categories.html
+  configuration: configuration.html
+  dashboard-extensions: dashboard-extensions.html
+  dashboard-gallery: dashboard-gallery.html
+  dashboard-layouts: dashboard-layouts.html
+  dashboard-reference: dashboard-reference.html
+  dashboards: dashboards.html
+  examples: examples.html
+  getting-started: getting-started.html
+  networks-hierarchies: networks-hierarchies.html
+  parts-of-a-whole: parts-of-a-whole.html
+  relationships-distributions: relationships-distributions.html
+  rvis: rvis.html
+  tables: tables.html
+  time-series: time-series.html
+last_built: 2026-11-25T06:11Z
+urls:
+  reference: https://genpack.github.io/rvis/reference
+  article: https://genpack.github.io/rvis/articles
